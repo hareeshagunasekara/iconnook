@@ -47,8 +47,8 @@ Dependencies point inward: routes → services → interfaces ← adapters. Serv
 4. Backing services (Postgres, Meili, Valkey, storage) are attached resources, swappable by URL.
 5. Build → release → run are separate (CI builds an image once; the same image runs everywhere).
 6. Processes are stateless. 7. Services export HTTP on a port from `PORT`.
-8. Scale by adding processes (replicas), not threads. 9. Fast startup, graceful shutdown on `SIGTERM` (finish in-flight requests, close pools).
-10. Dev/prod parity via Docker Compose ≈ k3s. 11. Logs are structured JSON to stdout (pino). 12. Admin tasks (migrate, import, reindex) run as one-off Jobs using the same image.
+7. Scale by adding processes (replicas), not threads. 9. Fast startup, graceful shutdown on `SIGTERM` (finish in-flight requests, close pools).
+8. Dev/prod parity via Docker Compose ≈ k3s. 11. Logs are structured JSON to stdout (pino). 12. Admin tasks (migrate, import, reindex) run as one-off Jobs using the same image.
 
 ## API design
 

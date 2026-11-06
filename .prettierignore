@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+**/dist/
+**/.astro/
+**/coverage/
+.turbo/
+# Generated from Iconify metadata
+SOURCES.md

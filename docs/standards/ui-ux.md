@@ -18,12 +18,14 @@ Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 1
 ## WCAG 2.2 AA checklist (the parts that bite icon sites)
 
 **Perceivable**
+
 - Text contrast ≥ 4.5:1 (≥ 3:1 for large text); icons, focus rings and input borders ≥ 3:1 against background (1.4.11).
 - Every icon conveys a name: grid items have accessible names like "home, Tabler Icons, outline". Decorative SVGs get `aria-hidden="true"`.
 - Don't rely on color alone (license tiers use text labels + color).
 - Text resizes to 200% and reflows at 320 CSS px wide with no horizontal scroll (1.4.10).
 
 **Operable**
+
 - Everything works with keyboard only; no keyboard traps; logical tab order. Icon grid uses `role="grid"` (or a list of buttons) with **roving tabindex** and arrow-key navigation, so it's one tab stop, not thousands.
 - Visible focus indicator on everything; **focus never hidden** behind sticky headers or banners (2.4.11, new in 2.2).
 - **Target size ≥ 24×24 CSS px** (2.5.8, new in 2.2); we aim for 44×44 on touch.
@@ -31,12 +33,14 @@ Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 1
 - Skip link to main content. Respect `prefers-reduced-motion` (no non-essential animation).
 
 **Understandable**
+
 - `lang` set on `<html>`. Labels on every input (placeholder is not a label). Errors described in text, next to the field.
 - Help (FAQ / contact) in the same place on every page (3.2.6 Consistent Help, new in 2.2).
 - Don't make users re-enter information they already gave in the same flow (3.3.7 Redundant Entry, new in 2.2).
 - Login (if any) needs no memory/cognitive test; allow password managers and passkeys (3.3.8, new in 2.2).
 
 **Robust**
+
 - Semantic HTML first (`button`, `a`, `nav`, `main`, headings in order); ARIA only when HTML can't express it. Live regions (`aria-live="polite"`) announce "Copied" and result counts.
 
 **Verify with:** axe-core in Playwright on every page template (CI-blocking), Lighthouse accessibility = 100, plus a manual keyboard pass and a screen-reader smoke test (VoiceOver / NVDA) on major UI changes.

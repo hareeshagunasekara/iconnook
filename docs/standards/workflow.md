@@ -13,6 +13,7 @@
 Description covers: what changed, why, how it was tested, screenshots for UI, and any security/accessibility/performance impact. Link the issue.
 
 **Definition of done (every PR):**
+
 - [ ] Typecheck, lint, format, unit + integration tests pass
 - [ ] New behavior has tests; bug fixes have a regression test
 - [ ] UI changes: keyboard-only pass, axe clean, works at 320px wide and in dark mode

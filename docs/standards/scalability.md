@@ -19,11 +19,11 @@ How IconNook stays fast and up when many users arrive at once (launch day, a vir
 
 ## Scaling stages
 
-| Stage | Load (rough) | Setup |
-|---|---|---|
-| 1. Launch | up to ~100k visits/day | 1 VPS, k3s single node, everything in-cluster, Cloudflare in front. 2 replicas of api/web. |
-| 2. Growing | ~100k–1M/day | 3-node k3s cluster (HA control plane), HorizontalPodAutoscaler on api/web/worker, Postgres on its own node with PgBouncer + daily backups + a streaming replica, 2+ Meilisearch instances. |
-| 3. Large | 1M+/day | Managed Postgres (with read replicas), more nodes or move manifests to managed Kubernetes, PNG rendering pre-generated for popular sizes, consider serving the read API from edge workers. |
+| Stage      | Load (rough)           | Setup                                                                                                                                                                                      |
+| ---------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1. Launch  | up to ~100k visits/day | 1 VPS, k3s single node, everything in-cluster, Cloudflare in front. 2 replicas of api/web.                                                                                                 |
+| 2. Growing | ~100k–1M/day           | 3-node k3s cluster (HA control plane), HorizontalPodAutoscaler on api/web/worker, Postgres on its own node with PgBouncer + daily backups + a streaming replica, 2+ Meilisearch instances. |
+| 3. Large   | 1M+/day                | Managed Postgres (with read replicas), more nodes or move manifests to managed Kubernetes, PNG rendering pre-generated for popular sizes, consider serving the read API from edge workers. |
 
 Move up a stage based on **measured** saturation (CPU > 70% sustained, p95 latency over budget, cache hit ratio dropping), not on guesses.
 
@@ -54,13 +54,13 @@ Move up a stage based on **measured** saturation (CPU > 70% sustained, p95 laten
 
 Before launch and before any major release, on staging sized like production:
 
-| Scenario | Shape | Pass criteria |
-|---|---|---|
-| Baseline | steady expected peak traffic, 30 min | p95 within budgets, error rate < 0.1% |
-| Spike | 0 → 10× peak in 1 min (viral post) | no errors beyond 429s, autoscaling kicks in, recovers within 5 min |
-| Soak | 70% peak for 4 h | no memory growth, no connection leaks, stable latency |
-| Stress | ramp until failure | know the breaking point and which component fails first; it must fail gracefully (503/429, not crashes) |
-| Cache-miss | randomized long-tail icons/queries | origin capacity without CDN help |
+| Scenario   | Shape                                | Pass criteria                                                                                           |
+| ---------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Baseline   | steady expected peak traffic, 30 min | p95 within budgets, error rate < 0.1%                                                                   |
+| Spike      | 0 → 10× peak in 1 min (viral post)   | no errors beyond 429s, autoscaling kicks in, recovers within 5 min                                      |
+| Soak       | 70% peak for 4 h                     | no memory growth, no connection leaks, stable latency                                                   |
+| Stress     | ramp until failure                   | know the breaking point and which component fails first; it must fail gracefully (503/429, not crashes) |
+| Cache-miss | randomized long-tail icons/queries   | origin capacity without CDN help                                                                        |
 
 Use a realistic traffic mix (e.g. 60% icon pages/assets, 25% search, 10% set pages, 5% downloads/PNG) and real query distributions. Record results in `docs/load-tests/` and compare against the previous run.
 
