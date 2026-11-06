@@ -60,3 +60,7 @@ Thumbs.db
 
 # --- Claude Code local settings (shared settings.json is fine) ---
 .claude/settings.local.json
+
+# Tailwind docs are source-available, not open source: never commit a local snapshot
+.claude/skills/tailwind-4-docs/references/docs/
+.claude/skills/tailwind-4-docs/references/docs-index.tsx
