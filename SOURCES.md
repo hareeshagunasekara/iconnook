@@ -1,0 +1,336 @@
+# Icon Sources
+
+Catalog of open-source icon sets we can import, generated from Iconify's `collections.json` ([iconify/icon-sets](https://github.com/iconify/icon-sets), `npm i @iconify/json`) on 2026-11-07.
+
+## License tiers
+
+| Tier | Licenses | What users must do | Icons |
+|---|---|---|---|
+| **A** | MIT, Apache-2.0, ISC, CC0, Unlicense, BSD, OFL-1.1, MPL-2.0 | Nothing visible (we keep the license text on file) | 370,398 |
+| **B** | CC-BY 3.0/4.0 | Credit the author (we show a copy-ready credit line) | 68,814 |
+| **C** | CC-BY-SA | Credit + share edits under the same license | 21,907 |
+| **X** | GPL, CC-BY-NC-SA | **Do not import** (copyleft / non-commercial) | 3,325 |
+
+Logos & Brands: the SVG license covers the drawing, not the trademark. Show a trademark notice on those pages.
+
+## UI Icons — 127 sets, 314,884 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `iconmind` | IconMind | 31,722 | MIT | A |  | [IconMind](https://github.com/Iconmind/iconmind) |
+| `fluent` | Fluent UI System Icons | 19,945 | MIT | A |  | [Microsoft Corporation](https://github.com/microsoft/fluentui-system-icons) |
+| `coolicons` | coolicons | 18,870 | MIT | A |  | [Kryston Schwarze](https://github.com/krystonschwarze/coolicons) |
+| `iconoven` | IconOven | 18,236 | MIT | A |  | [Appic Marketing](https://iconoven.com/icons) |
+| `material-symbols-light` | Material Symbols Light | 15,826 | Apache-2.0 | A |  | [Google](https://github.com/google/material-design-icons) |
+| `material-symbols` | Material Symbols | 15,761 | Apache-2.0 | A |  | [Google](https://github.com/google/material-design-icons) |
+| `keyline-icons` | Keyline Icons | 13,536 | MIT | A |  | [Keyline Icons](https://github.com/keyline-icons/keyline-icons) |
+| `ic` | Google Material Icons | 10,955 | Apache-2.0 | A |  | [Material Design Authors](https://github.com/material-icons/material-icons) |
+| `ph` | Phosphor | 9,072 | MIT | A |  | [Phosphor Icons](https://github.com/phosphor-icons/core) |
+| `energy-icons` | Energy Icons | 8,252 | MIT | A |  | [Sam Passmore](https://github.com/Sam-r-passmore/energy-icons) |
+| `mdi` | Material Design Icons | 7,447 | Apache-2.0 | A |  | [Pictogrammers](https://github.com/Templarian/MaterialDesign) |
+| `withicons` | with icons | 7,000 | MIT | A |  | [Evergrow](https://github.com/withevergrow/withicons) |
+| `reicon` | Reicon | 6,590 | MIT | A |  | [REICON](https://github.com/dqev/reicon) |
+| `tabler` | Tabler Icons | 6,257 | MIT | A |  | [Paweł Kuna](https://github.com/tabler/tabler-icons) |
+| `hugeicons` | Huge Icons | 6,065 | MIT | A |  | [Hugeicons](https://icon-sets.iconify.design/icon-sets/hugeicons/) |
+| `mingcute` | MingCute Icon | 4,526 | Apache-2.0 | A |  | [MingCute Design](https://github.com/Richard9394/MingCute) |
+| `boxicons` | Boxicons | 3,768 | MIT | A |  | [Boxicons](https://github.com/box-icons/boxicons-core) |
+| `glyphs` | Glyphs | 3,452 | MIT | A |  | [Goran Spasojevic](https://github.com/gorango/glyphs) |
+| `ri` | Remix Icon | 3,188 | Apache-2.0 | A |  | [Remix Design](https://github.com/cyberalien/RemixIcon) |
+| `lucide-extended` | Lucide Extended | 2,879 | ISC | A |  | [Applifted](https://github.com/applifted/lucide-extended) |
+| `andrsrxn` | andrsrxn/icons | 2,773 | MIT | A |  | [Andrés Raxón](https://github.com/andrsrxn/icons) |
+| `icon-park-outline` | IconPark Outline | 2,658 | Apache-2.0 | A |  | [ByteDance](https://github.com/bytedance/IconPark) |
+| `carbon` | Carbon | 2,638 | Apache-2.0 | A |  | [IBM](https://github.com/carbon-design-system/carbon/tree/main/packages/icons) |
+| `mynaui` | Myna UI Icons | 2,620 | MIT | A |  | [Praveen Juge](https://github.com/praveenjuge/mynaui-icons) |
+| `tdesign` | TDesign Icons | 2,358 | MIT | A |  | [TDesign](https://github.com/Tencent/tdesign-icons) |
+| `bi` | Bootstrap Icons | 2,078 | MIT | A |  | [The Bootstrap Authors](https://github.com/twbs/icons) |
+| `lucide` | Lucide | 2,020 | ISC | A |  | [Lucide Contributors](https://github.com/lucide-icons/lucide) |
+| `griddy-icons` | Griddy Icons | 2,010 | MIT | A |  | [Zuzana Benova](https://github.com/griddy-icons/griddy-icons) |
+| `vadivam` | Vadivam | 1,999 | MIT | A |  | [Praveen Juge](https://github.com/praveenjuge/vadivam) |
+| `icon-park-solid` | IconPark Solid | 1,947 | Apache-2.0 | A |  | [ByteDance](https://github.com/bytedance/IconPark) |
+| `icon-park-twotone` | IconPark TwoTone | 1,944 | Apache-2.0 | A |  | [ByteDance](https://github.com/bytedance/IconPark) |
+| `iconoir` | Iconoir | 1,671 | MIT | A |  | [Luca Burgio](https://github.com/iconoir-icons/iconoir) |
+| `garden` | Garden SVG Icons | 1,491 | Apache-2.0 | A |  | [Zendesk](https://github.com/zendeskgarden/svg-icons) |
+| `ix` | Siemens Industrial Experience Icons | 1,490 | MIT | A |  | [Siemens AG](https://github.com/siemens/ix-icons) |
+| `ion` | IonIcons | 1,357 | MIT | A |  | [Ben Sperry](https://github.com/ionic-team/ionicons) |
+| `famicons` | Famicons | 1,342 | MIT | A |  | [Family](https://github.com/familyjs/famicons) |
+| `si` | Sargam Icons | 1,299 | MIT | A |  | [Abhimanyu Rana](https://github.com/planetabhi/sargam-icons) |
+| `heroicons` | HeroIcons | 1,288 | MIT | A |  | [Refactoring UI Inc](https://github.com/tailwindlabs/heroicons) |
+| `f7` | Framework7 Icons | 1,253 | MIT | A |  | [Vladimir Kharlampidi](https://github.com/framework7io/framework7-icons) |
+| `line-md` | Material Line Icons | 1,218 | MIT | A |  | [Vjacheslav Trushkin](https://github.com/cyberalien/line-md) |
+| `uil` | Unicons | 1,215 | Apache-2.0 | A |  | [Iconscout](https://github.com/Iconscout/unicons) |
+| `teenyicons` | Teenyicons | 1,200 | MIT | A |  | [smhmd](https://github.com/teenyicons/teenyicons) |
+| `dinkie-icons` | Dinkie Icons | 1,198 | MIT | A |  | [atelierAnchor](https://github.com/atelier-anchor/dinkie-icons) |
+| `clarity` | Clarity | 1,103 | MIT | A |  | [VMware](https://github.com/vmware/clarity) |
+| `mage` | Mage Icons | 1,042 | Apache-2.0 | A |  | [MageIcons](https://github.com/Mage-Icons/mage-icons) |
+| `pixelarticons` | Pixelarticons | 1,036 | MIT | A |  | [Gerrit Halfmann](https://github.com/halfmage/pixelarticons) |
+| `stash` | Stash Icons | 982 | MIT | A |  | [Pingback LLC](https://github.com/stash-ui/icons) |
+| `jam` | Jam Icons | 940 | MIT | A |  | [Michael Amprimo](https://github.com/michaelampr) |
+| `qlementine-icons` | Qlementine Icons | 905 | MIT | A |  | [Olivier Cléro](https://github.com/oclero/qlementine-icons) |
+| `glyphs-poly` | Glyphs Poly | 863 | MIT | A | ● | [Goran Spasojevic](https://github.com/gorango/glyphs) |
+| `ant-design` | Ant Design Icons | 848 | MIT | A |  | [HeskeyBaozi](https://github.com/ant-design/ant-design-icons) |
+| `picon` | Pico-icon | 824 | OFL-1.1 | A |  | [Picon Contributors](https://github.com/yne/picon) |
+| `bx` | BoxIcons v2 | 814 | MIT | A |  | [Boxicons](https://github.com/box-icons/boxicons) |
+| `gravity-ui` | Gravity UI Icons | 809 | MIT | A |  | [YANDEX LLC](https://github.com/gravity-ui/icons/) |
+| `octicon` | Octicons | 780 | MIT | A |  | [GitHub](https://github.com/primer/octicons/) |
+| `majesticons` | Majesticons | 760 | MIT | A |  | [Gerrit Halfmann](https://github.com/halfmage/majesticons) |
+| `flowbite` | Flowbite Icons | 751 | MIT | A |  | [Themesberg](https://github.com/themesberg/flowbite-icons) |
+| `lsicon` | Lsicon | 716 | MIT | A |  | [Wis Design](https://www.lsicon.com/) |
+| `gg` | css.gg | 704 | MIT | A |  | [Astrit](https://github.com/astrit/css.gg) |
+| `bxs` | BoxIcons v2 Solid | 665 | MIT | A |  | [Boxicons](https://github.com/box-icons/boxicons) |
+| `memory` | Memory Icons | 651 | Apache-2.0 | A |  | [Pictogrammers](https://github.com/Pictogrammers/Memory) |
+| `at-icons` | @icons | 642 | MIT | A |  | [Valentin Fossati](https://github.com/Voxybuns/at-icons) |
+| `lineicons` | Lineicons | 606 | MIT | A |  | [Lineicons](https://github.com/LineiconsHQ/Lineicons) |
+| `proicons` | ProIcons | 544 | MIT | A |  | [ProCode](https://github.com/ProCode-Software/proicons) |
+| `akar-icons` | Akar Icons | 454 | MIT | A |  | [Arturo Wibawa](https://github.com/artcoholic/akar-icons) |
+| `oui` | OpenSearch UI | 437 | Apache-2.0 | A |  | [OpenSearch Contributors](https://github.com/opensearch-project/oui) |
+| `sidekickicons` | SidekickIcons | 432 | MIT | A |  | [Andri Soone](https://github.com/ndri/sidekickicons) |
+| `system-uicons` | System UIcons | 430 | Unlicense | A |  | [Corey Ginnivan](https://github.com/CoreyGinnivan/system-uicons) |
+| `ooui` | OOUI | 421 | MIT | A |  | [OOUI Team](https://github.com/wikimedia/oojs-ui) |
+| `pajamas` | Gitlab SVGs | 410 | MIT | A |  | [GitLab B.V.](https://gitlab.com/gitlab-org/gitlab-svgs/-/tree/main) |
+| `meteor-icons` | Meteor Icons | 409 | MIT | A |  | [zkreations](https://github.com/zkreations/icons) |
+| `lucide-lab` | Lucide Lab | 373 | ISC | A |  | [Lucide Contributors](https://github.com/lucide-icons/lucide-lab) |
+| `radix-icons` | Radix Icons | 332 | MIT | A |  | [WorkOS](https://github.com/radix-ui/icons) |
+| `bitcoin-icons` | Bitcoin Icons | 330 | MIT | A |  | [Bitcoin Design Community](https://github.com/BitcoinDesign/Bitcoin-Icons) |
+| `prime` | Prime Icons | 313 | MIT | A |  | [PrimeTek](https://github.com/primefaces/primeicons) |
+| `matita` | Matita | 302 | MIT | A |  | [matita.dev](https://github.com/matita-dev/icons) |
+| `struq` | Struq Icons | 300 | MIT | A |  | [Struq](https://struq.nl/iconen) |
+| `uim` | Unicons Monochrome | 298 | Apache-2.0 | A |  | [Iconscout](https://github.com/Iconscout/unicons) |
+| `zondicons` | Zondicons | 297 | MIT | A |  | [Steve Schoger](https://github.com/dukestreetstudio/zondicons) |
+| `ep` | Element Plus | 293 | MIT | A |  | [Element Plus](https://github.com/element-plus/element-plus-icons) |
+| `circum` | Circum Icons | 288 | MPL-2.0 | A |  | [Klarr Agency](https://github.com/Klarr-Agency/Circum-Icons) |
+| `humbleicons` | Humbleicons | 286 | MIT | A |  | [Jiří Zralý](https://github.com/zraly/humbleicons) |
+| `mdi-light` | Material Design Light | 284 | OFL-1.1 | A |  | [Pictogrammers](https://github.com/Templarian/MaterialDesignLight) |
+| `charm` | Charm Icons | 261 | MIT | A |  | [Jay Newey](https://github.com/jaynewey/charm-icons) |
+| `fe` | Feather Icon | 255 | MIT | A |  | [Megumi Hano](https://github.com/feathericon/feathericon) |
+| `eos-icons` | EOS Icons | 253 | MIT | A |  | [SUSE UX/UI team](https://gitlab.com/SUSE-UIUX/eos-icons) |
+| `uit` | Unicons Thin Line | 216 | Apache-2.0 | A |  | [Iconscout](https://github.com/Iconscout/unicons) |
+| `uiw` | uiw icons | 214 | MIT | A |  | [liwen0526](https://github.com/uiwjs/icons) |
+| `rivet-icons` | Rivet Icons | 210 | BSD-3-Clause | A |  | [Indiana University](https://github.com/indiana-university/rivet-icons) |
+| `doodle-icons` | Oreo Doodle Icons | 204 | MIT | A |  | [Nicole Tang](https://github.com/oreo-design/doodle-icons) |
+| `uis` | Unicons Solid | 190 | Apache-2.0 | A |  | [Iconscout](https://github.com/Iconscout/unicons) |
+| `cuida` | Cuida Icons | 182 | Apache-2.0 | A |  | [Sysvale](https://github.com/Sysvale/cuida-icons) |
+| `mi` | Mono Icons | 180 | MIT | A |  | [Mono](https://github.com/mono-company/mono-icons) |
+| `weui` | WeUI Icon | 162 | MIT | A |  | [WeUI](https://github.com/weui/weui-icon) |
+| `codex` | CodeX Icons | 156 | MIT | A |  | [CodeX](https://github.com/davidabou/icons) |
+| `formkit` | FormKit Icons | 144 | MIT | A |  | [FormKit, Inc](https://github.com/formkit/formkit/tree/master/packages/icons) |
+| `quill` | Quill Icons | 140 | MIT | A |  | [Casper Lourens](https://www.figma.com/community/file/1034432054377533052/Quill-Iconset) |
+| `nimbus` | Nimbus | 140 | MIT | A |  | [Linkedstore S.A.](https://github.com/cyberalien/nimbus-icons) |
+| `bytesize` | Bytesize Icons | 101 | MIT | A |  | [Dan Klammer](https://github.com/danklammer/bytesize-icons) |
+| `duo-icons` | Duoicons | 91 | MIT | A |  | [fernandcf](https://github.com/fazdiu/duo-icons) |
+| `ei` | Evil Icons | 70 | MIT | A |  | [Alexander Madyankin and Roman Shamin](https://github.com/evil-icons/evil-icons) |
+| `svg-spinners` | SVG Spinners | 46 | MIT | A |  | [Utkarsh Verma](https://github.com/n3r4zzurr0/svg-spinners) |
+| `solar` | Solar | 8,706 | CC-BY-4.0 | B |  | [480 Design](https://www.figma.com/community/file/1166831539721848736) |
+| `streamline` | Streamline | 3,000 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `fa7-solid` | Font Awesome Solid | 2,000 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `streamline-ultimate` | Ultimate free icons | 1,999 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `iconamoon` | IconaMoon | 1,781 | CC-BY-4.0 | B |  | [Dariush Habibpour](https://github.com/dariushhpg1/IconaMoon) |
+| `lets-icons` | Lets Icons | 1,528 | CC-BY-4.0 | B |  | [Leonid Tsvetkov](https://www.figma.com/community/file/886554014393250663) |
+| `streamline-sharp` | Sharp free icons | 1,500 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-flex` | Flex free icons | 1,500 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-plump` | Plump free icons | 1,499 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `pepicons-pop` | Pepicons Pop! | 1,275 | CC-BY-4.0 | B |  | [CyCraft](https://github.com/CyCraft/pepicons) |
+| `pepicons-print` | Pepicons Print | 1,275 | CC-BY-4.0 | B |  | [CyCraft](https://github.com/CyCraft/pepicons) |
+| `pepicons-pencil` | Pepicons Pencil | 1,275 | CC-BY-4.0 | B |  | [CyCraft](https://github.com/CyCraft/pepicons) |
+| `streamline-freehand` | Freehand free icons | 1,000 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-pixel` | Pixel free icons | 662 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `nrk` | NRK Core Icons | 637 | CC-BY-4.0 | B |  | [Norsk rikskringkasting](https://github.com/nrkno/core-icons) |
+| `pixel` | Pixel Icon | 578 | CC-BY-4.0 | B |  | [HackerNoon](https://github.com/hackernoon/pixel-icon-library) |
+| `cil` | CoreUI Free | 554 | CC-BY-4.0 | B |  | [creativeLabs Łukasz Holeczek](https://github.com/coreui/coreui-icons) |
+| `streamline-cyber` | Cyber free icons | 500 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `basil` | Basil | 493 | CC-BY-4.0 | B |  | [Craftwork](https://www.figma.com/community/file/931906394678748246) |
+| `guidance` | Guidance | 360 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-block` | Streamline Block | 300 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `fa7-regular` | Font Awesome Regular | 272 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `typcn` | Typicons | 336 | CC-BY-SA-4.0 | C |  | [Stephen Hutchings](https://github.com/stephenhutchings/typicons.font) |
+| `wordpress` | WordPress Icons | 344 | GPL-2.0-or-later | X |  | [The WordPress Contributors](https://github.com/WordPress/gutenberg/tree/HEAD/packages/icons) |
+| `gridicons` | Gridicons | 207 | GPL-2.0-only | X |  | [Automattic](https://github.com/Automattic/gridicons) |
+
+## Color Icons — 40 sets, 39,003 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `icon-park` | IconPark | 2,658 | Apache-2.0 | A | ● | [ByteDance](https://github.com/bytedance/IconPark) |
+| `withicons-suite` | with icons Suite | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-skeuo` | with icons Skeuo | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-sticker` | with icons Sticker | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-pastel` | with icons Pastel | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-plush` | with icons Plush | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-coquette` | with icons Coquette | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-anime` | with icons Anime | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-gothic` | with icons Gothic | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-bauhaus` | with icons Bauhaus | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-glass` | with icons Glass | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-kawaii` | with icons Kawaii | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-luxe` | with icons Luxe | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-retro` | with icons Retro | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-bento` | with icons Bento | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-brutal` | with icons Brutal | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-chrome` | with icons Chrome | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-clay` | with icons Clay | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-liquid` | with icons Liquid | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-halloween` | with icons Halloween | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-christmas` | with icons Christmas | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-lunar` | with icons Cunar | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-rangoli` | with icons Rangoli | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-utsav` | with icons Utsav | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-valentine` | with icons Valentine | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-dock` | with icons Dock | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-soft3d` | with icons Soft 3D | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `fluent-color` | Fluent UI System Color Icons | 890 | MIT | A | ● | [Microsoft Corporation](https://github.com/microsoft/fluentui-system-icons) |
+| `marketeq` | Marketeq | 590 | MIT | A | ● | Marketeq |
+| `meteocons` | Meteocons | 447 | MIT | A | ● | [Bas Milius](https://github.com/basmilius/weather-icons) |
+| `iconito` | Iconito Food | 120 | MIT | A | ● | [Iconito](https://github.com/iconi-to/free-food) |
+| `streamline-color` | Streamline color | 2,000 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-plump-color` | Plump color icons | 1,000 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-freehand-color` | Freehand color icons | 1,000 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-flex-color` | Flex color icons | 1,000 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-sharp-color` | Sharp color icons | 1,000 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-ultimate-color` | Ultimate color icons | 998 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-kameleon-color` | Kameleon color icons | 600 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-cyber-color` | Cyber color icons | 500 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-stickies-color` | Stickies color icons | 200 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+
+## Developer & Tech — 11 sets, 7,493 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `vscode-icons` | VSCode Icons | 1,719 | MIT | A | ● | [Roberto Huertas](https://github.com/vscode-icons/vscode-icons) |
+| `devicon` | Devicon | 1,104 | MIT | A | ● | [konpa](https://github.com/devicons/devicon/tree/master) |
+| `file-icons` | File Icons | 930 | ISC | A |  | [John Gardner](https://github.com/file-icons/icons) |
+| `material-icon-theme` | Material Icon Theme | 910 | MIT | A | ● | [Material Extensions](https://github.com/material-extensions/vscode-material-icon-theme) |
+| `devicon-plain` | Devicon Plain | 802 | MIT | A |  | [konpa](https://github.com/devicons/devicon/tree/master) |
+| `catppuccin` | Catppuccin Icons | 656 | MIT | A | ● | [Catppuccin](https://github.com/catppuccin/vscode-icons) |
+| `skill-icons` | Skill Icons | 400 | MIT | A | ● | [tandpfun](https://github.com/tandpfun/skill-icons) |
+| `gcp` | Google Cloud Icons | 214 | Apache-2.0 | A | ● | Google Cloud |
+| `unjs` | UnJS Logos | 63 | Apache-2.0 | A | ● | [UnJS](https://github.com/unjs) |
+| `k8s` | Kubernetes Icons | 38 | Apache-2.0 | A | ● | [The Kubernetes Authors](https://kubernetes.io) |
+| `codicon` | Codicons | 657 | CC-BY-4.0 | B |  | [Microsoft Corporation](https://github.com/microsoft/vscode-codicons) |
+
+## Logos & Brands — 17 sets, 33,760 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `thesvg-color` | theSVG Color | 5,200 | MIT | A | ● | [thesvg.org](https://github.com/glincker/thesvg) |
+| `token-branded` | Web3 Icons Branded | 4,085 | MIT | A | ● | [0xa3k5](https://github.com/0xa3k5/web3icons) |
+| `thesvg` | theSVG | 3,804 | MIT | A |  | [thesvg.org](https://github.com/glincker/thesvg) |
+| `simple-icons` | Simple Icons | 3,467 | CC0-1.0 | A |  | [Simple Icons Collaborators](https://github.com/simple-icons/simple-icons) |
+| `logos` | SVG Logos | 2,064 | CC0-1.0 | A | ● | [Gil Barbara](https://github.com/gilbarbara/logos) |
+| `token` | Web3 Icons | 1,788 | MIT | A |  | [0xa3k5](https://github.com/0xa3k5/web3icons) |
+| `cib` | CoreUI Brands | 830 | CC0-1.0 | A |  | [creativeLabs Łukasz Holeczek](https://github.com/coreui/coreui-icons) |
+| `cryptocurrency` | Cryptocurrency Icons | 483 | CC0-1.0 | A |  | [Christopher Downer](https://github.com/atomiclabs/cryptocurrency-icons) |
+| `cryptocurrency-color` | Cryptocurrency Color Icons | 483 | CC0-1.0 | A | ● | [Christopher Downer](https://github.com/atomiclabs/cryptocurrency-icons) |
+| `bxl` | Boxicons Brands | 295 | MIT | A |  | [Boxicons](https://github.com/box-icons/boxicons-core) |
+| `nonicons` | Nonicons | 69 | MIT | A |  | [yamatsum](https://github.com/yamatsum/nonicons) |
+| `selfhst` | selfh.st/icons | 7,311 | CC-BY-4.0 | B | ● | [selfh.st](https://github.com/selfhst/icons) |
+| `streamline-logos` | Logos free icons | 1,362 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `fa7-brands` | Font Awesome Brands | 608 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `entypo-social` | Entypo+ Social | 76 | CC-BY-SA-4.0 | C |  | [Daniel Bruce](https://github.com/chancancode/entypo-plus) |
+| `brandico` | Brandico | 45 | CC-BY-SA-3.0 | C |  | [Fontello](https://github.com/fontello/brandico.font) |
+| `cbi` | Custom Brand Icons | 1,790 | CC-BY-NC-SA-4.0 | X |  | [Emanuele & rchiileea](https://github.com/elax46/custom-brand-icons) |
+
+## Emoji — 11 sets, 25,484 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `noto` | Noto Emoji | 3,729 | Apache-2.0 | A | ● | [Google Inc](https://github.com/googlefonts/noto-emoji) |
+| `fluent-emoji-flat` | Fluent Emoji Flat | 3,145 | MIT | A | ● | [Microsoft Corporation](https://github.com/microsoft/fluentui-emoji) |
+| `noto-v1` | Noto Emoji (v1) | 2,162 | Apache-2.0 | A | ● | [Google Inc](https://github.com/googlefonts/noto-emoji) |
+| `fluent-emoji-high-contrast` | Fluent Emoji High Contrast | 1,595 | MIT | A |  | [Microsoft Corporation](https://github.com/microsoft/fluentui-emoji) |
+| `fxemoji` | Firefox OS Emoji | 1,034 | Apache-2.0 | A | ● | [Mozilla](https://github.com/mozilla/fxemoji) |
+| `twemoji` | Twitter Emoji | 3,988 | CC-BY-4.0 | B | ● | [Twitter](https://github.com/jdecked/twemoji) |
+| `emojione` | Emoji One (Colored) | 1,834 | CC-BY-4.0 | B | ● | [Emoji One](https://github.com/EmojiTwo/emojitwo) |
+| `emojione-monotone` | Emoji One (Monotone) | 1,403 | CC-BY-4.0 | B |  | [Emoji One](https://github.com/EmojiTwo/emojitwo) |
+| `streamline-emojis` | Streamline Emojis | 787 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `openmoji` | OpenMoji | 4,545 | CC-BY-SA-4.0 | C | ● | [OpenMoji](https://github.com/hfg-gmuend/openmoji) |
+| `emojione-v1` | Emoji One (v1) | 1,262 | CC-BY-SA-4.0 | C | ● | [Emoji One](https://github.com/joypixels/emojione-legacy) |
+
+## Maps & Location — 8 sets, 4,900 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `pinhead` | Pinhead Map Icons | 2,821 | CC0-1.0 | A |  | [Quincy Morgan](https://github.com/waysidemapping/pinhead) |
+| `temaki` | Temaki | 557 | CC0-1.0 | A |  | [Bryan Housel](https://github.com/rapideditor/temaki) |
+| `maki` | Maki | 215 | CC0-1.0 | A |  | [Mapbox](https://github.com/mapbox/maki) |
+| `osmic` | OSM Icons | 169 | CC0-1.0 | A |  | [GMGeo](https://github.com/gmgeo/osmic) |
+| `map` | Map Icons | 167 | OFL-1.1 | A |  | [Scott de Jonge](https://github.com/scottdejonge/map-icons) |
+| `geo` | GeoGlyphs | 30 | MIT | A |  | [Sam Matthews](https://github.com/cugos/geoglyphs) |
+| `roentgen` | Röntgen | 574 | CC-BY-4.0 | B |  | [Sergey Vartanov](https://github.com/enzet/Roentgen) |
+| `gis` | Font-GIS | 367 | CC-BY-4.0 | B |  | [Jean-Marc Viglino](https://github.com/viglino/font-gis) |
+
+## Flags — 5 sets, 1,736 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `flag` | Flag Icons | 542 | MIT | A | ● | [Panayiotis Lipiridis](https://github.com/lipis/flag-icons) |
+| `circle-flags` | Circle Flags | 444 | MIT | A | ● | [HatScripts](https://github.com/HatScripts/circle-flags) |
+| `tabler-flags` | Tabler Flags | 297 | MIT | A | ● | [Paweł Kuna](https://github.com/tabler/tabler-flags) |
+| `flagpack` | Flagpack | 254 | MIT | A | ● | [Yummygum](https://github.com/Yummygum/flagpack-core) |
+| `cif` | CoreUI Flags | 199 | CC0-1.0 | A | ● | [creativeLabs Łukasz Holeczek](https://github.com/coreui/coreui-icons) |
+
+## Themed (games, weather, science, medical) — 10 sets, 22,535 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `healthicons` | Health Icons | 2,128 | MIT | A |  | [Resolve to Save Lives](https://github.com/resolvetosavelives/healthicons) |
+| `wi` | Weather Icons | 219 | OFL-1.1 | A |  | [Erik Flowers](https://github.com/erikflowers/weather-icons) |
+| `academicons` | Academicons | 158 | OFL-1.1 | A |  | [James Walsh](https://github.com/jpswalsh/academicons) |
+| `medical-icon` | Medical Icons | 144 | MIT | A |  | [Samuel Frémondière](https://github.com/samcome/webfont-medical-icons) |
+| `ginetex` | Ginetex Care Symbols | 50 | MIT | A |  | [YESSIR Organization](https://github.com/yessir-web-tech/ginetex-icons) |
+| `game-icons` | Game Icons | 4,133 | CC-BY-3.0 | B |  | [GameIcons](https://github.com/game-icons/icons) |
+| `fad` | FontAudio | 155 | CC-BY-4.0 | B |  | [@fefanto](https://github.com/fefanto/fontaudio) |
+| `covid` | Covid Icons | 142 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `streamline-memes` | Memes | 84 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `arcticons` | Arcticons | 15,322 | CC-BY-SA-4.0 | C |  | [Donnnno](https://github.com/Arcticons-Team/Arcticons) |
+
+## Archive (import last) — 31 sets, 14,649 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `fluent-mdl2` | Fluent UI MDL2 | 1,735 | MIT | A |  | [Microsoft Corporation](https://github.com/microsoft/fluentui/tree/master/packages/react-icons-mdl2) |
+| `la` | Line Awesome | 1,544 | Apache-2.0 | A |  | [Icons8](https://github.com/icons8/line-awesome) |
+| `fa` | Font Awesome 4 | 678 | OFL-1.1 | A |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome/tree/fa-4) |
+| `vaadin` | Vaadin Icons | 636 | Apache-2.0 | A |  | [Vaadin](https://github.com/vaadin/web-components) |
+| `grommet-icons` | Grommet Icons | 636 | Apache-2.0 | A |  | [Grommet](https://github.com/grommet/grommet-icons) |
+| `fontisto` | Fontisto | 615 | MIT | A |  | [Kenan Gündoğan](https://github.com/kenangundogan/fontisto) |
+| `eva` | Eva Icons | 490 | MIT | A |  | [Akveo](https://github.com/akveo/eva-icons/) |
+| `flat-color-icons` | Flat Color Icons | 329 | MIT | A | ● | [Icons8](https://github.com/icons8/flat-Color-icons) |
+| `el` | Elusive Icons | 304 | OFL-1.1 | A |  | [Team Redux](https://github.com/dovy/elusive-icons) |
+| `foundation` | Foundation | 283 | MIT | A |  | [Zurb](https://github.com/zurb/foundation-icon-fonts) |
+| `raphael` | Raphael | 266 | MIT | A |  | [Dmitry Baranovskiy](https://github.com/dmitrybaranovskiy/raphael) |
+| `icons8` | Icons8 Windows 10 Icons | 234 | MIT | A |  | [Icons8](https://github.com/icons8/windows-10-icons) |
+| `heroicons-outline` | HeroIcons v1 Outline | 230 | MIT | A |  | [Refactoring UI Inc](https://github.com/tailwindlabs/heroicons) |
+| `heroicons-solid` | HeroIcons v1 Solid | 230 | MIT | A |  | [Refactoring UI Inc](https://github.com/tailwindlabs/heroicons) |
+| `oi` | Open Iconic | 223 | MIT | A |  | [Iconic](https://github.com/iconic/open-iconic) |
+| `wpf` | Icons8 Windows 8 Icons | 200 | MIT | A |  | [Icons8](https://github.com/icons8/WPF-UI-Framework) |
+| `simple-line-icons` | Simple line icons | 189 | MIT | A |  | [Sabbir Ahmed](https://github.com/thesabbir/simple-line-icons) |
+| `iwwa` | Innowatio Font | 105 | Apache-2.0 | A |  | [Innowatio](https://github.com/innowatio/iwwa-icons) |
+| `fa6-solid` | Font Awesome 6 Solid | 1,402 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `fa-solid` | Font Awesome 5 Solid | 1,001 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `fa6-brands` | Font Awesome 6 Brands | 495 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `fa-brands` | Font Awesome 5 Brands | 457 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `ci` | coolicons v4 | 442 | CC-BY-4.0 | B |  | [Kryston Schwarze](https://github.com/krystonschwarze/coolicons) |
+| `subway` | Subway Icon Set | 306 | CC-BY-4.0 | B |  | [Mariusz Ostrowski](https://github.com/mariuszostrowski/subway) |
+| `fa6-regular` | Font Awesome 6 Regular | 163 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `fa-regular` | Font Awesome 5 Regular | 151 | CC-BY-4.0 | B |  | [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) |
+| `entypo` | Entypo+ | 321 | CC-BY-SA-4.0 | C |  | [Daniel Bruce](https://github.com/chancancode/entypo-plus) |
+| `icomoon-free` | IcoMoon Free | 491 | GPL-3.0-or-later | X |  | [Keyamoon](https://github.com/Keyamoon/IcoMoon-Free) |
+| `dashicons` | Dashicons | 342 | GPL-2.0-or-later | X |  | [WordPress](https://github.com/WordPress/dashicons) |
+| `et` | Elegant | 100 | GPL-3.0-or-later | X |  | [Kenny Sing](https://github.com/pprince/etlinefont-bower) |
+| `gala` | Gala Icons | 51 | GPL-3.0 | X |  | [Jake Wells](https://github.com/cyberalien/gala-icons) |
+
+## Sources outside Iconify
+
+| Source | Type | License | Status |
+|---|---|---|---|
+| [Open Peeps](https://openpeeps.com) | Illustrations (people) | CC0 | ✅ Import |
+| [Open Doodles](https://www.opendoodles.com) | Illustrations | CC0 | ✅ Import |
+| [Openclipart](https://openclipart.org) | Clipart | Public domain / CC0 | ✅ Import (no current bulk archive, needs per-item fetch or old 0.19 release) |
+| [AIGA Symbol Signs](https://commons.wikimedia.org/wiki/Category:AIGA_symbol_signs) | Pictograms (signage) | Public domain | ✅ Import |
+| [Kenney](https://kenney.nl/assets) | Game assets | CC0 | ✅ Import vector packs only |
+| [Natural Earth](https://www.naturalearthdata.com) | Country/region shapes (convert to SVG) | Public domain | ✅ Import |
+| [Wikimedia Commons](https://commons.wikimedia.org) | Mixed SVGs | Per file | ⚠️ Only files tagged CC0 / PD / CC-BY |
+| [Humaaans](https://www.humaaans.com) | Illustrations | Unclear (sources disagree) | ⚠️ Verify before import |
+| [svgl](https://github.com/pheralb/svgl) | Logos | MIT code, logos are trademarks | ⚠️ Overlaps Simple Icons; optional |
+| [Unicode CLDR annotations](https://github.com/unicode-org/cldr-json) | Emoji keywords (search tags, not icons) | Unicode License | ✅ Use for search |
+| [unDraw](https://undraw.co/license) | Illustrations | Custom | ❌ License forbids building a competing library / packs |
+| Flaticon, Icons8, Freepik, Noun Project | Icons | Proprietary | ❌ Never import |
