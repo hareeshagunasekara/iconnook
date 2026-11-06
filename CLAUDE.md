@@ -3,7 +3,7 @@
 **IconNook** (iconnook.com) — a free, open-source SVG icon library (in the spirit of svgrepo / flaticon). No payments, no paywalls, ever.
 Goals, in priority order: **legally clean icons**, **fast**, **accessible to everyone**.
 
-> Status: planning done, code not scaffolded yet. The layout below is the target; update this file as it becomes real.
+> Status: Phase 1 (monorepo & tooling). Update this file as the project grows.
 > **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
 > **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
@@ -17,18 +17,21 @@ Goals, in priority order: **legally clean icons**, **fast**, **accessible to eve
 - **Files:** MinIO locally, Cloudflare R2 in production. SVGO for cleanup, resvg-js for PNG rendering.
 - **Infra:** Docker + Docker Compose for dev; k3s on a single VPS behind Cloudflare for prod; GitHub Actions → GHCR.
 
-## Layout (target)
+## Layout
 
 ```
-apps/web        Astro site
-apps/api        Hono REST API (/v1/...)
-apps/worker     BullMQ jobs: ZIP packs, PNG pre-render, flush download counters
-packages/db     Drizzle schema, migrations, shared types
-packages/importer  @iconify/json + extra sources → SVGO → Postgres + Meilisearch + storage
-packages/config shared tsconfig / ESLint / Prettier
-deploy/k8s      k3s manifests
-SOURCES.md      catalog of every icon source, its license and tier
+apps/web           Astro site                                            ✅ skeleton
+apps/api           Hono REST API (/v1/...)                               ✅ /healthz
+packages/core      shared pure domain logic (license tiers, types)        ✅
+packages/config    shared tsconfig                                        ✅
+packages/db        Drizzle schema, migrations                             Phase 2
+packages/importer  @iconify/json → SVGO → Postgres + Meilisearch          Phase 3
+apps/worker        BullMQ jobs: ZIP packs, PNG pre-render, counters       Phase 6
+deploy/k8s         k3s manifests                                          Phase 8
+SOURCES.md         catalog of every icon source, its license and tier
 ```
+
+Packages are created when they get real code (YAGNI), not as empty shells.
 
 ## Icon licensing rules (most important)
 
@@ -62,4 +65,23 @@ Significant decisions go in `docs/adr/`. The summary below is the short version.
 
 ## Commands
 
-Not set up yet. Expected once scaffolded: `pnpm install`, `docker compose up -d`, `pnpm dev`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm --filter importer import`. Fill in the real ones here.
+Node 24 (`.nvmrc`), pnpm 11 via corepack (`corepack enable pnpm`; version pinned in `package.json` → `packageManager`).
+
+```sh
+pnpm install                 # also installs git hooks (lefthook)
+pnpm dev                     # all apps: web http://localhost:4321, api http://localhost:8787
+pnpm check                   # everything CI runs: format:check, lint, typecheck, test, build
+pnpm lint | typecheck | test | build | format
+pnpm --filter @iconnook/api test     # one package
+```
+
+Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged files; commit-msg runs commitlint (Conventional Commits).
+
+## Tooling notes (why things are pinned)
+
+- **TypeScript 6.0.x**, not 7: typescript-eslint and `@astrojs/check` support `<6.1` only (Renovate is capped too).
+- **pnpm 11**, not 12: corepack can't run pnpm 12 yet.
+- pnpm's `minimumReleaseAge` blocks very new releases (supply-chain protection) — pin versions a few days old instead of adding exclusions.
+- `pnpm-workspace.yaml` overrides `@emnapi/runtime` to 1.11.x: the 2.0 beta crashes `astro check`. Remove once upstream fixes it.
+- Install scripts are blocked except those in `allowBuilds` (approve with `pnpm approve-builds <pkg>`).
+- ESLint and Prettier are configured once at the root; `packages/config` holds the shared tsconfig. `.astro` files are checked by `astro check`, not ESLint (yet).
