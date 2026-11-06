@@ -3,7 +3,7 @@
 **IconNook** (iconnook.com) — a free, open-source SVG icon library (in the spirit of svgrepo / flaticon). No payments, no paywalls, ever.
 Goals, in priority order: **legally clean icons**, **fast**, **accessible to everyone**.
 
-> Status: Phase 2 (local infrastructure & database). Update this file as the project grows.
+> Status: Phase 3 (importer & SVG sanitizer). Update this file as the project grows.
 > **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
 > **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
@@ -25,7 +25,8 @@ apps/api           Hono REST API (/v1/...)                               ✅ /he
 packages/core      shared pure domain logic (license tiers, types)        ✅
 packages/config    shared tsconfig                                        ✅
 packages/db        Drizzle schema, migrations, client, fixtures           ✅
-packages/importer  @iconify/json → SVGO → Postgres + Meilisearch          Phase 3
+packages/svg       SVG build + sanitizer (security-critical, ≥95% cov)    ✅
+packages/importer  @iconify/json → sanitize → Postgres + Meilisearch      ✅
 apps/worker        BullMQ jobs: ZIP packs, PNG pre-render, counters       Phase 6
 deploy/k8s         k3s manifests                                          Phase 8
 SOURCES.md         catalog of every icon source, its license and tier
@@ -76,6 +77,10 @@ pnpm dev                     # all apps: web http://localhost:4321, api http://l
 pnpm check                   # everything CI's quality job runs: format:check, lint, typecheck, test, build
 pnpm test:integration        # needs the compose stack; each test file gets its own throwaway database
 pnpm db:generate --name <x>  # after editing packages/db/src/schema.ts — review the SQL, commit it
+pnpm icons:import             # Tier A icon sets → Postgres, then rebuild search (~2–3 min, ~370k icons)
+pnpm icons:import --sets tabler,lucide --tiers A --no-index   # subset / skip reindex
+pnpm icons:reindex            # rebuild Meilisearch from Postgres (new index, atomic swap)
+pnpm icons:catalog            # regenerate SOURCES.md (never edit it by hand)
 pnpm --filter @iconnook/api test     # one package
 ```
 
@@ -92,6 +97,8 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 - `pnpm-workspace.yaml` overrides `@emnapi/runtime` to 1.11.x: the 2.0 beta crashes `astro check`. Remove once upstream fixes it.
 - `pnpm-workspace.yaml` forces drizzle-kit's old `@esbuild-kit` loader onto esbuild 0.25 (GHSA-67mh-4wv8-2f99). Remove when drizzle-kit drops `@esbuild-kit`.
 - CI dependency review allows **GHSA-g3hv-75wg-m249** (minimatch 10.x, dev-only via ESLint; forcing minimatch 11 breaks `eslint-plugin-import-x` 4.17). Remove the exception once import-x ≥ 4.18 is installed.
+- `@iconify/json` is ~600 MB unpacked: fine for dev/CI, but keep it out of runtime images (Phase 7: run the importer as its own Job image).
+- The importer writes per-set rejections and sanitizer changes to `.data/import-report.json` (gitignored) — review it after upgrading `@iconify/json`. Expected today: 3 rejected (2 over 512 KB, 1 with 0×0 size upstream), 0 changed.
 - Install scripts are blocked except those in `allowBuilds` (approve with `pnpm approve-builds <pkg>`).
 - ESLint and Prettier are configured once at the root; `packages/config` holds the shared tsconfig. `.astro` files are checked by `astro check`, not ESLint (yet).
 
