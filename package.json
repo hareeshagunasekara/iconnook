@@ -19,7 +19,10 @@
     "prepare": "lefthook install",
     "db:migrate": "pnpm --filter @iconnook/db db:migrate",
     "db:seed": "pnpm --filter @iconnook/db db:seed",
-    "db:generate": "pnpm --filter @iconnook/db db:generate"
+    "db:generate": "pnpm --filter @iconnook/db db:generate",
+    "icons:import": "pnpm --filter @iconnook/importer icons:import",
+    "icons:reindex": "pnpm --filter @iconnook/importer icons:reindex",
+    "icons:catalog": "pnpm --filter @iconnook/importer icons:catalog"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
