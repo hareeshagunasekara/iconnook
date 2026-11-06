@@ -6,6 +6,7 @@ Goals, in priority order: **legally clean icons**, **fast**, **accessible to eve
 > Status: planning done, code not scaffolded yet. The layout below is the target; update this file as it becomes real.
 > **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
+> **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
 
 ## Stack (decided — don't re-propose alternatives)
 
