@@ -50,8 +50,22 @@ jobs:
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10
+      meilisearch:
+        image: getmeili/meilisearch:v1.56.1
+        env:
+          MEILI_MASTER_KEY: ci-ephemeral-master-key
+          MEILI_NO_ANALYTICS: 'true'
+        ports:
+          - 7700:7700
+        options: >-
+          --health-cmd "wget -qO- http://127.0.0.1:7700/health"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     env:
       DATABASE_URL: postgres://iconnook:ci-ephemeral@localhost:5432/iconnook
+      MEILI_URL: http://localhost:7700
+      MEILI_MASTER_KEY: ci-ephemeral-master-key
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
