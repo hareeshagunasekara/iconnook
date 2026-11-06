@@ -8,6 +8,13 @@
       "when": 1793997319393,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793999067144,
+      "tag": "0001_fractional_icon_dimensions",
+      "breakpoints": true
     }
   ]
 }

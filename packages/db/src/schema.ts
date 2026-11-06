@@ -5,6 +5,7 @@ import {
   boolean,
   check,
   date,
+  doublePrecision,
   index,
   integer,
   pgEnum,
@@ -79,8 +80,9 @@ export const icons = pgTable(
     name: text('name').notNull(),
     /** Sanitized SVG inner markup (without the outer <svg> element). */
     body: text('body').notNull(),
-    width: integer('width').notNull(),
-    height: integer('height').notNull(),
+    // Iconify allows fractional sizes (e.g. FormKit is 25.9 wide); float8 round-trips JS numbers exactly.
+    width: doublePrecision('width').notNull(),
+    height: doublePrecision('height').notNull(),
     hidden: boolean('hidden').notNull().default(false),
     ...timestamps,
   },
