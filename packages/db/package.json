@@ -1,0 +1,41 @@
+{
+  "name": "@iconnook/db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "IconNook database schema, migrations and client (Drizzle + PostgreSQL)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "migrations"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude 'test/**'",
+    "test:integration": "vitest run --dir test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=../../.env src/cli/migrate.ts",
+    "db:seed": "tsx --env-file-if-exists=../../.env src/cli/seed.ts"
+  },
+  "dependencies": {
+    "@iconnook/core": "workspace:*",
+    "drizzle-orm": "0.45.4",
+    "postgres": "3.4.9",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@iconnook/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "drizzle-kit": "0.31.11",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vite": "8.3.6",
+    "vitest": "5.1.0"
+  }
+}

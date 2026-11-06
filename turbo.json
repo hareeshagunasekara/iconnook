@@ -11,6 +11,11 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "env": ["DATABASE_URL"],
+      "cache": false
+    },
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,
