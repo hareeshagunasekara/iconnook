@@ -18,6 +18,7 @@
     "@iconify/utils": "3.1.7",
     "@iconnook/core": "workspace:*",
     "@iconnook/db": "workspace:*",
+    "@iconnook/search": "workspace:*",
     "@iconnook/svg": "workspace:*",
     "drizzle-orm": "0.45.4",
     "meilisearch": "0.62.0",

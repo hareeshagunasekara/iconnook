@@ -1,6 +1,6 @@
 import { isImportable } from '@iconnook/core';
 import { schema, type Database } from '@iconnook/db';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 
 import type { PreparedIcon } from './prepare.js';
 import type { LoadedSet } from './types.js';
@@ -226,6 +226,15 @@ export async function syncSet(
   return db.transaction(async (tx) => {
     const setId = await upsertSet(tx, loaded);
     const { ids, stats } = await syncIcons(tx, setId, prepared);
+    await tx
+      .update(iconSets)
+      .set({ iconCount: sql`(SELECT count(*) FROM icons WHERE set_id = ${setId} AND NOT hidden)` })
+      .where(
+        and(
+          eq(iconSets.id, setId),
+          sql`${iconSets.iconCount} IS DISTINCT FROM (SELECT count(*) FROM icons WHERE set_id = ${setId} AND NOT hidden)`,
+        ),
+      );
     const synonyms = await syncSynonyms(tx, setId, ids, loaded);
     const cats = await syncCategories(tx, setId, ids, loaded);
     return {
