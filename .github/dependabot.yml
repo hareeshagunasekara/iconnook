@@ -1,9 +1,0 @@
-version: 2
-updates:
-  # npm dependencies are handled by Renovate (Phase 1); Dependabot keeps GitHub Actions pinned and current.
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-    commit-message:
-      prefix: ci

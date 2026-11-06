@@ -47,7 +47,7 @@ Steps:
    - `.gitignore` (node_modules, dist, .astro, .env*, !.env.example, coverage, playwright-report, .DS_Store, *.log, .turbo, k8s secrets plaintext, kubeconfig)
    - `.env.example` (placeholders only), `.editorconfig`, `.gitattributes`, `.nvmrc` (24)
    - `README.md` (what IconNook is, status, links to docs), `CONTRIBUTING.md`, `SECURITY.md` (how to report vulnerabilities), `CODE_OF_CONDUCT.md`
-   - `.github/`: PR template (definition-of-done checklist), issue templates (bug, feature, **new icon source** with license fields), `CODEOWNERS`, `dependabot.yml` for GitHub Actions
+   - `.github/`: PR template (definition-of-done checklist), issue templates (bug, feature, **new icon source** with license fields), `CODEOWNERS` (Dependabot version updates were later dropped in favor of Renovate for npm + Actions)
    - Rename project to IconNook across `CLAUDE.md`, docs
    - `docs/adr/0001-tech-stack.md` (records the decisions), `0002-license-tiers.md`
 5. 🤖 Install `gitleaks` (brew) and scan the full history.
