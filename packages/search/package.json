@@ -1,0 +1,32 @@
+{
+  "name": "@iconnook/search",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Search index contract shared by the importer (writes) and the API (reads)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@iconnook/db": "workspace:*",
+    "drizzle-orm": "0.45.4",
+    "meilisearch": "0.62.0"
+  },
+  "devDependencies": {
+    "@iconnook/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
