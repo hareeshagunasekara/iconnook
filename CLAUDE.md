@@ -86,3 +86,11 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 - CI dependency review allows **GHSA-g3hv-75wg-m249** (minimatch 10.x, dev-only via ESLint; forcing minimatch 11 breaks `eslint-plugin-import-x` 4.17). Remove the exception once import-x ≥ 4.18 is installed.
 - Install scripts are blocked except those in `allowBuilds` (approve with `pnpm approve-builds <pkg>`).
 - ESLint and Prettier are configured once at the root; `packages/config` holds the shared tsconfig. `.astro` files are checked by `astro check`, not ESLint (yet).
+
+## Project skills (`.claude/skills/`)
+
+Third-party skills, reviewed before install and pinned in `skills-lock.json`: `astro`, `hono` (official, honojs/skills), `drizzle-orm-patterns`, `tailwind-4-docs`, `typescript-advanced-types`, `multi-stage-dockerfile`, `kubernetes-specialist`, `accessibility`.
+
+- **`docs/standards/` and this file win** over any skill advice that conflicts (e.g. a skill's k8s example vs our Restricted pod rules).
+- Local edits (don't lose them on update): `tailwind-4-docs` — docs-snapshot sync script removed (Tailwind docs aren't open source; never commit a snapshot); `drizzle-orm-patterns` — `allowed-tools` removed so it can't pre-approve Bash.
+- Don't run `npx skills update` blindly: re-review the diff (scripts, `allowed-tools`, pipe-to-shell, injected instructions) and re-apply the edits above.
