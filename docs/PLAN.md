@@ -220,7 +220,7 @@ Steps:
 
 | Phase | Status | PR | Tag | Validated on |
 |---|---|---|---|---|
-| 0 Foundations | ⏳ next | | | |
+| 0 Foundations | 🟡 in review — waiting on domain purchase | | | 2026-11-07: gitleaks clean (tree + history), `.env` ignored, direct push to `main` rejected, secret scanning + push protection on |
 | 1 Monorepo & tooling | — | | | |
 | 2 Local infra & DB | — | | | |
 | 3 Importer & sanitizer | — | | | |
