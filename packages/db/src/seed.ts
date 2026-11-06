@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import type { Database } from './client.js';
 import { icons, iconSets } from './schema.js';
@@ -49,6 +49,10 @@ export async function seedFixtures(db: Database): Promise<{ setId: number; icons
         set: { body: sql`excluded.body` },
       })
       .returning({ id: icons.id });
+    await tx
+      .update(iconSets)
+      .set({ iconCount: sql`(SELECT count(*) FROM icons WHERE set_id = ${set.id} AND NOT hidden)` })
+      .where(eq(iconSets.id, set.id));
 
     return { setId: set.id, icons: inserted.length };
   });
