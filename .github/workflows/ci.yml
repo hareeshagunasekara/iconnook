@@ -26,10 +26,11 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
+      # Build first: type-aware lint and typecheck resolve workspace packages through their dist/ types.
+      - run: pnpm build
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
-      - run: pnpm build
 
   integration:
     name: Integration tests

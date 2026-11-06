@@ -74,7 +74,7 @@ pnpm install                 # also installs git hooks (lefthook)
 docker compose up -d         # postgres, meilisearch, valkey, seaweedfs (all bound to 127.0.0.1)
 pnpm db:migrate              # apply migrations (re-runnable)  ·  pnpm db:seed — tiny CC0 fixture set
 pnpm dev                     # all apps: web http://localhost:4321, api http://localhost:8787
-pnpm check                   # everything CI's quality job runs: format:check, lint, typecheck, test, build
+pnpm check                   # everything CI's quality job runs: format:check, build, lint, typecheck, test
 pnpm test:integration        # needs the compose stack; each test file gets its own throwaway database
 pnpm db:generate --name <x>  # after editing packages/db/src/schema.ts — review the SQL, commit it
 pnpm icons:import             # Tier A icon sets → Postgres, then rebuild search (~2–3 min, ~370k icons)
