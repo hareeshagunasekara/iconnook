@@ -9,3 +9,6 @@ overrides:
   # @astrojs/astro2tsx ships @emnapi/core 1.x, but its @emnapi/runtime peer resolves to a 2.0 beta,
   # which crashes `astro check`. Keep runtime on the matching stable line until upstream fixes it.
   '@emnapi/runtime': 1.11.3
+  # GHSA-67mh-4wv8-2f99: drizzle-kit's deprecated @esbuild-kit loader pins esbuild 0.18 (dev-server CORS issue).
+  # 0.25.x has the fix and the same transform API. Remove when drizzle-kit drops @esbuild-kit.
+  '@esbuild-kit/core-utils>esbuild': 0.25.12
