@@ -1,0 +1,44 @@
+name: New icon source
+description: Propose an icon set or SVG collection to add
+labels: [icon-source]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We only accept sources with a clear open license. GPL and non-commercial (NC) licenses can't be accepted,
+        and we never import from Flaticon, Icons8, Freepik, Noun Project or unDraw. See SOURCES.md for tiers.
+  - type: input
+    id: name
+    attributes:
+      label: Source name
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Official website or repository
+    validations:
+      required: true
+  - type: input
+    id: license
+    attributes:
+      label: License (SPDX id if known, e.g. MIT, CC0-1.0, CC-BY-4.0)
+    validations:
+      required: true
+  - type: input
+    id: license_url
+    attributes:
+      label: Link to the official license text
+    validations:
+      required: true
+  - type: input
+    id: count
+    attributes:
+      label: Approximate number of icons
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmation
+      options:
+        - label: The license is published by the original author, not a third-party re-upload site
+          required: true
