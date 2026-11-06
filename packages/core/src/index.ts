@@ -1,1 +1,7 @@
-export { isImportable, licenseTier, requiresAttribution, type LicenseTier } from './license.js';
+export {
+  isImportable,
+  licenseTier,
+  requiresAttribution,
+  type ImportableTier,
+  type LicenseTier,
+} from './license.js';

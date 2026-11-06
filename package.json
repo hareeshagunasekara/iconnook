@@ -15,11 +15,14 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm format:check && pnpm build && pnpm lint && pnpm typecheck && pnpm test",
     "prepare": "lefthook install",
     "db:migrate": "pnpm --filter @iconnook/db db:migrate",
     "db:seed": "pnpm --filter @iconnook/db db:seed",
-    "db:generate": "pnpm --filter @iconnook/db db:generate"
+    "db:generate": "pnpm --filter @iconnook/db db:generate",
+    "icons:import": "pnpm --filter @iconnook/importer icons:import",
+    "icons:reindex": "pnpm --filter @iconnook/importer icons:reindex",
+    "icons:catalog": "pnpm --filter @iconnook/importer icons:catalog"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",

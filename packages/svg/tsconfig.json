@@ -1,0 +1,8 @@
+{
+  "extends": "@iconnook/config/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": ["src", "test", "*.config.ts"]
+}

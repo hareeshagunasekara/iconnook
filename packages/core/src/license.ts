@@ -24,7 +24,9 @@ export function licenseTier(spdx: string): LicenseTier {
   return TIER_BY_SPDX[spdx.trim()] ?? 'X';
 }
 
-export function isImportable(tier: LicenseTier): boolean {
+export type ImportableTier = Exclude<LicenseTier, 'X'>;
+
+export function isImportable(tier: LicenseTier): tier is ImportableTier {
   return tier !== 'X';
 }
 

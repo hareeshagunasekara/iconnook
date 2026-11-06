@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { runMigrations } from '../src/client.js';
 import { iconSets, icons } from '../src/schema.js';
 import { FIXTURE_ICONS, FIXTURE_SET, seedFixtures } from '../src/seed.js';
-import { createTestDatabase, type TestDatabase } from './helpers.js';
+import { createTestDatabase, type TestDatabase } from '../src/testing.js';
 
 let t: TestDatabase;
 
@@ -117,6 +117,16 @@ describe('icon constraints', () => {
 
     expect(badName).toMatchObject({ code: '23514', constraint_name: 'icons_name_format' });
     expect(badPrefix).toMatchObject({ code: '23514', constraint_name: 'icon_sets_prefix_format' });
+  });
+
+  it('store fractional dimensions exactly', async () => {
+    const setId = await insertSet('set-fractional');
+    const [row] = await t.db
+      .insert(icons)
+      .values({ setId, name: 'narrow', body: '<g/>', width: 25.9, height: 24 })
+      .returning({ width: icons.width });
+
+    expect(row?.width).toBe(25.9);
   });
 
   it('delete a set’s icons when the set is deleted', async () => {

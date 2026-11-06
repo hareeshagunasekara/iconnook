@@ -2,8 +2,8 @@ import { randomBytes } from 'node:crypto';
 
 import postgres from 'postgres';
 
-import { createDb, runMigrations, type DbHandle } from '../src/client.js';
-import { loadDbConfig } from '../src/config.js';
+import { createDb, runMigrations, type DbHandle } from './client.js';
+import { loadDbConfig } from './config.js';
 
 export interface TestDatabase extends DbHandle {
   url: string;
