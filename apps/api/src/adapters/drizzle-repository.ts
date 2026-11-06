@@ -131,13 +131,10 @@ export class DrizzleIconRepository implements IconRepository {
 
   async listCategories(): Promise<CategorySummary[]> {
     return this.db
-      .select({
-        slug: categories.slug,
-        label: categories.label,
-        total: count(iconCategories.iconId),
-      })
+      .select({ slug: categories.slug, label: categories.label, total: count(icons.id) })
       .from(categories)
       .innerJoin(iconCategories, eq(iconCategories.categoryId, categories.id))
+      .innerJoin(icons, and(eq(icons.id, iconCategories.iconId), visible))
       .groupBy(categories.id)
       .orderBy(asc(categories.label));
   }

@@ -37,6 +37,17 @@ describe('health', () => {
     expect(res.status).toBe(503);
     expect(await res.json()).toMatchObject({ checks: { search: 'down' } });
   });
+
+  it('stays ready (degraded) when only Valkey is down — the rate limiter fails open', async () => {
+    const { app, deps } = setup();
+    deps.rateLimiter.down = true;
+    const res = await app.request('/readyz');
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({
+      status: 'degraded',
+      checks: { database: 'ok', search: 'ok', cache: 'down' },
+    });
+  });
 });
 
 describe('security & protocol headers', () => {
@@ -70,6 +81,12 @@ describe('security & protocol headers', () => {
     ).toBe(304);
   });
 
+  it('skips ETags for PNGs (large, CDN-cached) but keeps them for SVG', async () => {
+    const { app } = setup();
+    expect((await app.request('/v1/icons/tabler/arrow-left.png')).headers.has('etag')).toBe(false);
+    expect((await app.request('/v1/icons/tabler/arrow-left.svg')).headers.has('etag')).toBe(true);
+  });
+
   it('returns RFC 9457 problems for unknown endpoints', async () => {
     const { app } = setup();
     await problem(await app.request('/v1/nope'), 404);
@@ -91,6 +108,14 @@ describe('rate limiting', () => {
     expect((await app.request('/v1/icons/tabler/arrow-left.png')).status).toBe(200);
     await problem(await app.request('/v1/icons/tabler/arrow-left.png'), 429);
     expect((await app.request('/v1/icons/tabler/arrow-left.svg')).status).toBe(200);
+  });
+
+  it('does not charge the render limit for canonical-URL redirects', async () => {
+    const { app } = setup({ rateLimit: { perMinute: 1_000, renderPerMinute: 1 } });
+    const redirect = await app.request('/v1/icons/tabler/arrow-left.png?size=64&color=%23FF0000');
+    expect(redirect.status).toBe(301);
+    const location = redirect.headers.get('location') ?? '';
+    expect((await app.request(location)).status).toBe(200);
   });
 
   it('fails open when the limiter is unavailable', async () => {
@@ -280,7 +305,26 @@ describe('JSON endpoints', () => {
     expect(body['html']).not.toContain('<script>');
     expect(body['html']).not.toContain('javascript:');
     expect(body['html']).toContain('&lt;script&gt;');
-    expect(body['plain']).toContain('same license');
+    // CC-BY-SA: the share-alike notice must be in every pasteable form.
+    for (const format of ['plain', 'html', 'markdown']) {
+      expect(body[format]).toContain('same license');
+    }
+  });
+
+  it('keeps Markdown links intact for URLs containing parentheses', async () => {
+    const set = fakeSet({ author: { name: 'A', url: 'https://example.com/foo_(bar)' } });
+    const { app } = setup({}, fakeDeps([fakeIcon({ setInfo: set })]));
+    const body = (await (
+      await app.request('/v1/icons/tabler/arrow-left/attribution')
+    ).json()) as Record<string, string>;
+    expect(body['markdown']).toContain('[A](<https://example.com/foo_(bar)>)');
+  });
+
+  it('turns invalid search filters into 400, not 500', async () => {
+    const deps = fakeDeps();
+    deps.search.search = () => Promise.reject(new RangeError('Invalid set filter "x"'));
+    const { app } = setup({}, deps);
+    await problem(await app.request('/v1/search?q=home'), 400);
   });
 
   it('publishes an OpenAPI 3.1 document covering every endpoint', async () => {
@@ -365,6 +409,19 @@ describe('clientKey', () => {
     await app.request('/v1/sets', { headers: { 'cf-connecting-ip': '1.1.1.1' } });
     await app.request('/v1/sets', { headers: { 'cf-connecting-ip': '2.2.2.2' } });
     expect(deps.rateLimiter.counts.size).toBe(1); // spoofed headers don't create fresh buckets
+  });
+
+  it('accepts only one valid IP from a trusted header, so junk values cannot mint new buckets', async () => {
+    const deps = fakeDeps();
+    const app = createApp(deps, { ...testAppOptions, trustProxyHeader: 'x-forwarded-for' });
+    for (const value of ['junk-1', 'junk-2', '<script>', '']) {
+      await app.request('/v1/sets', { headers: { 'x-forwarded-for': value } });
+    }
+    expect(deps.rateLimiter.counts.size).toBe(1); // all fell back to the same (socket) identity
+
+    await app.request('/v1/sets', { headers: { 'x-forwarded-for': '203.0.113.9, 10.0.0.1' } });
+    await app.request('/v1/sets', { headers: { 'x-forwarded-for': '203.0.113.9, 10.9.9.9' } });
+    expect(deps.rateLimiter.counts.size).toBe(2); // first entry of the list is the client
     expect(typeof clientKey).toBe('function');
   });
 });

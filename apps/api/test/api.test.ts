@@ -44,7 +44,7 @@ beforeAll(async () => {
       icons: new DrizzleIconRepository(t.db),
       search: new MeiliIconSearch(meili, index),
       rateLimiter: new ValkeyRateLimiter(redis, limiterPrefix),
-      png: new ResvgRenderer(2),
+      png: new ResvgRenderer({ concurrency: 2 }),
     },
     {
       apiUrl: 'https://api.test',
@@ -105,6 +105,19 @@ describe('against real Postgres, Meilisearch and Valkey', () => {
     const icon = await contract('/v1/icons/iconnook-fixtures/plus', IconDetail);
     expect(icon.setInfo.prefix).toBe('iconnook-fixtures');
     await contract('/v1/categories', Category.array());
+  });
+
+  it('counts only visible icons in categories', async () => {
+    await t.raw`INSERT INTO categories (slug, label) VALUES ('shapes', 'Shapes')`;
+    await t.raw`INSERT INTO icons (set_id, name, body, width, height, hidden)
+                SELECT id, 'ghost', '<g/>', 24, 24, true FROM icon_sets WHERE prefix = 'iconnook-fixtures'`;
+    await t.raw`INSERT INTO icon_categories (icon_id, category_id)
+                SELECT i.id, c.id FROM icons i, categories c
+                WHERE c.slug = 'shapes' AND i.name IN ('circle', 'ghost')`;
+
+    const categories = await contract('/v1/categories', Category.array());
+    expect(categories).toEqual([{ slug: 'shapes', label: 'Shapes', total: 1 }]);
+    expect((await app.request('/v1/icons/iconnook-fixtures/ghost')).status).toBe(404);
   });
 
   it('returns 404 problems for missing icons', async () => {

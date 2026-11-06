@@ -1,5 +1,5 @@
 import { createRoute, type OpenAPIHono, type z } from '@hono/zod-openapi';
-import type { Context, MiddlewareHandler } from 'hono';
+import type { Context } from 'hono';
 import type { ZodError } from 'zod';
 
 import type { IconRecord, Dependencies } from '../domain.js';
@@ -31,7 +31,8 @@ export interface RouteContext {
   service: IconService;
   apiUrl: string;
   siteUrl: string;
-  renderLimit: MiddlewareHandler;
+  /** Counts a PNG render against the stricter limit; returns a 429 response or null. */
+  checkRenderLimit: (c: Context) => Promise<Response | null>;
 }
 
 export const toIssues = (error: ZodError) =>
@@ -107,13 +108,16 @@ export function registerV1(app: OpenAPIHono, ctx: RouteContext): void {
     return c.body(svg, 200, { 'Content-Type': 'image/svg+xml; charset=utf-8' });
   });
 
-  app.get(`/v1/icons/${SET}/:file{[a-z0-9-]+\\.png}`, ctx.renderLimit, async (c) => {
+  app.get(`/v1/icons/${SET}/:file{[a-z0-9-]+\\.png}`, async (c) => {
     const { set, name } = assetName(c, '.png');
     const query = PngQuery.safeParse(c.req.query());
     if (!query.success) throw badRequest('Invalid PNG parameters', toIssues(query.error));
     const { color, size, stroke, download } = query.data;
     const redirect = canonicalRedirect(c, { color, size, stroke, download });
     if (redirect) return redirect;
+    // Only real renders count against the render limit (not the redirect hop).
+    const limited = await ctx.checkRenderLimit(c);
+    if (limited) return limited;
 
     const png = await service.png(set, name, {
       size: size ?? PNG_SIZE.default,

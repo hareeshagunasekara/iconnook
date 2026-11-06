@@ -1,4 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { except } from 'hono/combine';
 import { cors } from 'hono/cors';
 import { etag } from 'hono/etag';
 import { HTTPException } from 'hono/http-exception';
@@ -7,7 +8,7 @@ import { timeout } from 'hono/timeout';
 import { pino, type Logger } from 'pino';
 
 import type { Dependencies } from './domain.js';
-import { rateLimit, requestLog, securityHeaders } from './http/middleware.js';
+import { checkRateLimit, rateLimit, requestLog, securityHeaders } from './http/middleware.js';
 import { badRequest, ProblemError, problemResponse } from './http/problem.js';
 import { registerV1, toIssues } from './routes/v1.js';
 import { IconService } from './services/icon-service.js';
@@ -78,7 +79,11 @@ export function createApp(deps: Dependencies, options: AppOptions): OpenAPIHono 
       limitOpts,
     ),
   );
-  app.use('/v1/*', etag());
+  // ETags for JSON and SVG; PNGs are large and CDN-cached for a year, so hashing them is wasted CPU.
+  app.use(
+    '/v1/*',
+    except((c) => c.req.path.endsWith('.png'), etag()),
+  );
 
   // Liveness: no dependency checks, so a slow database never gets the pod killed.
   app.get('/healthz', (c) => {
@@ -103,9 +108,11 @@ export function createApp(deps: Dependencies, options: AppOptions): OpenAPIHono 
         check('cache', () => deps.rateLimiter.ping()),
       ]),
     );
-    const ready = Object.values(checks).every((v) => v === 'ok');
+    // Valkey is optional: the rate limiter fails open without it, so it never makes a pod unready.
+    const ready = checks['database'] === 'ok' && checks['search'] === 'ok';
     c.header('Cache-Control', 'no-store');
-    return c.json({ status: ready ? 'ok' : 'unavailable', checks }, ready ? 200 : 503);
+    const status = !ready ? 'unavailable' : checks['cache'] === 'ok' ? 'ok' : 'degraded';
+    return c.json({ status, checks }, ready ? 200 : 503);
   });
 
   registerV1(app, {
@@ -113,11 +120,13 @@ export function createApp(deps: Dependencies, options: AppOptions): OpenAPIHono 
     service: new IconService(deps, options.siteUrl),
     apiUrl: options.apiUrl,
     siteUrl: options.siteUrl,
-    renderLimit: rateLimit(
-      deps.rateLimiter,
-      { name: 'render', limit: options.rateLimit.renderPerMinute, windowSeconds: 60 },
-      limitOpts,
-    ),
+    checkRenderLimit: (c) =>
+      checkRateLimit(
+        c,
+        deps.rateLimiter,
+        { name: 'render', limit: options.rateLimit.renderPerMinute, windowSeconds: 60 },
+        limitOpts,
+      ),
   });
 
   app.doc31('/v1/openapi.json', {

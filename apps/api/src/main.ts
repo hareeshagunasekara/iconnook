@@ -36,7 +36,7 @@ const app = createApp(
     icons: new DrizzleIconRepository(db.db),
     search: new MeiliIconSearch(meili),
     rateLimiter: new ValkeyRateLimiter(redis),
-    png: new ResvgRenderer(config.PNG_CONCURRENCY),
+    png: new ResvgRenderer({ concurrency: config.PNG_CONCURRENCY }),
   },
   {
     apiUrl: config.PUBLIC_API_URL,

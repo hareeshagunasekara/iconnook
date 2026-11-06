@@ -1,7 +1,7 @@
 import { customizeSvg, toCode, type CodeFormat, type Customization } from '@iconnook/svg';
 
 import type { Dependencies, IconDetail, IconListItem } from '../domain.js';
-import { notFound, unavailable } from '../http/problem.js';
+import { badRequest, notFound, unavailable } from '../http/problem.js';
 
 export interface SearchParams {
   q: string;
@@ -28,7 +28,8 @@ const escapeHtml = (s: string) =>
     (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] ?? ch,
   );
 const escapeMd = (s: string) => s.replace(/([\\[\]()*_`])/g, '\\$1');
-const safeUrl = (url: string | null) => (url && /^https?:\/\//.test(url) ? url : null);
+/** Only plain http(s) URLs without whitespace or angle brackets are linked; anything else is dropped. */
+const safeUrl = (url: string | null) => (url && /^https?:\/\/[^\s<>]+$/.test(url) ? url : null);
 
 export class IconService {
   constructor(
@@ -68,14 +69,17 @@ export class IconService {
     const licenseUrl = safeUrl(setInfo.license.url);
     const shareAlike = setInfo.license.tier === 'C';
 
+    // CC-BY-SA requires the share-alike notice in every form the user might paste.
+    const notice = shareAlike ? '. Modified versions must use the same license.' : '';
     const plain =
       `"${name}" icon from ${setInfo.name} by ${author}, licensed under ${setInfo.license.spdx}` +
       (licenseUrl ? ` (${licenseUrl})` : '') +
-      (shareAlike ? '. Modified versions must use the same license.' : '');
+      notice;
     const link = (text: string, url: string | null) =>
       url ? `<a href="${escapeHtml(url)}">${escapeHtml(text)}</a>` : escapeHtml(text);
+    // Angle-bracket destinations keep URLs containing ")" from breaking the link (CommonMark).
     const mdLink = (text: string, url: string | null) =>
-      url ? `[${escapeMd(text)}](${url})` : escapeMd(text);
+      url ? `[${escapeMd(text)}](<${url}>)` : escapeMd(text);
 
     return {
       required: setInfo.license.attributionRequired,
@@ -83,10 +87,10 @@ export class IconService {
       plain,
       html:
         `${link(name, page)} icon from ${escapeHtml(setInfo.name)} by ${link(author, authorUrl)}, ` +
-        `licensed under ${link(setInfo.license.spdx, licenseUrl)}`,
+        `licensed under ${link(setInfo.license.spdx, licenseUrl)}${escapeHtml(notice)}`,
       markdown:
         `${mdLink(name, page)} icon from ${escapeMd(setInfo.name)} by ${mdLink(author, authorUrl)}, ` +
-        `licensed under ${mdLink(setInfo.license.spdx, licenseUrl)}`,
+        `licensed under ${mdLink(setInfo.license.spdx, licenseUrl)}${escapeMd(notice)}`,
     };
   }
 
@@ -97,7 +101,8 @@ export class IconService {
     try {
       hits = await this.deps.search.search(params);
     } catch (error) {
-      if (error instanceof RangeError) throw error; // invalid filter: a client error, not an outage
+      // An invalid filter is the client's fault (400), anything else is an outage (503).
+      if (error instanceof RangeError) throw badRequest(error.message);
       throw unavailable('Search is temporarily unavailable, please retry shortly');
     }
     const items = await this.deps.icons.getIconsByIds(hits.ids);

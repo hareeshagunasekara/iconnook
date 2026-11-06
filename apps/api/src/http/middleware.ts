@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { isIP } from 'node:net';
 
 import { getConnInfo } from '@hono/node-server/conninfo';
 import type { Context, MiddlewareHandler } from 'hono';
@@ -50,10 +51,15 @@ export function securityHeaders(options: { hsts: boolean }): MiddlewareHandler {
 
 /**
  * Client identity for rate limiting: the trusted proxy header if configured, else the socket address.
- * Hashed so raw IPs never reach Valkey (docs/standards/security.md#privacy).
+ * Only a single, valid IP from the header is accepted (first entry of a list), so clients can't mint
+ * fresh buckets with junk values. The header is only trustworthy if the origin is reachable solely
+ * through that proxy (Phase 8 firewall). Hashed so raw IPs never reach Valkey.
  */
 export function clientKey(c: Context, trustProxyHeader: string | undefined): string {
-  let ip = trustProxyHeader ? c.req.header(trustProxyHeader) : undefined;
+  const forwarded = trustProxyHeader
+    ? c.req.header(trustProxyHeader)?.split(',')[0]?.trim()
+    : undefined;
+  let ip = forwarded && isIP(forwarded) ? forwarded : undefined;
   if (!ip) {
     try {
       ip = getConnInfo(c).remote.address;
@@ -73,43 +79,54 @@ export interface RateLimitRule {
   windowSeconds: number;
 }
 
+export interface RateLimitOptions {
+  trustProxyHeader: string | undefined;
+  logger: Logger;
+}
+
 /**
- * Per-client rate limit. Fails open if Valkey is unavailable (Cloudflare rate limits remain as the
- * outer layer — docs/standards/scalability.md), and logs it.
+ * Counts one request against `rule` and returns a 429 response if over the limit, else null.
+ * Fails open if Valkey is unavailable (Cloudflare rate limits remain as the outer layer —
+ * docs/standards/scalability.md), and logs it.
  */
+export async function checkRateLimit(
+  c: Context,
+  limiter: RateLimiter,
+  rule: RateLimitRule,
+  opts: RateLimitOptions,
+): Promise<Response | null> {
+  const key = `${rule.name}:${clientKey(c, opts.trustProxyHeader)}`;
+  let result;
+  try {
+    result = await limiter.hit(key, rule.limit, rule.windowSeconds);
+  } catch (error) {
+    opts.logger.warn({ err: error, rule: rule.name }, 'rate limiter unavailable, allowing request');
+    return null;
+  }
+  c.header('RateLimit-Limit', String(result.limit));
+  c.header('RateLimit-Remaining', String(result.remaining));
+  c.header('RateLimit-Reset', String(result.resetSeconds));
+  if (result.allowed) return null;
+  c.header('Retry-After', String(result.resetSeconds));
+  return problemResponse(
+    c,
+    new ProblemError(
+      429,
+      'rate-limited',
+      'Too Many Requests',
+      `Limit of ${String(rule.limit)} requests per ${String(rule.windowSeconds)}s reached`,
+    ),
+  );
+}
+
 export function rateLimit(
   limiter: RateLimiter,
   rule: RateLimitRule,
-  opts: { trustProxyHeader: string | undefined; logger: Logger },
+  opts: RateLimitOptions,
 ): MiddlewareHandler {
   return async (c, next) => {
-    const key = `${rule.name}:${clientKey(c, opts.trustProxyHeader)}`;
-    let result;
-    try {
-      result = await limiter.hit(key, rule.limit, rule.windowSeconds);
-    } catch (error) {
-      opts.logger.warn(
-        { err: error, rule: rule.name },
-        'rate limiter unavailable, allowing request',
-      );
-      await next();
-      return;
-    }
-    c.header('RateLimit-Limit', String(result.limit));
-    c.header('RateLimit-Remaining', String(result.remaining));
-    c.header('RateLimit-Reset', String(result.resetSeconds));
-    if (!result.allowed) {
-      c.header('Retry-After', String(result.resetSeconds));
-      return problemResponse(
-        c,
-        new ProblemError(
-          429,
-          'rate-limited',
-          'Too Many Requests',
-          `Limit of ${String(rule.limit)} requests per ${String(rule.windowSeconds)}s reached`,
-        ),
-      );
-    }
+    const limited = await checkRateLimit(c, limiter, rule, opts);
+    if (limited) return limited;
     await next();
     return undefined;
   };
