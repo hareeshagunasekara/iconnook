@@ -12,8 +12,10 @@ export const MAX_ELEMENTS = 5_000;
 export type SanitizeResult =
   | {
       ok: true;
-      /** Sanitized `<svg>` element markup. */
+      /** Sanitized `<svg>` element markup (HTML serialization, for inlining in pages). */
       svg: string;
+      /** Same element as standalone XML with proper namespaces (for .svg files and data URIs). */
+      xml: string;
       /** Inner markup of the sanitized `<svg>` (what we store). */
       body: string;
       /** How many elements/attributes the sanitizer removed (0 = input was already clean). */
@@ -23,6 +25,7 @@ export type SanitizeResult =
 
 const { window } = new JSDOM('');
 const purify = createDOMPurify(window);
+const xmlSerializer = new window.XMLSerializer();
 
 /** Removals made by our hooks (DOMPurify only records its own); reset per sanitizeSvg call. */
 let hookRemovals = 0;
@@ -157,5 +160,11 @@ export function sanitizeSvg(input: string): SanitizeResult {
   const removed =
     purify.removed.filter((r) => !('element' in r && r.element.nodeName === 'BODY')).length +
     hookRemovals;
-  return { ok: true, svg: svg.outerHTML, body: svg.innerHTML, removed };
+  return {
+    ok: true,
+    svg: svg.outerHTML,
+    xml: xmlSerializer.serializeToString(svg),
+    body: svg.innerHTML,
+    removed,
+  };
 }
