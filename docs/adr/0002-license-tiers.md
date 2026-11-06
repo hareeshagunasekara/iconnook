@@ -11,12 +11,12 @@ Competing sites either restrict free use (Flaticon, Icons8 require attribution l
 
 Every icon set is assigned a tier from its license:
 
-| Tier | Licenses | User obligation | Import |
-|---|---|---|---|
-| A | MIT, Apache-2.0, ISC, CC0-1.0, Unlicense, BSD-3-Clause, OFL-1.1, MPL-2.0 | None visible | Phase 3 (launch) |
-| B | CC-BY-3.0, CC-BY-4.0 | Credit author | After launch, with attribution UI |
-| C | CC-BY-SA-3.0, CC-BY-SA-4.0 | Credit + share-alike | After launch, with attribution UI |
-| X | GPL-*, any NC license | — | Never |
+| Tier | Licenses                                                                 | User obligation      | Import                            |
+| ---- | ------------------------------------------------------------------------ | -------------------- | --------------------------------- |
+| A    | MIT, Apache-2.0, ISC, CC0-1.0, Unlicense, BSD-3-Clause, OFL-1.1, MPL-2.0 | None visible         | Phase 3 (launch)                  |
+| B    | CC-BY-3.0, CC-BY-4.0                                                     | Credit author        | After launch, with attribution UI |
+| C    | CC-BY-SA-3.0, CC-BY-SA-4.0                                               | Credit + share-alike | After launch, with attribution UI |
+| X    | GPL-*, any NC license                                                    | —                    | Never                             |
 
 Never imported regardless of license claims on third-party sites: Flaticon, Icons8, Freepik, Noun Project, unDraw (its license forbids building a competing library). Logo sets carry a trademark notice. A source's license must be verified at its official origin before import.
 

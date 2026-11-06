@@ -4,20 +4,20 @@ Goal: confidence to deploy `main` any time. Tests are part of "done" (see workfl
 
 ## Test types & tools
 
-| Layer | Tool | What it covers | Runs |
-|---|---|---|---|
-| Static | `tsc --noEmit`, ESLint, Prettier | Types, bugs patterns, import cycles, formatting | Pre-commit + every PR |
-| Unit | **Vitest** | Pure logic: SVG transforms, sanitizer, license-tier mapping, slugging, Zod schemas, formatters (JSX/Vue/data URI) | Every PR |
-| Integration | **Vitest + Testcontainers** (or the compose stack in CI) | API routes against real Postgres / Meilisearch / Valkey; repositories; importer end-to-end on a fixture set; migrations up from empty | Every PR |
-| Contract | OpenAPI schema check (generated spec diff) + response validation in integration tests | API responses match the published `/v1/openapi.json`; no accidental breaking change | Every PR |
-| Component | Vitest + Testing Library (Preact) | Interactive islands: search box, editor controls, icon grid keyboard nav | Every PR |
-| E2E | **Playwright** (Chromium, Firefox, WebKit; one mobile viewport) | Critical user journeys (below) on a production build | Every PR (Chromium), nightly (all browsers) |
-| Accessibility | **@axe-core/playwright** in every E2E page visit; Lighthouse a11y = 100 | WCAG 2.2 AA automated checks | Every PR |
-| Visual regression | Playwright screenshots of a few key components/pages (light + dark) | Unintended UI changes | Every PR, reviewed on diff |
-| Performance | **Lighthouse CI** (budgets in performance.md) | LCP/CLS/JS size per template | Every PR |
-| Load | **k6** | Throughput, latency, scaling behavior (see scalability.md) | Before launch, before big releases, monthly |
-| Security | gitleaks, `pnpm audit`/OSV, CodeQL, Trivy; **OWASP ZAP baseline** scan on staging; sanitizer fuzzing | Secrets, vulnerable deps, code flaws, image CVEs, header/config issues, SVG XSS | PR (static), nightly (ZAP, fuzz) |
-| Resilience | Manual/scripted: kill pods, stop Meilisearch, saturate Valkey on staging | Graceful degradation, recovery | Before launch, quarterly |
+| Layer             | Tool                                                                                                 | What it covers                                                                                                                        | Runs                                        |
+| ----------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Static            | `tsc --noEmit`, ESLint, Prettier                                                                     | Types, bugs patterns, import cycles, formatting                                                                                       | Pre-commit + every PR                       |
+| Unit              | **Vitest**                                                                                           | Pure logic: SVG transforms, sanitizer, license-tier mapping, slugging, Zod schemas, formatters (JSX/Vue/data URI)                     | Every PR                                    |
+| Integration       | **Vitest + Testcontainers** (or the compose stack in CI)                                             | API routes against real Postgres / Meilisearch / Valkey; repositories; importer end-to-end on a fixture set; migrations up from empty | Every PR                                    |
+| Contract          | OpenAPI schema check (generated spec diff) + response validation in integration tests                | API responses match the published `/v1/openapi.json`; no accidental breaking change                                                   | Every PR                                    |
+| Component         | Vitest + Testing Library (Preact)                                                                    | Interactive islands: search box, editor controls, icon grid keyboard nav                                                              | Every PR                                    |
+| E2E               | **Playwright** (Chromium, Firefox, WebKit; one mobile viewport)                                      | Critical user journeys (below) on a production build                                                                                  | Every PR (Chromium), nightly (all browsers) |
+| Accessibility     | **@axe-core/playwright** in every E2E page visit; Lighthouse a11y = 100                              | WCAG 2.2 AA automated checks                                                                                                          | Every PR                                    |
+| Visual regression | Playwright screenshots of a few key components/pages (light + dark)                                  | Unintended UI changes                                                                                                                 | Every PR, reviewed on diff                  |
+| Performance       | **Lighthouse CI** (budgets in performance.md)                                                        | LCP/CLS/JS size per template                                                                                                          | Every PR                                    |
+| Load              | **k6**                                                                                               | Throughput, latency, scaling behavior (see scalability.md)                                                                            | Before launch, before big releases, monthly |
+| Security          | gitleaks, `pnpm audit`/OSV, CodeQL, Trivy; **OWASP ZAP baseline** scan on staging; sanitizer fuzzing | Secrets, vulnerable deps, code flaws, image CVEs, header/config issues, SVG XSS                                                       | PR (static), nightly (ZAP, fuzz)            |
+| Resilience        | Manual/scripted: kill pods, stop Meilisearch, saturate Valkey on staging                             | Graceful degradation, recovery                                                                                                        | Before launch, quarterly                    |
 
 ## Critical E2E journeys (must always pass)
 

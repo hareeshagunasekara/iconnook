@@ -19,12 +19,12 @@ TypeScript · Astro + Preact + Tailwind · Hono · PostgreSQL + Drizzle · Meili
 
 ## Docs
 
-| | |
-|---|---|
-| [docs/PLAN.md](docs/PLAN.md) | Phase-by-phase build plan and progress |
+|                                             |                                                                                                         |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [docs/PLAN.md](docs/PLAN.md)                | Phase-by-phase build plan and progress                                                                  |
 | [docs/standards/](docs/standards/README.md) | Engineering standards: code, architecture, security, UI/UX, performance, testing, scalability, workflow |
-| [docs/adr/](docs/adr/) | Architecture decision records |
-| [SOURCES.md](SOURCES.md) | Every icon source with its license and tier |
+| [docs/adr/](docs/adr/)                      | Architecture decision records                                                                           |
+| [SOURCES.md](SOURCES.md)                    | Every icon source with its license and tier                                                             |
 
 ## Contributing
 
