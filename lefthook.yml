@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: gitleaks
+      run: gitleaks git --pre-commit --staged --no-banner --redact
+    - name: prettier
+      glob: '*.{js,ts,tsx,astro,json,md,yml,yaml,css}'
+      run: pnpm exec prettier --check {staged_files}
+    - name: eslint
+      glob: '*.{js,ts,tsx}'
+      run: pnpm exec eslint {staged_files}
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}

@@ -1,0 +1,9 @@
+{
+  "name": "@iconnook/config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared TypeScript configuration for IconNook packages",
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json"
+  }
+}

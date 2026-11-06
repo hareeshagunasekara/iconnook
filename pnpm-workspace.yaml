@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  esbuild: true
+  lefthook: true
+
+overrides:
+  # @astrojs/astro2tsx ships @emnapi/core 1.x, but its @emnapi/runtime peer resolves to a 2.0 beta,
+  # which crashes `astro check`. Keep runtime on the matching stable line until upstream fixes it.
+  '@emnapi/runtime': 1.11.3
