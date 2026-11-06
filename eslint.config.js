@@ -39,4 +39,10 @@ export default tseslint.config(
     files: ['**/*.js', '**/*.mjs'],
     extends: [tseslint.configs.disableTypeChecked],
   },
+  {
+    // k6 load-test scripts: k6 requires a default export and provides these globals.
+    files: ['load/**/*.js'],
+    languageOptions: { globals: { __ENV: 'readonly', __VU: 'readonly', __ITER: 'readonly' } },
+    rules: { 'import-x/no-default-export': 'off' },
+  },
 );

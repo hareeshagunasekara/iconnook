@@ -40,7 +40,7 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()
 Cross-Origin-Opener-Policy: same-origin
 ```
 
-Tighten `style-src` with nonces/hashes if feasible. Public API: CORS `*` for GET asset endpoints only; everything else same-origin.
+Tighten `style-src` with nonces/hashes if feasible. Public API: CORS `*` for GET (the API is public, read-only, unauthenticated and sets no cookies — so this is safe and intended). ZAP flags it as "Cross-Domain Misconfiguration" (10098); that rule is ignored with this justification in `.zap/rules.tsv`. Run ZAP with `zap-api-scan.py -t <api>/v1/openapi.json -f openapi -c rules.tsv`.
 
 ## Abuse & availability
 
