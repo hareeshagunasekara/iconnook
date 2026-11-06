@@ -6,7 +6,7 @@
 Browser ──► Cloudflare (CDN, WAF, cache) ──► Traefik ingress (k3s)
                                             ├── web    Astro (SSR + static), cached at edge
                                             ├── api    Hono, stateless, ≥2 replicas
-                                            └── (internal) postgres · meilisearch · valkey · minio/R2
+                                            └── (internal) postgres · meilisearch · valkey · seaweedfs/R2
               worker (BullMQ) ◄── valkey queue      importer (Job) ──► postgres + meili + storage
 ```
 
@@ -33,7 +33,7 @@ packages/importer ───┘
 routes/      HTTP: parse input (Zod), call service, map to response. No business logic.
 services/    Business logic. Pure where possible. Depends on interfaces (ports).
 repositories/ Data access behind interfaces (IconRepository, SearchIndex, Storage).
-adapters/    Concrete implementations: Drizzle/Postgres, Meilisearch, R2/MinIO, Valkey.
+adapters/    Concrete implementations: Drizzle/Postgres, Meilisearch, R2/SeaweedFS, Valkey.
 main.ts      Composition root: read config, build adapters, inject into services, start server.
 ```
 

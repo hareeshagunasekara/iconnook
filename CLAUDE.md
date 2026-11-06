@@ -3,7 +3,7 @@
 **IconNook** (iconnook.com) — a free, open-source SVG icon library (in the spirit of svgrepo / flaticon). No payments, no paywalls, ever.
 Goals, in priority order: **legally clean icons**, **fast**, **accessible to everyone**.
 
-> Status: Phase 1 (monorepo & tooling). Update this file as the project grows.
+> Status: Phase 2 (local infrastructure & database). Update this file as the project grows.
 > **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
 > **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
@@ -14,7 +14,7 @@ Goals, in priority order: **legally clean icons**, **fast**, **accessible to eve
 - **Web:** Astro + Preact islands + Tailwind CSS v4. Ship minimal JS; pages must work without JS for browse/download.
 - **API:** Hono + Zod (OpenAPI generated from Zod schemas).
 - **Data:** PostgreSQL + Drizzle ORM (source of truth), Meilisearch (search, rebuildable from Postgres), Valkey (cache, rate limits, BullMQ queue).
-- **Files:** MinIO locally, Cloudflare R2 in production. SVGO for cleanup, resvg-js for PNG rendering.
+- **Files:** SeaweedFS locally (S3 API, ADR 0003), Cloudflare R2 in production. SVGO for cleanup, resvg-js for PNG rendering.
 - **Infra:** Docker + Docker Compose for dev; k3s on a single VPS behind Cloudflare for prod; GitHub Actions → GHCR.
 
 ## Layout
@@ -24,7 +24,7 @@ apps/web           Astro site                                            ✅ ske
 apps/api           Hono REST API (/v1/...)                               ✅ /healthz
 packages/core      shared pure domain logic (license tiers, types)        ✅
 packages/config    shared tsconfig                                        ✅
-packages/db        Drizzle schema, migrations                             Phase 2
+packages/db        Drizzle schema, migrations, client, fixtures           ✅
 packages/importer  @iconify/json → SVGO → Postgres + Meilisearch          Phase 3
 apps/worker        BullMQ jobs: ZIP packs, PNG pre-render, counters       Phase 6
 deploy/k8s         k3s manifests                                          Phase 8
@@ -68,12 +68,19 @@ Significant decisions go in `docs/adr/`. The summary below is the short version.
 Node 24 (`.nvmrc`), pnpm 11 via corepack (`corepack enable pnpm`; version pinned in `package.json` → `packageManager`).
 
 ```sh
+cp .env.example .env         # first time only; fill in local passwords (gitignored)
 pnpm install                 # also installs git hooks (lefthook)
+docker compose up -d         # postgres, meilisearch, valkey, seaweedfs (all bound to 127.0.0.1)
+pnpm db:migrate              # apply migrations (re-runnable)  ·  pnpm db:seed — tiny CC0 fixture set
 pnpm dev                     # all apps: web http://localhost:4321, api http://localhost:8787
-pnpm check                   # everything CI runs: format:check, lint, typecheck, test, build
-pnpm lint | typecheck | test | build | format
+pnpm check                   # everything CI's quality job runs: format:check, lint, typecheck, test, build
+pnpm test:integration        # needs the compose stack; each test file gets its own throwaway database
+pnpm db:generate --name <x>  # after editing packages/db/src/schema.ts — review the SQL, commit it
 pnpm --filter @iconnook/api test     # one package
 ```
+
+- Schema changes only via generated migrations in `packages/db/migrations/` (forward-only; expand → migrate → contract).
+- Port clash with a local Postgres? Set `POSTGRES_HOST_PORT=5433` and matching `DATABASE_URL` in `.env`.
 
 Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged files; commit-msg runs commitlint (Conventional Commits).
 
