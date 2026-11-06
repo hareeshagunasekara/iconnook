@@ -19,4 +19,14 @@ Thanks for helping! IconNook is early in development — see [docs/PLAN.md](docs
 
 ## Development setup
 
-Coming in Phase 1–2 (Node 24, pnpm, Docker). This section will list the exact commands.
+Requirements: Node 24, Docker, and pnpm via corepack (`corepack enable pnpm`).
+
+```sh
+cp .env.example .env     # then replace the change-me values
+pnpm install
+docker compose up -d
+pnpm db:migrate && pnpm db:seed
+pnpm dev                 # web http://localhost:4321 · api http://localhost:8787
+pnpm check               # what CI runs
+pnpm test:integration    # database tests (needs docker compose)
+```

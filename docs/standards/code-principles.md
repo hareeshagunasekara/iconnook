@@ -8,7 +8,7 @@
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **S**ingle Responsibility | One module = one reason to change. A route handler parses input, calls a service, shapes the response — it does not run SQL or render SVG itself.                                                              |
 | **O**pen/Closed           | Add behavior by adding code, not editing stable code. New icon source = new adapter implementing `IconSource`; the importer core doesn't change. New export format (JSX, Vue…) = new entry in a formatter map. |
-| **L**iskov Substitution   | Any implementation of an interface must be usable wherever the interface is expected. `MinioStorage` and `R2Storage` behave identically behind `Storage` — same errors, same semantics.                        |
+| **L**iskov Substitution   | Any implementation of an interface must be usable wherever the interface is expected. `SeaweedStorage` and `R2Storage` behave identically behind `Storage` — same errors, same semantics.                      |
 | **I**nterface Segregation | Small, specific interfaces. A function that only reads icons takes `IconReader`, not the whole repository.                                                                                                     |
 | **D**ependency Inversion  | Business logic depends on interfaces; concrete infra (Postgres, Meilisearch, R2) is injected at the edge (app startup). This is what makes services testable without Docker.                                   |
 

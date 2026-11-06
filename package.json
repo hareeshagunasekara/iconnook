@@ -11,11 +11,15 @@
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "db:migrate": "pnpm --filter @iconnook/db db:migrate",
+    "db:seed": "pnpm --filter @iconnook/db db:seed",
+    "db:generate": "pnpm --filter @iconnook/db db:generate"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
