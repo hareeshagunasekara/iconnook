@@ -1,0 +1,1 @@
+ALTER TYPE "public"."set_type" ADD VALUE 'cute' BEFORE 'color';
