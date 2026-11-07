@@ -64,6 +64,14 @@ export const iconSets = pgTable(
     version: text('version'),
     /** Visible icons in the set, maintained by the importer (avoids counting on every request). */
     iconCount: integer('icon_count').notNull().default(0),
+    /**
+     * Icon names the set's authors picked as representative (Iconify `samples`), in order. The first
+     * one that exists is the set's preview on cards — a real icon from the set, never a made-up one.
+     */
+    sampleIcons: text('sample_icons')
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
     ...timestamps,
   },
   (t) => [

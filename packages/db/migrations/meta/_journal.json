@@ -29,6 +29,13 @@
       "when": 1794035009926,
       "tag": "0003_collections_and_download_flushes",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794037571617,
+      "tag": "0004_set_sample_icons",
+      "breakpoints": true
     }
   ]
 }
