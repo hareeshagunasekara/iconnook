@@ -1,4 +1,5 @@
 import type { ImportableTier } from '@iconnook/core';
+import type { FeatureFlag, PackRequest } from '@iconnook/jobs';
 import type { SearchHits, SearchQuery } from '@iconnook/search';
 
 /** Domain types and the ports (interfaces) the services depend on. Adapters implement them. */
@@ -64,7 +65,54 @@ export interface IconRepository {
   /** Icons of a set ordered by name; `cursor` is the last name of the previous page. */
   listSetIcons(prefix: string, page: { cursor?: string; limit: number }): Promise<Page<IconRecord>>;
   listCategories(): Promise<CategorySummary[]>;
+  /** Icons by "set:name", in request order; unknown refs are skipped. */
+  getIconsByRefs(refs: readonly string[]): Promise<IconListItem[]>;
+  iconExists(id: number): Promise<boolean>;
+  createCollection(collection: {
+    id: string;
+    name: string | null;
+    iconIds: readonly number[];
+  }): Promise<void>;
+  getCollection(id: string): Promise<Collection | null>;
   ping(): Promise<void>;
+}
+
+export interface Collection {
+  id: string;
+  name: string | null;
+  createdAt: string;
+  icons: IconListItem[];
+}
+
+export type PackState = 'queued' | 'active' | 'completed' | 'failed';
+
+export interface PackStatus {
+  id: string;
+  state: PackState;
+  /** 0–100 */
+  progress: number;
+  format: 'zip' | 'sprite';
+  error?: string;
+}
+
+/** Background pack builds (BullMQ in production). */
+export interface PackQueue {
+  /** Enqueues the pack, or returns the existing job for this id (content-addressed). */
+  enqueue(id: string, request: PackRequest): Promise<PackStatus>;
+  status(id: string): Promise<PackStatus | null>;
+}
+
+export interface FileStore {
+  /** Streams a stored file; null if it doesn't exist (e.g. a pack past retention). */
+  get(key: string): Promise<Response | null>;
+}
+
+export interface FeatureFlags {
+  isEnabled(flag: FeatureFlag): Promise<boolean>;
+}
+
+export interface DownloadCounter {
+  record(iconId: number): Promise<void>;
 }
 
 export interface IconSearch {
@@ -94,4 +142,8 @@ export interface Dependencies {
   search: IconSearch;
   rateLimiter: RateLimiter;
   png: PngRenderer;
+  packs: PackQueue;
+  files: FileStore;
+  flags: FeatureFlags;
+  downloads: DownloadCounter;
 }

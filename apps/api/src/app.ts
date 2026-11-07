@@ -1,5 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { except } from 'hono/combine';
+import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 import { etag } from 'hono/etag';
 import { HTTPException } from 'hono/http-exception';
@@ -11,6 +12,7 @@ import type { Dependencies } from './domain.js';
 import { checkRateLimit, rateLimit, requestLog, securityHeaders } from './http/middleware.js';
 import { badRequest, ProblemError, problemResponse } from './http/problem.js';
 import { registerV1, toIssues } from './routes/v1.js';
+import { registerCollections } from './routes/v1-collections.js';
 import { IconService } from './services/icon-service.js';
 
 export interface AppOptions {
@@ -19,7 +21,7 @@ export interface AppOptions {
   /** Send HSTS (production only — browsers would pin localhost otherwise). */
   hsts: boolean;
   trustProxyHeader?: string | undefined;
-  rateLimit: { perMinute: number; renderPerMinute: number };
+  rateLimit: { perMinute: number; renderPerMinute: number; writePerMinute?: number };
   requestTimeoutMs?: number;
   logger?: Logger;
 }
@@ -59,8 +61,11 @@ export function createApp(deps: Dependencies, options: AppOptions): OpenAPIHono 
     '*',
     cors({
       origin: '*',
-      allowMethods: ['GET', 'HEAD', 'OPTIONS'],
+      // Public, anonymous API with no cookies: any origin may read and POST (collections, packs).
+      allowMethods: ['GET', 'HEAD', 'POST', 'OPTIONS'],
+      allowHeaders: ['Content-Type'],
       exposeHeaders: [
+        'Location',
         'ETag',
         'RateLimit-Limit',
         'RateLimit-Remaining',
@@ -71,6 +76,23 @@ export function createApp(deps: Dependencies, options: AppOptions): OpenAPIHono 
     }),
   );
   app.use('*', timeout(options.requestTimeoutMs ?? 10_000));
+  // Request bodies are small JSON (≤ 500 icon refs); reject anything bigger before parsing.
+  app.use(
+    '/v1/*',
+    bodyLimit({
+      maxSize: 64 * 1024,
+      onError: (c) =>
+        problemResponse(
+          c,
+          new ProblemError(
+            413,
+            'too-large',
+            'Payload Too Large',
+            'Request body is limited to 64 KB',
+          ),
+        ),
+    }),
+  );
   app.use(
     '/v1/*',
     rateLimit(
@@ -127,6 +149,17 @@ export function createApp(deps: Dependencies, options: AppOptions): OpenAPIHono 
         { name: 'render', limit: options.rateLimit.renderPerMinute, windowSeconds: 60 },
         limitOpts,
       ),
+  });
+
+  registerCollections(app, {
+    deps,
+    apiUrl: options.apiUrl,
+    siteUrl: options.siteUrl,
+    writeLimit: rateLimit(
+      deps.rateLimiter,
+      { name: 'write', limit: options.rateLimit.writePerMinute ?? 30, windowSeconds: 60 },
+      limitOpts,
+    ),
   });
 
   app.doc31('/v1/openapi.json', {
