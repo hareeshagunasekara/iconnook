@@ -43,7 +43,7 @@ test.describe('without JavaScript', () => {
   test('icon page still offers preview, downloads and SVG code', async ({ page }) => {
     await page.goto('/icons/iconnook-fixtures/circle');
     await expect(page.getByRole('img', { name: /preview on light background/ })).toBeVisible();
-    await expect(page.locator('[role="img"] > svg')).toHaveCount(2); // light + dark previews inline, no requests
+    await expect(page.locator('[role="img"] > svg')).toHaveCount(2); // both icon previews (light and dark background) inline, no requests
     await expect(page.getByRole('link', { name: 'Download SVG' })).toHaveAttribute(
       'href',
       /circle\.svg\?download=1&size=48$/,

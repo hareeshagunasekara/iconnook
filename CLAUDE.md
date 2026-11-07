@@ -87,7 +87,7 @@ pnpm icons:catalog            # regenerate SOURCES.md (never edit it by hand)
 pnpm --filter @iconnook/worker dev            # background jobs (packs, download counters)
 pnpm --filter @iconnook/worker flags set packs off   # feature flags: packs | png, on | off
 docker run --rm -i -e BASE_URL=http://host.docker.internal:8787 grafana/k6 run - < load/api.js   # API load test
-pnpm build && pnpm --filter @iconnook/web test:e2e   # Playwright journeys + axe (light/dark) + 320px + no-JS
+pnpm build && pnpm --filter @iconnook/web test:e2e   # Playwright journeys + axe + 320px + no-JS
 cd apps/web && CHROME_PATH=$(node -e "console.log(require('@playwright/test').chromium.executablePath())") npx @lhci/cli@0.16.0 autorun   # Lighthouse budgets (site must be running)
 pnpm --filter @iconnook/api test     # one package
 ```
@@ -107,6 +107,7 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 - CI dependency review allows **GHSA-g3hv-75wg-m249** (minimatch 10.x, dev-only via ESLint; forcing minimatch 11 breaks `eslint-plugin-import-x` 4.17). Remove the exception once import-x ≥ 4.18 is installed.
 - `@iconify/json` is ~600 MB unpacked: fine for dev/CI, but keep it out of runtime images (Phase 7: run the importer as its own Job image).
 - The importer writes per-set rejections and sanitizer changes to `.data/import-report.json` (gitignored) — review it after upgrading `@iconify/json`. Expected today: 3 rejected (2 over 512 KB, 1 with 0×0 size upstream), 0 changed.
+- **Light theme only — no dark mode** (ADR 0004, your decision): no `prefers-color-scheme` styles, no theme toggle, no dark-mode tests, and don't propose it. The dark _background_ in the icon-page preview is an icon preview, not a theme.
 - Web CSS: base styles go in `@layer base` / `@layer components` — unlayered CSS overrides every Tailwind utility (this broke button contrast once).
 - Web CSP comes from Astro (`security.csp`, hashed scripts, sent as a header in SSR); `src/middleware.ts` appends `frame-ancestors` and other headers. Never add `'unsafe-inline'` to script-src.
 - Each `role="search"` form needs a unique `aria-label` (axe `landmark-unique`).

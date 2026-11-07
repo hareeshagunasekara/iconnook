@@ -16,7 +16,7 @@ Description covers: what changed, why, how it was tested, screenshots for UI, an
 
 - [ ] Typecheck, lint, format, unit + integration tests pass
 - [ ] New behavior has tests; bug fixes have a regression test
-- [ ] UI changes: keyboard-only pass, axe clean, works at 320px wide and in dark mode
+- [ ] UI changes: keyboard-only pass, axe clean, works at 320px wide
 - [ ] Inputs validated with Zod; no secrets; no new `any`
 - [ ] Performance budgets hold (Lighthouse CI)
 - [ ] New dependency? Justified in the PR (size, maintenance, license is MIT/Apache/BSD/ISC-compatible)

@@ -4,13 +4,13 @@
 
 ## How it was tested
 
-<!-- Commands run, new tests, manual checks. Screenshots for UI changes (light + dark). -->
+<!-- Commands run, new tests, manual checks. Screenshots for UI changes. -->
 
 ## Checklist ([definition of done](../docs/standards/workflow.md))
 
 - [ ] Typecheck, lint, format and tests pass
 - [ ] New behavior has tests; bug fixes include a regression test
-- [ ] UI: keyboard-only pass, axe clean, works at 320px and in dark mode
+- [ ] UI: keyboard-only pass, axe clean, works at 320px
 - [ ] Inputs validated with Zod; no new `any`; **no secrets committed**
 - [ ] Performance budgets hold
 - [ ] New dependency justified (size, maintenance, license)
