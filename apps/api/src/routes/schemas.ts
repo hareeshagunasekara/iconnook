@@ -143,6 +143,12 @@ export const IconSet = z
     version: z.string().nullable(),
     author: z.object({ name: z.string(), url: z.string().nullable() }).nullable(),
     license: License,
+    preview: z
+      .object({ name: z.string(), body: z.string(), width: z.number(), height: z.number() })
+      .nullable()
+      .openapi({
+        description: "A real icon from the set (first of the authors' samples), sanitized SVG body",
+      }),
   })
   .openapi('IconSet');
 

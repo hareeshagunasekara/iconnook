@@ -21,6 +21,16 @@ export interface SetSummary {
   version: string | null;
   author: { name: string; url: string | null } | null;
   license: LicenseInfo;
+  /** A real icon from the set (the first of its authors' sample icons) for cards; null if none. */
+  preview: SetPreview | null;
+}
+
+export interface SetPreview {
+  name: string;
+  /** Sanitized inner SVG markup. */
+  body: string;
+  width: number;
+  height: number;
 }
 
 export interface IconRecord {
