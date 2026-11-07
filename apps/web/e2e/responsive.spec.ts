@@ -16,10 +16,15 @@ test.describe('at 320px wide', () => {
   for (const path of PAGES) {
     test(`no horizontal scrolling on ${path}`, async ({ page }) => {
       await page.goto(path);
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      );
-      expect(overflow).toBeLessThanOrEqual(0);
+      // Name the offenders so CI failures (different fonts on Linux) are easy to fix.
+      const wide = await page.evaluate(() => {
+        const limit = document.documentElement.clientWidth;
+        return [...document.querySelectorAll('body *')]
+          .filter((el) => el.getBoundingClientRect().right > limit + 1)
+          .slice(0, 5)
+          .map((el) => `${el.tagName.toLowerCase()}.${el.className.slice(0, 60)}`);
+      });
+      expect(wide).toEqual([]);
     });
   }
 });
