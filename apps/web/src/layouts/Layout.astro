@@ -7,6 +7,7 @@ import { PUBLIC_API_URL } from 'astro:env/client';
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import { IconModal } from '../islands/IconModal.tsx';
 
 interface Props {
   title: string;
@@ -61,12 +62,14 @@ const ogImage = new URL(image, Astro.site);
       <slot />
     </main>
     <Footer />
+    <IconModal client:idle apiUrl={PUBLIC_API_URL} />
     <!-- Screen-reader announcements ("Copied", result counts) -->
     <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <script>
       import '../scripts/shortcuts.ts';
       import '../scripts/grid-nav.ts';
       import '../scripts/menu.ts';
+      import '../scripts/search-suggest.ts';
     </script>
   </body>
 </html>

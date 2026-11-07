@@ -1,17 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useId, useState } from 'preact/hooks';
 
 import {
   addToCollection,
-  announce as announceLive,
+  announce,
   inCollection,
   onCollectionChange,
   removeFromCollection,
 } from '../lib/collection';
+import { UiIcon } from './UiIcon';
 
 /**
- * Icon page editor (Preact island). Server-rendered with defaults, so preview, downloads and the SVG
- * code all work without JavaScript; with JS, controls update everything live.
- * The preview is an <img> of the API's sanitized SVG — no client-side innerHTML.
+ * Icon editor (Preact island), on the icon page and in the icon modal: live preview, customizing,
+ * one-click copy in each code format, downloads and the collection. Server-rendered with defaults,
+ * so preview and downloads work without JavaScript. The preview is an <img> of the API's sanitized
+ * SVG, or the server-sanitized inline body; never client-built innerHTML.
  */
 
 const FORMATS = [
@@ -35,13 +37,12 @@ interface Props {
   isColor: boolean;
   /** Stroke-based icons can change stroke width. */
   hasStroke: boolean;
-  /** Server-fetched SVG code for the default state (shown without JS). */
-  initialCode: string;
   /**
-   * Server-rendered inline SVG of the uncustomized icon (same sanitized body the icon grids inline).
-   * Shown until the user customizes, so the page's largest element needs no extra request.
+   * Server-rendered inline SVG of the uncustomized icon (same sanitized body the icon grids inline),
+   * shown until the user customizes so the page's largest element needs no extra request. Empty in
+   * the modal, which shows the API's SVG instead.
    */
-  initialSvg: string;
+  initialSvg?: string;
   /** For the anonymous download counter. */
   iconId: number;
 }
@@ -56,7 +57,21 @@ function canonical(base: string, params: Record<string, string | number | undefi
   return query ? `${base}?${query}` : base;
 }
 
-const announce = announceLive;
+/**
+ * Copies text that is still being fetched. ClipboardItem accepts a promise, so Safari keeps the
+ * click's permission while the code loads; elsewhere fall back to writeText after the fetch.
+ */
+async function copyFetched(text: Promise<string>): Promise<void> {
+  if (typeof ClipboardItem !== 'undefined' && 'write' in navigator.clipboard) {
+    const blob = text.then((t) => new Blob([t], { type: 'text/plain' }));
+    await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })]);
+    return;
+  }
+  await navigator.clipboard.writeText(await text);
+}
+
+const BUTTON =
+  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[var(--radius-button)] border-2 border-ink bg-surface px-3 font-semibold';
 
 export function IconEditor({
   apiUrl,
@@ -64,11 +79,12 @@ export function IconEditor({
   name,
   isColor,
   hasStroke,
-  initialCode,
-  initialSvg,
+  initialSvg = '',
   iconId,
 }: Props) {
+  const id = useId();
   const ref = `${set}:${name}`;
+  const label = name.replaceAll('-', ' ');
   // false on the server and first render (no storage there), then synced from this browser.
   const [saved, setSaved] = useState(false);
   useEffect(() => {
@@ -91,141 +107,88 @@ export function IconEditor({
   const [colorText, setColorText] = useState('');
   const [size, setSize] = useState(48);
   const [stroke, setStroke] = useState<number | undefined>(undefined);
-  const [format, setFormat] = useState<Format>('svg');
-  const [code, setCode] = useState(initialCode);
-  const [copied, setCopied] = useState(false);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [copied, setCopied] = useState<Format | null>(null);
 
   const base = `${apiUrl}/v1/icons/${set}/${name}`;
   const custom = { color: color ? color.toLowerCase() : undefined, stroke };
-  const preview = canonical(`${base}.svg`, { ...custom, size: 256 });
+  const customized = color !== '' || stroke !== undefined;
   const svgDownload = canonical(`${base}.svg`, { ...custom, size, download: 1 });
   const pngDownload = canonical(`${base}.png`, {
     ...custom,
     size: Math.max(16, size),
     download: 1,
   });
-  const codeUrl = useMemo(
-    () =>
-      canonical(`${base}/code`, {
-        ...custom,
-        format,
-        size:
-          format === 'svg' || format === 'jsx' || format === 'vue' || format === 'svelte'
-            ? size
-            : undefined,
-      }),
-    [base, color, stroke, format, size],
-  );
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const timer = window.setTimeout(() => {
-      fetch(codeUrl, { signal: controller.signal })
-        .then((r) =>
-          r.ok
-            ? (r.json() as Promise<{ code: string }>)
-            : Promise.reject(new Error(String(r.status))),
-        )
-        .then((r) => {
-          setCode(r.code);
-        })
-        .catch(() => undefined);
-    }, 150);
-    return () => {
-      controller.abort();
-      window.clearTimeout(timer);
-    };
-  }, [codeUrl]);
-
-  const copy = async () => {
+  const copy = async (format: Format) => {
+    const sized = format === 'svg' || format === 'jsx' || format === 'vue' || format === 'svelte';
+    const url = canonical(`${base}/code`, { ...custom, format, size: sized ? size : undefined });
+    const text = fetch(url)
+      .then((r) =>
+        r.ok
+          ? (r.json() as Promise<{ code: string }>)
+          : Promise.reject(new Error(String(r.status))),
+      )
+      .then((r) => r.code);
+    const formatLabel = FORMATS.find((f) => f.id === format)?.label ?? '';
     try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      announce(`Copied ${FORMATS.find((f) => f.id === format)?.label ?? ''} code`);
+      await copyFetched(text);
+      setCopied(format);
+      announce(`Copied ${formatLabel} code`);
       window.setTimeout(() => {
-        setCopied(false);
+        setCopied((current) => (current === format ? null : current));
       }, 2_000);
     } catch {
-      announce('Copy failed. Select the code and copy it manually.');
+      announce(`Copy failed. Download the SVG instead, or try again.`);
     }
   };
 
-  // ARIA tabs: arrow keys move between tabs (only the selected tab is in the tab order).
-  const onTabKey = (event: KeyboardEvent, index: number) => {
-    const delta = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
-    if (delta === undefined && event.key !== 'Home' && event.key !== 'End') return;
-    event.preventDefault();
-    const next =
-      event.key === 'Home'
-        ? 0
-        : event.key === 'End'
-          ? FORMATS.length - 1
-          : (index + (delta ?? 0) + FORMATS.length) % FORMATS.length;
-    const target = FORMATS[next];
-    if (target) setFormat(target.id);
-    tabRefs.current[next]?.focus();
-  };
+  const preview = (dark: boolean) =>
+    !customized && initialSvg ? (
+      <span
+        role="img"
+        aria-label={`${label} icon preview on ${dark ? 'dark' : 'light'} background`}
+        class={`${dark ? 'text-[#eceef2]' : 'text-ink'} [&>svg]:h-28 [&>svg]:w-auto`}
+        dangerouslySetInnerHTML={{ __html: initialSvg }}
+      />
+    ) : (
+      <img
+        src={canonical(`${base}.svg`, {
+          ...custom,
+          color: color ? color.toLowerCase() : dark && !isColor ? '#eceef2' : undefined,
+          size: 256,
+        })}
+        alt={`${label} icon preview on ${dark ? 'dark' : 'light'} background`}
+        width={112}
+        height={112}
+        class="max-h-full w-auto"
+      />
+    );
 
   return (
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
-      <div class="space-y-4">
-        <div class="grid grid-cols-2 gap-2">
-          <div class="flex aspect-square items-center justify-center rounded-xl bg-white p-6">
-            {color === '' && stroke === undefined ? (
-              <span
-                role="img"
-                aria-label={`${name.replaceAll('-', ' ')} icon preview on light background`}
-                class="text-[#14161a] [&>svg]:h-32 [&>svg]:w-auto"
-                dangerouslySetInnerHTML={{ __html: initialSvg }}
-              />
-            ) : (
-              <img
-                src={preview}
-                alt={`${name.replaceAll('-', ' ')} icon preview on light background`}
-                width={128}
-                height={128}
-                class="max-h-full w-auto"
-              />
-            )}
-          </div>
-          <div class="flex aspect-square items-center justify-center rounded-xl bg-[#111317] p-6">
-            {color === '' && stroke === undefined ? (
-              <span
-                role="img"
-                aria-label={`${name.replaceAll('-', ' ')} icon preview on dark background`}
-                class="text-[#eceef2] [&>svg]:h-32 [&>svg]:w-auto"
-                dangerouslySetInnerHTML={{ __html: initialSvg }}
-              />
-            ) : (
-              <img
-                src={canonical(`${base}.svg`, {
-                  ...custom,
-                  color: color ? color.toLowerCase() : isColor ? undefined : '#eceef2',
-                  size: 256,
-                })}
-                alt={`${name.replaceAll('-', ' ')} icon preview on dark background`}
-                width={128}
-                height={128}
-                class="max-h-full w-auto"
-              />
-            )}
-          </div>
+    <div class="grid gap-6 md:grid-cols-[minmax(0,18rem)_1fr]">
+      <div class="grid grid-cols-2 content-start gap-2 md:grid-cols-1">
+        <div class="flex aspect-square items-center justify-center rounded-[var(--radius-card)] border-2 border-ink bg-white p-6">
+          {preview(false)}
         </div>
+        <div class="flex aspect-square items-center justify-center rounded-[var(--radius-card)] border-2 border-ink bg-[#111317] p-6">
+          {preview(true)}
+        </div>
+      </div>
 
-        <fieldset class="space-y-3 rounded-xl border border-[var(--color-surface-2)] p-4">
-          <legend class="px-1 font-semibold">Customize</legend>
+      <div class="min-w-0 space-y-5">
+        <fieldset class="space-y-3 rounded-[var(--radius-card)] border-2 border-ink/15 p-4">
+          <legend class="px-1 font-display font-bold">Customize</legend>
           {isColor ? (
-            <p class="text-sm text-[var(--color-text-muted)]">
+            <p class="text-sm text-text-muted">
               This is a multicolor icon, so its colors can't be changed.
             </p>
           ) : (
-            <div class="flex items-center gap-2">
-              <label for="ed-color" class="w-16 text-sm">
+            <div class="flex flex-wrap items-center gap-2">
+              <label for={`${id}-color`} class="w-16 text-sm">
                 Color
               </label>
               <input
-                id="ed-color"
+                id={`${id}-color`}
                 type="color"
                 value={HEX.test(color) && color.length === 7 ? color : '#000000'}
                 onInput={(e) => {
@@ -233,44 +196,44 @@ export function IconEditor({
                   setColor(v);
                   setColorText(v);
                 }}
-                class="h-11 w-11 cursor-pointer rounded border border-[var(--color-border)] bg-transparent"
+                class="h-11 w-11 cursor-pointer rounded border border-border bg-transparent"
               />
-              <label for="ed-color-hex" class="sr-only">
+              <label for={`${id}-hex`} class="sr-only">
                 Color as hex code
               </label>
               <input
-                id="ed-color-hex"
+                id={`${id}-hex`}
                 type="text"
                 inputMode="text"
                 placeholder="#000000"
                 value={colorText}
                 maxLength={7}
                 aria-invalid={colorText !== '' && !HEX.test(colorText)}
-                aria-describedby="ed-color-help"
+                aria-describedby={`${id}-color-help`}
                 onInput={(e) => {
                   const v = (e.target as HTMLInputElement).value.trim();
                   setColorText(v);
                   if (HEX.test(v)) setColor(v);
                   if (v === '') setColor('');
                 }}
-                class="min-h-11 w-28 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-2 font-mono"
+                class="min-h-11 w-28 rounded-lg border border-border bg-surface px-2 font-mono"
               />
-              <span id="ed-color-help" class="text-xs text-[var(--color-text-muted)]">
+              <span id={`${id}-color-help`} class="text-xs text-text-muted">
                 {colorText !== '' && !HEX.test(colorText) ? 'Use #rgb or #rrggbb' : ''}
               </span>
             </div>
           )}
           <div class="flex items-center gap-2">
-            <label for="ed-size" class="w-16 text-sm">
+            <label for={`${id}-size`} class="w-16 text-sm">
               Size
             </label>
             <select
-              id="ed-size"
+              id={`${id}-size`}
               value={size}
               onChange={(e) => {
                 setSize(Number((e.target as HTMLSelectElement).value));
               }}
-              class="min-h-11 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-2"
+              class="min-h-11 rounded-lg border border-border bg-surface px-2"
             >
               {SIZES.map((s) => (
                 <option value={s}>{s} px</option>
@@ -279,11 +242,11 @@ export function IconEditor({
           </div>
           {hasStroke && (
             <div class="flex items-center gap-2">
-              <label for="ed-stroke" class="w-16 text-sm">
+              <label for={`${id}-stroke`} class="w-16 text-sm">
                 Stroke
               </label>
               <input
-                id="ed-stroke"
+                id={`${id}-stroke`}
                 type="range"
                 min={0.5}
                 max={3}
@@ -294,7 +257,7 @@ export function IconEditor({
                 }}
                 class="flex-1"
               />
-              <output for="ed-stroke" class="w-10 text-right font-mono text-sm">
+              <output for={`${id}-stroke`} class="w-10 text-right font-mono text-sm">
                 {stroke ?? 'auto'}
               </output>
             </div>
@@ -308,27 +271,37 @@ export function IconEditor({
               setStroke(undefined);
               announce('Customization reset');
             }}
-            class="min-h-11 rounded-lg border border-[var(--color-border)] px-3 text-sm"
+            class="min-h-11 rounded-lg border border-border px-3 text-sm"
           >
             Reset
           </button>
         </fieldset>
 
+        <div>
+          <p id={`${id}-copy`} class="font-display font-bold">
+            Copy code
+          </p>
+          <div role="group" aria-labelledby={`${id}-copy`} class="mt-2 flex flex-wrap gap-2">
+            {FORMATS.map((f) => (
+              <button
+                type="button"
+                aria-label={copied === f.id ? `Copied ${f.label}` : `Copy as ${f.label}`}
+                onClick={() => void copy(f.id)}
+                class={BUTTON}
+              >
+                <UiIcon name={copied === f.id ? 'check' : 'copy'} class="size-4" />
+                {copied === f.id ? 'Copied' : f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div class="flex flex-wrap gap-2">
-          <a
-            href={svgDownload}
-            class="inline-flex min-h-11 items-center rounded-lg bg-[var(--color-accent)] px-4 font-medium text-[var(--color-accent-contrast)]"
-            download
-            onClick={countDownload}
-          >
+          <a href={svgDownload} class="btn-primary gap-1.5" download onClick={countDownload}>
+            <UiIcon name="download" class="size-4" />
             Download SVG
           </a>
-          <a
-            href={pngDownload}
-            class="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-4 font-medium"
-            download
-            onClick={countDownload}
-          >
+          <a href={pngDownload} class={BUTTON} download onClick={countDownload}>
             Download PNG ({Math.max(16, size)} px)
           </a>
           <button
@@ -337,64 +310,16 @@ export function IconEditor({
             onClick={() => {
               if (saved) {
                 removeFromCollection(ref);
-                announce(`Removed ${name.replaceAll('-', ' ')} from your collection`);
+                announce(`Removed ${label} from your collection`);
               } else if (addToCollection([ref])) {
-                announce(`Added ${name.replaceAll('-', ' ')} to your collection`);
+                announce(`Added ${label} to your collection`);
               } else {
                 announce('Your collection is full (500 icons)');
               }
             }}
-            class="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-4 font-medium"
+            class={BUTTON}
           >
             {saved ? '✓ In collection' : '+ Add to collection'}
-          </button>
-        </div>
-      </div>
-
-      <div class="min-w-0">
-        <div role="tablist" aria-label="Copy as" class="flex flex-wrap gap-1">
-          {FORMATS.map((f, i) => (
-            <button
-              type="button"
-              role="tab"
-              id={`tab-${f.id}`}
-              aria-selected={format === f.id}
-              aria-controls="code-panel"
-              tabIndex={format === f.id ? 0 : -1}
-              ref={(el) => {
-                tabRefs.current[i] = el;
-              }}
-              onClick={() => {
-                setFormat(f.id);
-              }}
-              onKeyDown={(e) => {
-                onTabKey(e, i);
-              }}
-              class={`min-h-11 rounded-t-lg px-3 text-sm ${format === f.id ? 'bg-[var(--color-surface)] font-semibold' : 'text-[var(--color-text-muted)]'}`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-        <div
-          id="code-panel"
-          role="tabpanel"
-          aria-labelledby={`tab-${format}`}
-          class="rounded-b-xl rounded-tr-xl bg-[var(--color-surface)] p-3"
-        >
-          <pre
-            class="max-h-80 overflow-auto text-xs leading-relaxed whitespace-pre-wrap break-all"
-            tabIndex={0}
-            aria-label={`${format} code`}
-          >
-            <code>{code}</code>
-          </pre>
-          <button
-            type="button"
-            onClick={() => void copy()}
-            class="mt-3 min-h-11 rounded-lg bg-[var(--color-accent)] px-4 font-medium text-[var(--color-accent-contrast)]"
-          >
-            {copied ? 'Copied ✓' : `Copy ${FORMATS.find((f) => f.id === format)?.label ?? ''}`}
           </button>
         </div>
       </div>

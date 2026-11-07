@@ -94,6 +94,11 @@
     scroll-padding-top: 5rem;
   }
 
+  /* No page scrolling behind an open dialog. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
   a {
     color: inherit;
   }
@@ -181,6 +186,65 @@
   }
   .btn-primary:hover {
     background: var(--color-accent-hover);
+  }
+
+  /* Search suggestions under a search box (scripts/search-suggest.ts). */
+  .suggest {
+    position: absolute;
+    top: calc(100% + 0.375rem);
+    right: 0;
+    left: 0;
+    z-index: 50;
+    max-height: min(70vh, 28rem);
+    overflow-y: auto;
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
+    padding: 0.375rem;
+    box-shadow: 4px 4px 0 var(--color-mustard);
+    text-align: left;
+  }
+  .suggest-group {
+    padding: 0.5rem 0.5rem 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .suggest-option {
+    display: flex;
+    min-height: 2.75rem;
+    cursor: pointer;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: 0.5rem;
+    padding-inline: 0.5rem;
+  }
+  .suggest-option:hover,
+  .suggest-option[aria-selected='true'] {
+    background: var(--color-mustard-soft);
+  }
+  .suggest-meta {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  /* The icon dialog: a big card over a dimmed page. */
+  .icon-modal {
+    width: min(64rem, calc(100vw - 1.5rem));
+    max-width: none;
+    max-height: calc(100dvh - 1.5rem);
+    margin: auto;
+    overflow: auto;
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-card);
+    background: var(--color-bg);
+    padding: 0;
+    color: var(--color-text);
+    box-shadow: 8px 8px 0 var(--color-purple);
+  }
+  .icon-modal::backdrop {
+    background: rgb(17 17 17 / 0.55);
   }
 
   .input {
