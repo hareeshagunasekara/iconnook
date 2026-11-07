@@ -1,0 +1,87 @@
+---
+import ErrorState from '../../components/ErrorState.astro';
+import LicenseBadge from '../../components/LicenseBadge.astro';
+import Layout from '../../layouts/Layout.astro';
+import { api, SET_TYPES, typeLabel, type IconSet } from '../../lib/api';
+
+const type = SET_TYPES.find((t) => t.value === Astro.url.searchParams.get('type'))?.value;
+let sets: IconSet[] | null = null;
+try {
+  sets = await api<IconSet[]>('/v1/sets', { type });
+} catch {
+  Astro.response.status = 503;
+}
+const groups = SET_TYPES.map((t) => ({
+  ...t,
+  sets: (sets ?? []).filter((s) => s.type === t.value).sort((a, b) => b.total - a.total),
+})).filter((g) => g.sets.length > 0);
+const fmt = new Intl.NumberFormat('en');
+---
+
+<Layout
+  title={type ? `${typeLabel(type)} — icon sets` : 'Icon sets'}
+  description="Every open-source icon set on IconNook, with its license and number of icons."
+>
+  <h1 class="text-3xl font-bold">{type ? typeLabel(type) : 'All icon sets'}</h1>
+  <nav aria-label="Filter by kind" class="mt-4">
+    <ul class="flex flex-wrap gap-2">
+      <li>
+        <a
+          href="/sets"
+          aria-current={!type ? 'page' : undefined}
+          class="inline-flex min-h-11 items-center rounded-full border border-[var(--color-border)] px-4"
+        >
+          All
+        </a>
+      </li>
+      {SET_TYPES.map((t) => (
+        <li>
+          <a
+            href={`/sets?type=${t.value}`}
+            aria-current={t.value === type ? 'page' : undefined}
+            class="inline-flex min-h-11 items-center rounded-full border border-[var(--color-border)] px-4"
+          >
+            {t.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  {!sets && (
+    <div class="mt-8">
+      <ErrorState title="Icon sets are temporarily unavailable" />
+    </div>
+  )}
+
+  {groups.map((group) => (
+    <section aria-labelledby={`g-${group.value}`} class="mt-10">
+      <h2 id={`g-${group.value}`} class="text-xl font-semibold">
+        {group.label}{' '}
+        <span class="text-base font-normal text-[var(--color-text-muted)]">
+          ({group.sets.length})
+        </span>
+      </h2>
+      <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {group.sets.map((set) => (
+          <li>
+            <a href={`/sets/${set.prefix}`} class="set-card">
+              <span class="font-semibold">{set.name}</span>
+              <span class="text-sm text-[var(--color-text-muted)]">
+                {fmt.format(set.total)} icons{set.author ? ` · by ${set.author.name}` : ''}
+              </span>
+              <LicenseBadge license={set.license} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</Layout>
+
+<style>
+  [aria-current='page'] {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+</style>

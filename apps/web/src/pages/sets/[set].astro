@@ -1,0 +1,111 @@
+---
+import ErrorState from '../../components/ErrorState.astro';
+import IconGrid from '../../components/IconGrid.astro';
+import LicenseBadge from '../../components/LicenseBadge.astro';
+import Pagination from '../../components/Pagination.astro';
+import Layout from '../../layouts/Layout.astro';
+import { api, typeLabel, type IconSet, type IconSummary } from '../../lib/api';
+
+const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const prefix = Astro.params.set ?? '';
+const after = Astro.url.searchParams.get('after') ?? undefined;
+if (!SLUG.test(prefix) || (after !== undefined && !SLUG.test(after))) return Astro.rewrite('/404');
+
+let set: IconSet | null = null;
+let page: { items: IconSummary[]; nextCursor: string | null } | null = null;
+let failed = false;
+try {
+  [set, page] = await Promise.all([
+    api<IconSet>(`/v1/sets/${prefix}`),
+    api<{ items: IconSummary[]; nextCursor: string | null }>(`/v1/sets/${prefix}/icons`, {
+      limit: 96,
+      cursor: after,
+    }),
+  ]);
+} catch {
+  failed = true;
+  Astro.response.status = 503;
+}
+if (!failed && !set) return Astro.rewrite('/404');
+const fmt = new Intl.NumberFormat('en');
+---
+
+<Layout
+  title={set ? `${set.name} icons` : 'Icon set'}
+  description={
+    set
+      ? `${fmt.format(set.total)} free ${set.name} icons (${set.license.spdx}) in SVG and PNG.`
+      : 'Icon set on IconNook.'
+  }
+>
+  {failed && <ErrorState title="This icon set is temporarily unavailable" />}
+  {set && (
+    <>
+      <nav aria-label="Breadcrumb" class="text-sm text-[var(--color-text-muted)]">
+        <a class="link" href="/sets">
+          Icon sets
+        </a>{' '}
+        › <span aria-current="page">{set.name}</span>
+      </nav>
+      <header class="mt-2 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold">{set.name}</h1>
+          <p class="mt-1 text-[var(--color-text-muted)]">
+            {fmt.format(set.total)} icons · {typeLabel(set.type)}
+            {set.author && (
+              <>
+                {' · by '}
+                {set.author.url ? (
+                  <a class="link" href={set.author.url} rel="noopener">
+                    {set.author.name}
+                  </a>
+                ) : (
+                  set.author.name
+                )}
+              </>
+            )}
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <LicenseBadge license={set.license} />
+          {set.license.url && (
+            <a class="link text-sm" href={set.license.url} rel="noopener">
+              License text
+            </a>
+          )}
+        </div>
+      </header>
+      <form
+        role="search"
+        aria-label={`Search in ${set.name}`}
+        action="/search"
+        method="get"
+        class="mt-6 flex max-w-md gap-2"
+      >
+        <input type="hidden" name="set" value={set.prefix} />
+        <label for="set-search" class="sr-only">
+          Search in {set.name}
+        </label>
+        <input
+          id="set-search"
+          name="q"
+          type="search"
+          placeholder={`Search in ${set.name}…`}
+          class="min-h-11 w-full min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-3"
+        />
+        <button type="submit" class="min-h-11 rounded-lg border border-[var(--color-border)] px-4">
+          Search
+        </button>
+      </form>
+      {page && (
+        <div class="mt-6">
+          <IconGrid icons={page.items} name={`${set.name} icons`} />
+          <Pagination
+            prev={after ? `/sets/${set.prefix}` : undefined}
+            next={page.nextCursor ? `/sets/${set.prefix}?after=${page.nextCursor}` : undefined}
+          />
+        </div>
+      )}
+    </>
+  )}
+</Layout>

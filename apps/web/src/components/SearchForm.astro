@@ -1,0 +1,46 @@
+---
+interface Props {
+  query?: string;
+  id: string;
+  /** Header variant: smaller, label visually hidden. */
+  compact?: boolean;
+  /** Accessible name of the search landmark (must be unique per page). */
+  landmark?: string;
+}
+const { query = '', id, compact = false, landmark = 'Search icons' } = Astro.props;
+---
+
+<form role="search" aria-label={landmark} action="/search" method="get" class="w-full">
+  <label for={id} class={compact ? 'sr-only' : 'mb-1 block font-medium'}>
+    Search icons
+  </label>
+  <div class="flex gap-2">
+    <input
+      id={id}
+      name="q"
+      type="search"
+      value={query}
+      maxlength="100"
+      autocomplete="off"
+      placeholder="Search 370,000+ icons…"
+      aria-describedby={compact ? undefined : `${id}-hint`}
+      data-search-input
+      class:list={[
+        'min-h-11 w-full min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-3',
+        compact ? 'text-base' : 'text-lg',
+      ]}
+    />
+    <button
+      type="submit"
+      class="min-h-11 rounded-lg bg-[var(--color-accent)] px-4 font-medium text-[var(--color-accent-contrast)]"
+    >
+      Search
+    </button>
+  </div>
+</form>
+{!compact && (
+  <p id={`${id}-hint`} class="mt-2 text-sm text-[var(--color-text-muted)]">
+    Tip: press <kbd class="rounded border border-[var(--color-border)] px-1">/</kbd> anywhere to
+    search.
+  </p>
+)}

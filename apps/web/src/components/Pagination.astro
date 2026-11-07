@@ -1,0 +1,39 @@
+---
+interface Props {
+  /** Link to the previous page, if any. */
+  prev?: string | undefined;
+  /** Link to the next page, if any. */
+  next?: string | undefined;
+  /** e.g. "Page 2 of 14". */
+  status?: string | undefined;
+}
+const { prev, next, status } = Astro.props;
+---
+
+{(prev || next) && (
+  <nav aria-label="Pagination" class="mt-8 flex items-center justify-between gap-4">
+    {prev ? (
+      <a
+        class="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-4"
+        href={prev}
+        rel="prev"
+      >
+        ← Previous
+      </a>
+    ) : (
+      <span />
+    )}
+    {status && <p class="text-sm text-[var(--color-text-muted)]">{status}</p>}
+    {next ? (
+      <a
+        class="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-4"
+        href={next}
+        rel="next"
+      >
+        Next →
+      </a>
+    ) : (
+      <span />
+    )}
+  </nav>
+)}

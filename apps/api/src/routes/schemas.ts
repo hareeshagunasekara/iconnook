@@ -75,19 +75,30 @@ export const CodeQuery = CustomizeQuery.extend({
   size: z.coerce.number().int().min(SIZE_RANGE.min).max(SIZE_RANGE.max).optional(),
 });
 
-export const SearchQuery = z.object({
-  q: z.string().trim().min(1).max(100).openapi({ example: 'arrow left' }),
-  set: slug('Filter by set', 'tabler').optional(),
-  type: z.enum(SET_TYPES).optional(),
-  tier: z.enum(['A', 'B', 'C']).optional(),
-  color: z
-    .enum(['true', 'false'])
-    .transform((v) => v === 'true')
-    .optional(),
-  category: slug('Filter by category', 'arrows').optional(),
-  page: z.coerce.number().int().min(1).max(100).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(48),
-});
+export const SearchQuery = z
+  .object({
+    q: z.string().trim().max(100).default('').openapi({
+      example: 'arrow left',
+      description: 'Search text; may be empty when a filter is given',
+    }),
+    set: slug('Filter by set', 'tabler').optional(),
+    type: z.enum(SET_TYPES).optional(),
+    tier: z.enum(['A', 'B', 'C']).optional(),
+    color: z
+      .enum(['true', 'false'])
+      .transform((v) => v === 'true')
+      .optional(),
+    category: slug('Filter by category', 'arrows').optional(),
+    page: z.coerce.number().int().min(1).max(100).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(48),
+  })
+  .refine(
+    (s) => s.q !== '' || s.set !== undefined || s.type !== undefined || s.category !== undefined,
+    {
+      message: 'Provide q, or browse with a set, type or category filter',
+      path: ['q'],
+    },
+  );
 
 export const SetListQuery = z.object({
   type: z.enum(SET_TYPES).optional(),

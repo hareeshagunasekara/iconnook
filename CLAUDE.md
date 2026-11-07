@@ -3,7 +3,7 @@
 **IconNook** (iconnook.com) — a free, open-source SVG icon library (in the spirit of svgrepo / flaticon). No payments, no paywalls, ever.
 Goals, in priority order: **legally clean icons**, **fast**, **accessible to everyone**.
 
-> Status: Phase 4 (API). Update this file as the project grows.
+> Status: Phase 5 (website). Update this file as the project grows.
 > **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
 > **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
@@ -20,7 +20,7 @@ Goals, in priority order: **legally clean icons**, **fast**, **accessible to eve
 ## Layout
 
 ```
-apps/web           Astro site                                            ✅ skeleton
+apps/web           Astro SSR site (Preact islands, Tailwind), e2e + axe   ✅
 apps/api           Hono REST API (/v1/..., OpenAPI 3.1)                   ✅
 packages/core      shared pure domain logic (license tiers, types)        ✅
 packages/config    shared tsconfig                                        ✅
@@ -83,6 +83,8 @@ pnpm icons:import --sets tabler,lucide --tiers A --no-index   # subset / skip re
 pnpm icons:reindex            # rebuild Meilisearch from Postgres (new index, atomic swap)
 pnpm icons:catalog            # regenerate SOURCES.md (never edit it by hand)
 docker run --rm -i -e BASE_URL=http://host.docker.internal:8787 grafana/k6 run - < load/api.js   # API load test
+pnpm build && pnpm --filter @iconnook/web test:e2e   # Playwright journeys + axe (light/dark) + 320px + no-JS
+cd apps/web && CHROME_PATH=$(node -e "console.log(require('@playwright/test').chromium.executablePath())") npx @lhci/cli@0.16.0 autorun   # Lighthouse budgets (site must be running)
 pnpm --filter @iconnook/api test     # one package
 ```
 
@@ -101,6 +103,9 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 - CI dependency review allows **GHSA-g3hv-75wg-m249** (minimatch 10.x, dev-only via ESLint; forcing minimatch 11 breaks `eslint-plugin-import-x` 4.17). Remove the exception once import-x ≥ 4.18 is installed.
 - `@iconify/json` is ~600 MB unpacked: fine for dev/CI, but keep it out of runtime images (Phase 7: run the importer as its own Job image).
 - The importer writes per-set rejections and sanitizer changes to `.data/import-report.json` (gitignored) — review it after upgrading `@iconify/json`. Expected today: 3 rejected (2 over 512 KB, 1 with 0×0 size upstream), 0 changed.
+- Web CSS: base styles go in `@layer base` / `@layer components` — unlayered CSS overrides every Tailwind utility (this broke button contrast once).
+- Web CSP comes from Astro (`security.csp`, hashed scripts, sent as a header in SSR); `src/middleware.ts` appends `frame-ancestors` and other headers. Never add `'unsafe-inline'` to script-src.
+- Each `role="search"` form needs a unique `aria-label` (axe `landmark-unique`).
 - Install scripts are blocked except those in `allowBuilds` (approve with `pnpm approve-builds <pkg>`).
 - ESLint and Prettier are configured once at the root; `packages/config` holds the shared tsconfig. `.astro` files are checked by `astro check`, not ESLint (yet).
 

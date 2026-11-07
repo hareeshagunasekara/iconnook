@@ -1,0 +1,40 @@
+---
+import ErrorState from '../../components/ErrorState.astro';
+import Layout from '../../layouts/Layout.astro';
+import { api, type Category } from '../../lib/api';
+
+let categories: Category[] | null = null;
+try {
+  categories = await api<Category[]>('/v1/categories');
+} catch {
+  Astro.response.status = 503;
+}
+const fmt = new Intl.NumberFormat('en');
+const sorted = [...(categories ?? [])].sort((a, b) => a.label.localeCompare(b.label));
+---
+
+<Layout
+  title="Categories"
+  description="Browse free icons by topic: arrows, buildings, business, communication and more."
+>
+  <h1 class="text-3xl font-bold">Categories</h1>
+  <p class="mt-2 text-[var(--color-text-muted)]">Topics come from the icon sets themselves.</p>
+  {!categories && (
+    <div class="mt-8">
+      <ErrorState title="Categories are temporarily unavailable" />
+    </div>
+  )}
+  <ul class="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+    {sorted.map((c) => (
+      <li>
+        <a
+          href={`/categories/${c.slug}`}
+          class="flex min-h-11 items-center justify-between gap-2 rounded-lg bg-[var(--color-surface)] px-3 py-2 hover:outline hover:outline-1 hover:outline-[var(--color-border)]"
+        >
+          <span>{c.label}</span>
+          <span class="text-sm text-[var(--color-text-muted)]">{fmt.format(c.total)}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Layout>

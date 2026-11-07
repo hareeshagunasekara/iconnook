@@ -1,0 +1,40 @@
+---
+import type { IconSummary } from '../lib/api';
+import { inlineSvg, label } from '../lib/icons';
+
+interface Props {
+  icons: IconSummary[];
+  /** Accessible name of the grid, e.g. "Search results for home". */
+  name: string;
+  /** Show the set name under each icon (search results mix sets). */
+  showSet?: boolean;
+}
+const { icons, name, showSet = false } = Astro.props;
+---
+
+<ul
+  class="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-2"
+  aria-label={name}
+  data-icon-grid
+>
+  {icons.map((icon) => (
+    <li>
+      <a
+        href={`/icons/${icon.set}/${icon.name}`}
+        class="flex h-full min-h-28 flex-col items-center justify-center gap-2 rounded-lg border border-transparent bg-[var(--color-surface)] p-3 text-center hover:border-[var(--color-border)]"
+      >
+        <span
+          class="text-[2rem] leading-none"
+          set:html={inlineSvg(icon, 'h-8 w-auto max-w-full')}
+        />
+        <span class="line-clamp-2 text-xs break-all">{label(icon.name)}</span>
+        {showSet && icon.setName && (
+          <span class="line-clamp-1 text-[0.7rem] text-[var(--color-text-muted)]">
+            {icon.setName}
+          </span>
+        )}
+        {!showSet && icon.setName && <span class="sr-only">, {icon.setName}</span>}
+      </a>
+    </li>
+  ))}
+</ul>

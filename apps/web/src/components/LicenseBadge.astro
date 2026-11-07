@@ -1,0 +1,26 @@
+---
+import type { License } from '../lib/api';
+
+interface Props {
+  license: License;
+}
+const { license } = Astro.props;
+// Never color alone (WCAG 1.4.1): the text says what the tier means.
+const meaning = license.attributionRequired
+  ? license.tier === 'C'
+    ? 'Credit + share-alike'
+    : 'Credit required'
+  : 'No attribution needed';
+const color = { A: 'var(--color-tier-a)', B: 'var(--color-tier-b)', C: 'var(--color-tier-c)' }[
+  license.tier
+];
+---
+
+<span
+  class="inline-flex w-fit max-w-full flex-wrap items-center gap-x-1.5 self-start rounded-full border px-2.5 py-0.5 text-xs font-medium"
+  style={`border-color: ${color}; color: ${color}`}
+>
+  <span>{license.spdx}</span>
+  <span aria-hidden="true">·</span>
+  <span>{meaning}</span>
+</span>

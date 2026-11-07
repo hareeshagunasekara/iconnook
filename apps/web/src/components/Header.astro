@@ -1,0 +1,53 @@
+---
+import SearchForm from './SearchForm.astro';
+
+interface Props {
+  query?: string;
+}
+const { query = '' } = Astro.props;
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/sets', label: 'Icon sets' },
+  { href: '/categories', label: 'Categories' },
+  { href: '/licenses', label: 'Licenses' },
+];
+---
+
+<header class="sticky top-0 z-40 border-b border-[var(--color-surface-2)] bg-[var(--color-bg)]/95 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
+    <a
+      href="/"
+      class="flex min-h-11 items-center gap-2 text-lg font-bold"
+      aria-label="IconNook home"
+    >
+      <img src="/favicon.svg" alt="" width="28" height="28" />
+      <span>IconNook</span>
+    </a>
+    <div class="order-3 w-full sm:order-none sm:w-auto sm:flex-1">
+      <SearchForm query={query} id="site-search" compact landmark="Site search" />
+    </div>
+    <nav aria-label="Main" class="ml-auto">
+      <ul class="flex gap-1">
+        {nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="inline-flex min-h-11 items-center rounded px-3 hover:bg-[var(--color-surface)]"
+              aria-current={path.startsWith(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  [aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+  }
+</style>

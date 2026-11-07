@@ -1,23 +1,108 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import ErrorState from '../components/ErrorState.astro';
+import LicenseBadge from '../components/LicenseBadge.astro';
+import SearchForm from '../components/SearchForm.astro';
+import Layout from '../layouts/Layout.astro';
+import { api, SET_TYPES, type IconSet } from '../lib/api';
+
+let sets: IconSet[] | null = null;
+try {
+  sets = await api<IconSet[]>('/v1/sets');
+} catch {
+  Astro.response.status = 503;
+}
+const all = sets ?? [];
+const totalIcons = all.reduce((n, s) => n + s.total, 0);
+const popular = [...all]
+  .filter((s) => s.type === 'ui' || s.type === 'color')
+  .sort((a, b) => b.total - a.total)
+  .slice(0, 12);
+const POPULAR_SEARCHES = [
+  'home',
+  'arrow',
+  'user',
+  'settings',
+  'heart',
+  'search',
+  'mail',
+  'calendar',
+  'trash',
+  'star',
+];
+const fmt = new Intl.NumberFormat('en');
 ---
 
-<BaseLayout
-  title="IconNook — free, open-source SVG icons"
-  description="Hundreds of thousands of free, open-source SVG icons. Every icon clearly licensed."
+<Layout
+  title="IconNook"
+  description="Hundreds of thousands of free, open-source SVG icons from 190+ sets. Every icon clearly licensed — copy as SVG, JSX, Vue or CSS, or download SVG and PNG."
 >
-  <section class="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-24 text-center">
-    <h1 class="text-4xl font-bold tracking-tight">IconNook</h1>
-    <p class="text-lg text-[var(--color-text-muted)]">
-      Free, open-source SVG icons — every one clearly licensed. Coming soon.
+  <section class="mx-auto max-w-3xl py-10 text-center sm:py-16">
+    <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Free, open-source SVG icons</h1>
+    <p class="mt-4 text-lg text-[var(--color-text-muted)]">
+      {totalIcons > 0
+        ? `${fmt.format(totalIcons)} icons from ${String(all.length)} sets`
+        : 'Hundreds of thousands of icons'}{' '}
+      — every one clearly licensed. No sign-up, no payments.
     </p>
-    <p>
-      <a
-        class="text-[var(--color-accent)] underline underline-offset-4"
-        href="https://github.com/hareeshagunasekara/iconnook"
-      >
-        Follow development on GitHub
-      </a>
+    <div class="mt-8 text-left">
+      <SearchForm id="home-search" />
+    </div>
+    <p class="mt-4 text-sm">
+      <span class="text-[var(--color-text-muted)]">Popular:</span>{' '}
+      {POPULAR_SEARCHES.map((q, i) => (
+        <>
+          {i > 0 && ' · '}
+          <a class="link" href={`/search?q=${encodeURIComponent(q)}`}>
+            {q}
+          </a>
+        </>
+      ))}
     </p>
   </section>
-</BaseLayout>
+
+  {!sets && <ErrorState title="Icon sets are temporarily unavailable" />}
+
+  {popular.length > 0 && (
+    <section aria-labelledby="popular-sets" class="mt-8">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 id="popular-sets" class="text-2xl font-semibold">
+          Popular icon sets
+        </h2>
+        <a class="link text-sm" href="/sets">
+          All {all.length} sets
+        </a>
+      </div>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {popular.map((set) => (
+          <li>
+            <a href={`/sets/${set.prefix}`} class="set-card">
+              <span class="font-semibold">{set.name}</span>
+              <span class="text-sm text-[var(--color-text-muted)]">
+                {fmt.format(set.total)} icons{set.author ? ` · by ${set.author.name}` : ''}
+              </span>
+              <LicenseBadge license={set.license} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <section aria-labelledby="browse" class="mt-12">
+    <h2 id="browse" class="text-2xl font-semibold">
+      Browse by kind
+    </h2>
+    <ul class="mt-4 flex flex-wrap gap-2">
+      {SET_TYPES.filter((t) => t.value !== 'archive').map((t) => (
+        <li>
+          <a
+            href={`/sets?type=${t.value}`}
+            class="inline-flex min-h-11 items-center rounded-full border border-[var(--color-border)] px-4"
+          >
+            {t.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Layout>

@@ -1,40 +1,93 @@
 @import 'tailwindcss';
 
-/* Design tokens (docs/standards/ui-ux.md). Components use tokens, never raw values. */
+/* Design tokens (docs/standards/ui-ux.md). Components use tokens, never raw values.
+   Contrast (WCAG 2.2 AA): text ≥ 4.5:1, UI borders/focus ≥ 3:1 against --color-bg, both themes. */
 @theme {
   --color-bg: #ffffff;
-  --color-surface: #f5f6f8;
+  --color-surface: #f4f5f7;
+  --color-surface-2: #e9ebef;
+  --color-border: #8a919c;
   --color-text: #14161a;
-  --color-text-muted: #545b66;
-  --color-accent: #3b4fd8;
-  --color-focus: #3b4fd8;
+  --color-text-muted: #4d5560;
+  --color-accent: #3443c4;
+  --color-accent-contrast: #ffffff;
+  --color-focus: #3443c4;
+  --color-tier-a: #1d6b3a;
+  --color-tier-b: #8a4b00;
+  --color-tier-c: #8a1c4a;
 
   --font-sans:
     system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-bg: #111317;
     --color-surface: #1b1e24;
+    --color-surface-2: #262a32;
+    --color-border: #7d8592;
     --color-text: #eceef2;
-    --color-text-muted: #a3a9b4;
-    --color-accent: #8c9bff;
-    --color-focus: #8c9bff;
+    --color-text-muted: #aab0bb;
+    --color-accent: #9aa6ff;
+    --color-accent-contrast: #111317;
+    --color-focus: #9aa6ff;
+    --color-tier-a: #6fd497;
+    --color-tier-b: #f2b25c;
+    --color-tier-c: #f28cb4;
   }
 }
 
-html {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  line-height: 1.5;
+/* Base styles live in @layer base: unlayered CSS would override every Tailwind utility. */
+@layer base {
+  html {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    color-scheme: light dark;
+  }
+
+  body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  /* Keep focused elements visible below the sticky header (WCAG 2.4.11 Focus Not Obscured). */
+  html {
+    scroll-padding-top: 5rem;
+  }
+
+  a {
+    color: inherit;
+  }
 }
 
-:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+@layer components {
+  .set-card {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    background: var(--color-surface);
+    padding: 1rem;
+  }
+  .set-card:hover {
+    outline: 1px solid var(--color-border);
+  }
+  .link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
