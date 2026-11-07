@@ -36,6 +36,13 @@
       "when": 1794037571617,
       "tag": "0004_set_sample_icons",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794060492731,
+      "tag": "0005_set_kinds",
+      "breakpoints": true
     }
   ]
 }
