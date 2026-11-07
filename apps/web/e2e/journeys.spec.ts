@@ -4,6 +4,10 @@ import { expect, test, type Page } from '@playwright/test';
 
 const SET = 'iconnook-fixtures';
 
+/** The icon page's editor works once its island has hydrated (Astro then drops the ssr flag). */
+const editorReady = (page: Page) =>
+  page.locator('astro-island[component-url*="IconEditor"]:not([ssr])').waitFor();
+
 /** Icon tiles open in a dialog once the modal island is ready (before that they're plain links). */
 const modalReady = (page: Page) =>
   page.waitForFunction(() => document.documentElement.dataset.iconModalReady === 'true');
@@ -58,6 +62,7 @@ test('copies every code format with one click, without showing the code', async 
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto(`/icons/${SET}/plus`);
+  await editorReady(page);
   const copied = () => page.evaluate(() => navigator.clipboard.readText());
   await page.getByRole('button', { name: 'Copy as JSX' }).click();
   await expect(page.getByRole('button', { name: 'Copied JSX' })).toBeVisible();
@@ -92,6 +97,7 @@ test('set pages show numbered pages and 404 past the last one', async ({ page })
 
 test('downloads SVG and PNG at the chosen size', async ({ page, request }) => {
   await page.goto(`/icons/${SET}/square`);
+  await editorReady(page);
   await page.getByLabel('Size').selectOption('128');
   const svgHref = await page.getByRole('link', { name: 'Download SVG' }).getAttribute('href');
   const pngHref = await page
@@ -215,4 +221,14 @@ test('sends security headers and a CSP', async ({ request, page }) => {
   expect(csp).not.toMatch(/script-src[^;]*'unsafe-inline'/);
   expect(res.headers()['cache-control']).toContain('s-maxage');
   await page.goto('/');
+});
+
+test('"Back to top" scrolls up to the hero', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+  await page.getByRole('link', { name: 'Back to top' }).click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
 });
