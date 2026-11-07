@@ -14,13 +14,17 @@
   --color-purple: #552cb7;
   --color-green: #00995e;
   --color-blue: #058cd7;
-  /* Softer fills for pills and icon tiles (ink text ≥ 9:1 on all of them). */
-  --color-mustard-soft: #ffd894;
-  --color-pink-soft: #fdb3cc;
-  --color-coral-soft: #fea79c;
-  --color-purple-soft: #cbbcf2;
-  --color-green-soft: #9ddcc0;
-  --color-blue-soft: #9dd3f2;
+  /* Lighter fills for pills and icon tiles (ink text ≥ 8:1 on all of them). */
+  --color-mustard-soft: #ffc567;
+  --color-pink-soft: #f9a3c0;
+  --color-coral-soft: #fb8a7a;
+  --color-purple-soft: #c6b0f2;
+  --color-green-soft: #8fd8ae;
+  --color-blue-soft: #7fc6f0;
+  /* Pale fills for license badges. */
+  --color-green-pale: #d3f2e1;
+  --color-mustard-pale: #ffe7bd;
+  --color-pink-pale: #fdd9e6;
 
   /* Semantic roles */
   --color-bg: var(--color-cream);

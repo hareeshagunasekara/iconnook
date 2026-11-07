@@ -10,7 +10,7 @@ const KINDS = SET_TYPES.filter((t) => t.value !== 'archive');
 
 <section
   aria-labelledby="browse"
-  class="grid items-center gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]"
+  class="grid items-center gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,0.55fr)]"
 >
   <div>
     <h2 id="browse" class="section-title">
@@ -19,15 +19,15 @@ const KINDS = SET_TYPES.filter((t) => t.value !== 'archive');
         <Doodle kind="burst" color="mustard" class="absolute -top-5 -right-8 size-9 rotate-12" />
       </span>
     </h2>
-    <ul class="mt-8 flex max-w-[44rem] flex-wrap gap-3">
+    <ul class="mt-8 flex flex-wrap gap-3">
       {KINDS.map((t) => (
         <li>
           <a
             href={`/sets?type=${t.value}`}
-            class="pill text-base"
+            class="pill min-h-12 px-5 text-lg"
             style={`--pill: var(--color-${t.color}-soft)`}
           >
-            <UiIcon name={t.icon} class="size-5" />
+            <UiIcon name={t.icon} class="size-6" />
             {t.label}
           </a>
         </li>
