@@ -4,7 +4,7 @@ import type { ZodError } from 'zod';
 
 import type { IconRecord, Dependencies } from '../domain.js';
 import { setCache, SVG_CSP } from '../http/middleware.js';
-import { badRequest, notFound } from '../http/problem.js';
+import { badRequest, notFound, unavailable } from '../http/problem.js';
 import type { IconService } from '../services/icon-service.js';
 import {
   AttributionResult,
@@ -116,6 +116,8 @@ export function registerV1(app: OpenAPIHono, ctx: RouteContext): void {
     const redirect = canonicalRedirect(c, { color, size, stroke, download });
     if (redirect) return redirect;
     // Only real renders count against the render limit (not the redirect hop).
+    if (!(await deps.flags.isEnabled('png')))
+      throw unavailable('PNG rendering is temporarily disabled');
     const limited = await ctx.checkRenderLimit(c);
     if (limited) return limited;
 

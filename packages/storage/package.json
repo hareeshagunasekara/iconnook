@@ -1,0 +1,31 @@
+{
+  "name": "@iconnook/storage",
+  "version": "0.0.0",
+  "private": true,
+  "description": "S3-compatible object storage client (SeaweedFS locally, Cloudflare R2 in production)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "aws4fetch": "1.0.20",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@iconnook/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}

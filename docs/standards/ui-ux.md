@@ -47,7 +47,7 @@ Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 1
 
 ## Design system rules
 
-- **Design tokens** (CSS custom properties) for color, spacing, radius, type, motion — no raw hex values or magic numbers in components. Light and dark themes from the same tokens; follow `prefers-color-scheme`, allow override.
+- **Design tokens** (CSS custom properties) for color, spacing, radius, type, motion — no raw hex values or magic numbers in components. **Light theme only — no dark mode** (ADR 0004). Don't add `prefers-color-scheme` styles or a theme toggle.
 - **Spacing** on a 4px scale. **Type** scale with ≤ 6 sizes; body ≥ 16px; line height 1.5 for body text.
 - **System font stack** (or one self-hosted variable font with `font-display: swap`) — no font-loading layout shift.
 - **States for every interactive component:** default, hover, focus-visible, active, disabled, loading, error, empty.
@@ -58,7 +58,7 @@ Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 1
 
 - **Search is the homepage's main action.** Instant results as you type (debounced ~150ms), typo tolerance, filters for style / set / license tier / color-vs-mono, all reflected in the URL so results are shareable.
 - **Icon card:** icon preview on a neutral background; hover/focus reveals quick actions (copy SVG, download, add to collection) — and those actions are reachable by keyboard, not hover-only.
-- **Icon page:** large preview on light + dark backgrounds, live controls (color, size, stroke), copy-as tabs (SVG / JSX / Vue / Svelte / data URI / CSS), download SVG/PNG, license badge + attribution text (tier B/C), author link, set link, similar icons.
+- **Icon page:** large preview on a light and a dark background (an icon preview, not a site theme), live controls (color, size, stroke), copy-as tabs (SVG / JSX / Vue / Svelte / data URI / CSS), download SVG/PNG, license badge + attribution text (tier B/C), author link, set link, similar icons.
 - **License clarity is a UX feature:** tier badge on every card in tier B/C views; plain-language explanation ("Free for commercial use. Credit required: copy this line"). Never hide license info behind a click.
 - **Collections:** no sign-up required (stored locally, shareable by link). Bulk download as ZIP or SVG sprite.
 - **Empty & error states** always offer a next step (suggestions, popular sets, clear filters).

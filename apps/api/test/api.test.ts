@@ -5,6 +5,9 @@ import { createTestDatabase, type TestDatabase } from '@iconnook/db/testing';
 import { rebuildSearchIndex } from '@iconnook/search';
 import { customizeSvg } from '@iconnook/svg';
 import { Resvg } from '@resvg/resvg-js';
+import { QUEUE_PACKS } from '@iconnook/jobs';
+import { loadStorageConfig, S3Storage } from '@iconnook/storage';
+import { Queue } from 'bullmq';
 import { Redis } from 'ioredis';
 import { Meilisearch } from 'meilisearch';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -14,6 +17,12 @@ import { DrizzleIconRepository } from '../src/adapters/drizzle-repository.js';
 import { MeiliIconSearch } from '../src/adapters/meili-search.js';
 import { ResvgRenderer } from '../src/adapters/resvg-renderer.js';
 import { ValkeyRateLimiter } from '../src/adapters/valkey-rate-limiter.js';
+import {
+  StorageFileStore,
+  ValkeyDownloadCounter,
+  ValkeyFeatureFlags,
+} from '../src/adapters/valkey-services.js';
+import { BullPackQueue } from '../src/adapters/bull-pack-queue.js';
 import { createApp } from '../src/app.js';
 import {
   Category,
@@ -31,6 +40,11 @@ const index = `icons_test_${randomBytes(4).toString('hex')}`;
 const meili = new Meilisearch({ host: env.MEILI_URL, apiKey: env.MEILI_MASTER_KEY });
 const redis = new Redis(env.VALKEY_URL, { maxRetriesPerRequest: 1 });
 const limiterPrefix = `rl_test_${randomBytes(4).toString('hex')}`;
+// Isolated BullMQ key prefix so tests never touch real queues.
+const packQueue = new Queue(QUEUE_PACKS, {
+  connection: redis,
+  prefix: `bull_test_${randomBytes(4).toString('hex')}`,
+});
 
 let t: TestDatabase;
 let app: ReturnType<typeof createApp>;
@@ -45,6 +59,10 @@ beforeAll(async () => {
       search: new MeiliIconSearch(meili, index),
       rateLimiter: new ValkeyRateLimiter(redis, limiterPrefix),
       png: new ResvgRenderer({ concurrency: 2 }),
+      packs: new BullPackQueue(packQueue),
+      files: new StorageFileStore(new S3Storage(loadStorageConfig())),
+      flags: new ValkeyFeatureFlags(redis),
+      downloads: new ValkeyDownloadCounter(redis),
     },
     {
       apiUrl: 'https://api.test',
@@ -59,6 +77,8 @@ afterAll(async () => {
   await meili.deleteIndexIfExists(index);
   const keys = await redis.keys(`${limiterPrefix}:*`);
   if (keys.length) await redis.del(...keys);
+  await packQueue.obliterate({ force: true });
+  await packQueue.close();
   await redis.quit();
   await t.drop();
 });

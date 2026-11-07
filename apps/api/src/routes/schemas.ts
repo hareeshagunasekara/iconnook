@@ -215,4 +215,96 @@ export const problemResponses = {
     content: { 'application/problem+json': { schema: Problem } },
     description: 'Rate limited',
   },
+  503: {
+    content: { 'application/problem+json': { schema: Problem } },
+    description: 'Temporarily unavailable (feature disabled or dependency down)',
+  },
 } as const;
+
+// ---- Collections, packs, downloads ----
+
+export const IconRefs = z
+  .string()
+  .max(20_000)
+  .transform((s) => [
+    ...new Set(
+      s
+        .split(',')
+        .map((r) => r.trim())
+        .filter(Boolean),
+    ),
+  ])
+  .pipe(
+    z
+      .array(z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*:[a-z0-9]+(-[a-z0-9]+)*$/))
+      .min(1)
+      .max(500),
+  )
+  .openapi({
+    example: 'tabler:home,mdi:home',
+    description: 'Comma-separated "set:name" list (max 500)',
+  });
+
+export const IconsByRefQuery = z.object({ names: IconRefs });
+
+export const IconListResult = z
+  .object({
+    items: z.array(
+      IconSummary.extend({
+        setName: z.string(),
+        tier: z.enum(['A', 'B', 'C']),
+        isColor: z.boolean(),
+      }),
+    ),
+  })
+  .openapi('IconList');
+
+export const CollectionParams = z.object({
+  id: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{10,32}$/)
+    .openapi({ param: { name: 'id', in: 'path' }, example: 'q3Xz9-bK2wLm' }),
+});
+
+export const CreateCollectionBody = z
+  .object({
+    name: z.string().trim().max(80).optional(),
+    icons: z
+      .array(z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*:[a-z0-9]+(-[a-z0-9]+)*$/))
+      .min(1)
+      .max(500),
+  })
+  .openapi('CreateCollection');
+
+export const CollectionResult = z
+  .object({
+    id: z.string(),
+    name: z.string().nullable(),
+    createdAt: z.string(),
+    url: z.string(),
+    items: IconListResult.shape.items,
+  })
+  .openapi('Collection');
+
+export const PackStatusResult = z
+  .object({
+    id: z.string(),
+    state: z.enum(['queued', 'active', 'completed', 'failed']),
+    progress: z.number(),
+    format: z.enum(['zip', 'sprite']),
+    error: z.string().optional(),
+    statusUrl: z.string(),
+    downloadUrl: z.string().nullable(),
+  })
+  .openapi('PackStatus');
+
+export const PackIdParam = z.object({
+  id: z
+    .string()
+    .regex(/^[0-9a-f]{32}$/)
+    .openapi({ param: { name: 'id', in: 'path' } }),
+});
+
+export const DownloadEventBody = z
+  .object({ iconId: z.number().int().positive() })
+  .openapi('DownloadEvent');

@@ -343,11 +343,18 @@ describe('JSON endpoints', () => {
     expect(doc.openapi).toBe('3.1.0');
     expect(Object.keys(doc.paths).sort()).toEqual([
       '/v1/categories',
+      '/v1/collections',
+      '/v1/collections/{id}',
+      '/v1/downloads',
+      '/v1/icons',
       '/v1/icons/{set}/{name}',
       '/v1/icons/{set}/{name}.png',
       '/v1/icons/{set}/{name}.svg',
       '/v1/icons/{set}/{name}/attribution',
       '/v1/icons/{set}/{name}/code',
+      '/v1/packs',
+      '/v1/packs/{id}',
+      '/v1/packs/{id}/download',
       '/v1/search',
       '/v1/sets',
       '/v1/sets/{set}',
@@ -430,5 +437,187 @@ describe('clientKey', () => {
     await app.request('/v1/sets', { headers: { 'x-forwarded-for': '203.0.113.9, 10.9.9.9' } });
     expect(deps.rateLimiter.counts.size).toBe(2); // first entry of the list is the client
     expect(typeof clientKey).toBe('function');
+  });
+});
+
+describe('collections, packs and downloads', () => {
+  const post = (app: ReturnType<typeof setup>['app'], path: string, body: unknown) =>
+    app.request(path, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+  it('looks up several icons by "set:name", skipping unknown ones', async () => {
+    const { app } = setup();
+    const res = await app.request('/v1/icons?names=tabler:home,tabler:nope,tabler:arrow-left');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { items: { name: string }[] };
+    expect(body.items.map((i) => i.name)).toEqual(['home', 'arrow-left']);
+    await problem(await app.request('/v1/icons?names=Not%20A%20Ref'), 400);
+  });
+
+  it('shares a collection and reads it back', async () => {
+    const { app } = setup();
+    const created = await post(app, '/v1/collections', {
+      name: 'My set',
+      icons: ['tabler:home', 'tabler:arrow-left'],
+    });
+    expect(created.status).toBe(201);
+    const body = (await created.json()) as { id: string; url: string; items: unknown[] };
+    expect(body.id).toMatch(/^[A-Za-z0-9_-]{16}$/);
+    expect(body.url).toBe(`https://site.test/c/${body.id}`);
+    expect(created.headers.get('location')).toBe(`https://api.test/v1/collections/${body.id}`);
+
+    const read = await app.request(`/v1/collections/${body.id}`);
+    expect(await read.json()).toMatchObject({
+      name: 'My set',
+      items: [{ name: 'home' }, { name: 'arrow-left' }],
+    });
+  });
+
+  it.each([
+    [{ icons: [] }],
+    [{ icons: ['bad ref'] }],
+    [{ icons: ['tabler:home'], name: 'x'.repeat(81) }],
+    [{ icons: Array.from({ length: 501 }, (_, i) => `s:i${String(i)}`) }],
+  ])('rejects invalid collections %#', async (payload) => {
+    const { app } = setup();
+    await problem(await post(app, '/v1/collections', payload), 400);
+  });
+
+  it('rejects a collection whose icons all do not exist, and unknown collection ids', async () => {
+    const { app } = setup();
+    await problem(await post(app, '/v1/collections', { icons: ['tabler:nope'] }), 400);
+    await problem(await app.request('/v1/collections/doesnotexist1'), 404);
+    await problem(await app.request('/v1/collections/bad!'), 400);
+  });
+
+  it('queues a pack (202), dedupes identical requests, and reports status', async () => {
+    const { app, deps } = setup();
+    const request = { icons: ['tabler:home', 'tabler:arrow-left'], format: 'zip', png: 64 };
+    const first = await post(app, '/v1/packs', request);
+    expect(first.status).toBe(202);
+    const status = (await first.json()) as {
+      id: string;
+      state: string;
+      downloadUrl: string | null;
+      statusUrl: string;
+    };
+    expect(status).toMatchObject({ state: 'queued', downloadUrl: null });
+    expect(status.statusUrl).toBe(`https://api.test/v1/packs/${status.id}`);
+
+    const again = (await (
+      await post(app, '/v1/packs', { ...request, icons: [...request.icons].reverse() })
+    ).json()) as { id: string };
+    expect(again.id).toBe(status.id);
+    expect(deps.packs.jobs.size).toBe(1);
+
+    expect(await (await app.request(`/v1/packs/${status.id}`)).json()).toMatchObject({
+      id: status.id,
+      state: 'queued',
+    });
+  });
+
+  it('downloads a finished pack and refuses unfinished ones', async () => {
+    const { app, deps } = setup();
+    const { id } = (await (
+      await post(app, '/v1/packs', { icons: ['tabler:home'], format: 'sprite' })
+    ).json()) as { id: string };
+    await problem(await app.request(`/v1/packs/${id}/download`), 409);
+
+    deps.packs.jobs.set(id, { id, state: 'completed', progress: 100, format: 'sprite' });
+    await problem(await app.request(`/v1/packs/${id}/download`), 404); // finished but file expired
+
+    deps.files.objects.set(`packs/${id}.svg`, '<svg/>');
+    const res = await app.request(`/v1/packs/${id}/download`);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('image/svg+xml');
+    expect(res.headers.get('content-disposition')).toBe(
+      'attachment; filename="iconnook-sprite.svg"',
+    );
+    expect(await res.text()).toBe('<svg/>');
+  });
+
+  it('rebuilds a "completed" pack whose file has expired instead of promising a 404', async () => {
+    const { app, deps } = setup();
+    const request = { icons: ['tabler:home'], format: 'zip' };
+    const { id } = (await (await post(app, '/v1/packs', request)).json()) as { id: string };
+    deps.packs.jobs.set(id, { id, state: 'completed', progress: 100, format: 'zip' }); // file never stored
+
+    const again = (await (await post(app, '/v1/packs', request)).json()) as {
+      state: string;
+      downloadUrl: string | null;
+    };
+    expect(again).toMatchObject({ state: 'queued', downloadUrl: null });
+
+    deps.packs.jobs.set(id, { id, state: 'completed', progress: 100, format: 'zip' });
+    deps.files.objects.set(`packs/${id}.zip`, 'PK');
+    const ready = (await (await post(app, '/v1/packs', request)).json()) as { state: string };
+    expect(ready.state).toBe('completed'); // file present: no rebuild
+  });
+
+  it.each([
+    [{ icons: ['tabler:home'], format: 'tar' }],
+    [{ icons: ['tabler:home'], format: 'sprite', png: 64 }],
+    [{ icons: ['tabler:home', 'tabler:home'], format: 'zip' }],
+    [{ icons: ['tabler:home'], format: 'zip', color: 'red' }],
+  ])('rejects invalid pack requests %#', async (payload) => {
+    const { app } = setup();
+    await problem(await post(app, '/v1/packs', payload), 400);
+  });
+
+  it('returns 404 for unknown packs and 400 for malformed ids', async () => {
+    const { app } = setup();
+    await problem(await app.request(`/v1/packs/${'a'.repeat(32)}`), 404);
+    await problem(await app.request('/v1/packs/not-hex'), 400);
+  });
+
+  it('feature flags switch packs and PNG off instantly (503 + Retry-After)', async () => {
+    const { app, deps } = setup();
+    deps.flags.disabled.add('packs');
+    const res = await post(app, '/v1/packs', { icons: ['tabler:home'], format: 'zip' });
+    await problem(res, 503);
+    expect(res.headers.get('retry-after')).toBe('5');
+
+    deps.flags.disabled.add('png');
+    await problem(await app.request('/v1/icons/tabler/home.png'), 503);
+    expect((await app.request('/v1/icons/tabler/home.svg')).status).toBe(200); // SVG unaffected
+  });
+
+  it('applies the stricter write limit to collections and packs', async () => {
+    const { app } = setup({
+      rateLimit: { perMinute: 1_000, renderPerMinute: 1_000, writePerMinute: 1 },
+    } as never);
+    expect((await post(app, '/v1/collections', { icons: ['tabler:home'] })).status).toBe(201);
+    await problem(await post(app, '/v1/collections', { icons: ['tabler:home'] }), 429);
+  });
+
+  it('counts downloads of existing icons only', async () => {
+    const { app, deps } = setup();
+    expect((await post(app, '/v1/downloads', { iconId: 1 })).status).toBe(202);
+    expect((await post(app, '/v1/downloads', { iconId: 1 })).status).toBe(202);
+    expect(deps.downloads.counts.get(1)).toBe(2);
+    await problem(await post(app, '/v1/downloads', { iconId: 999 }), 404);
+    await problem(await post(app, '/v1/downloads', { iconId: 'x' }), 400);
+  });
+
+  it('allows cross-origin POST from the website and caps body size', async () => {
+    const { app } = setup();
+    const preflight = await app.request('/v1/packs', {
+      method: 'OPTIONS',
+      headers: {
+        origin: 'https://iconnook.com',
+        'access-control-request-method': 'POST',
+        'access-control-request-headers': 'content-type',
+      },
+    });
+    expect(preflight.headers.get('access-control-allow-methods')).toContain('POST');
+    const huge = await app.request('/v1/collections', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'content-length': String(70 * 1024) },
+      body: 'x'.repeat(70 * 1024),
+    });
+    await problem(huge, 413);
   });
 });

@@ -1,13 +1,22 @@
 import { serve } from '@hono/node-server';
 import { createDb } from '@iconnook/db';
+import { QUEUE_PACKS } from '@iconnook/jobs';
+import { loadStorageConfig, S3Storage } from '@iconnook/storage';
+import { Queue } from 'bullmq';
 import { Redis } from 'ioredis';
 import { Meilisearch } from 'meilisearch';
 import { pino } from 'pino';
 
+import { BullPackQueue } from './adapters/bull-pack-queue.js';
 import { DrizzleIconRepository } from './adapters/drizzle-repository.js';
 import { MeiliIconSearch } from './adapters/meili-search.js';
 import { ResvgRenderer } from './adapters/resvg-renderer.js';
 import { ValkeyRateLimiter } from './adapters/valkey-rate-limiter.js';
+import {
+  StorageFileStore,
+  ValkeyDownloadCounter,
+  ValkeyFeatureFlags,
+} from './adapters/valkey-services.js';
 import { createApp } from './app.js';
 import { loadConfig } from './config.js';
 
@@ -31,12 +40,21 @@ const meili = new Meilisearch({
   timeout: 5_000,
 });
 
+// Producer-side queue connection: fail fast like the rest of the API (the worker blocks instead).
+const packQueue = new Queue(QUEUE_PACKS, {
+  connection: new Redis(config.VALKEY_URL, { maxRetriesPerRequest: 1, enableOfflineQueue: false }),
+});
+
 const app = createApp(
   {
     icons: new DrizzleIconRepository(db.db),
     search: new MeiliIconSearch(meili),
     rateLimiter: new ValkeyRateLimiter(redis),
     png: new ResvgRenderer({ concurrency: config.PNG_CONCURRENCY }),
+    packs: new BullPackQueue(packQueue),
+    files: new StorageFileStore(new S3Storage(loadStorageConfig())),
+    flags: new ValkeyFeatureFlags(redis),
+    downloads: new ValkeyDownloadCounter(redis),
   },
   {
     apiUrl: config.PUBLIC_API_URL,
@@ -60,7 +78,9 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.on(signal, () => {
     logger.info({ signal }, 'shutting down');
     server.close(() => {
-      void Promise.allSettled([db.close(), redis.quit()]).then(() => process.exit(0));
+      void Promise.allSettled([db.close(), redis.quit(), packQueue.close()]).then(() =>
+        process.exit(0),
+      );
     });
   });
 }

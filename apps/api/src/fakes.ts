@@ -1,8 +1,14 @@
 import type {
+  Collection,
   Dependencies,
+  DownloadCounter,
+  FeatureFlags,
+  FileStore,
   IconDetail,
   IconRepository,
   IconSearch,
+  PackQueue,
+  PackStatus,
   PngRenderer,
   RateLimiter,
   SetSummary,
@@ -42,7 +48,11 @@ export const fakeIcon = (overrides: Partial<IconDetail> = {}): IconDetail => ({
 });
 
 export interface FakeDeps extends Dependencies {
-  icons: IconRepository & { data: IconDetail[] };
+  icons: IconRepository & { data: IconDetail[]; collections: Map<string, Collection> };
+  packs: PackQueue & { jobs: Map<string, PackStatus> };
+  files: FileStore & { objects: Map<string, string> };
+  flags: FeatureFlags & { disabled: Set<string> };
+  downloads: DownloadCounter & { counts: Map<number, number> };
   rateLimiter: RateLimiter & { counts: Map<string, number>; down: boolean };
   search: IconSearch & { down: boolean };
 }
@@ -88,6 +98,48 @@ export function fakeDeps(
       });
     },
     listCategories: () => Promise.resolve([{ slug: 'arrows', label: 'Arrows', total: 1 }]),
+    collections: new Map(),
+    getIconsByRefs: (refs) =>
+      Promise.resolve(
+        refs.flatMap((r) => {
+          const i = data.find((d) => `${d.set}:${d.name}` === r);
+          return i
+            ? [
+                {
+                  ...i,
+                  setName: i.setInfo.name,
+                  tier: i.setInfo.license.tier,
+                  isColor: i.setInfo.isColor,
+                },
+              ]
+            : [];
+        }),
+      ),
+    iconExists: (id) => Promise.resolve(data.some((d) => d.id === id)),
+    createCollection(c) {
+      this.collections.set(c.id, {
+        id: c.id,
+        name: c.name,
+        createdAt: new Date(0).toISOString(),
+        icons: c.iconIds.flatMap((id) => {
+          const i = data.find((d) => d.id === id);
+          return i
+            ? [
+                {
+                  ...i,
+                  setName: i.setInfo.name,
+                  tier: i.setInfo.license.tier,
+                  isColor: i.setInfo.isColor,
+                },
+              ]
+            : [];
+        }),
+      });
+      return Promise.resolve();
+    },
+    getCollection(id) {
+      return Promise.resolve(this.collections.get(id) ?? null);
+    },
     ping: () => Promise.resolve(),
   };
   const search: FakeDeps['search'] = {
@@ -121,7 +173,52 @@ export function fakeDeps(
   const png: PngRenderer = {
     render: (svg, width) => Promise.resolve(Buffer.from(`PNG:${String(width)}:${svg}`)),
   };
-  return { icons, search, rateLimiter, png };
+  const packs: FakeDeps['packs'] = {
+    jobs: new Map(),
+    enqueue(id, request) {
+      const existing = this.jobs.get(id);
+      if (existing) return Promise.resolve(existing);
+      const status: PackStatus = { id, state: 'queued', progress: 0, format: request.format };
+      this.jobs.set(id, status);
+      return Promise.resolve(status);
+    },
+    status(id) {
+      return Promise.resolve(this.jobs.get(id) ?? null);
+    },
+    rebuild(id, request) {
+      const status: PackStatus = { id, state: 'queued', progress: 0, format: request.format };
+      this.jobs.set(id, status);
+      return Promise.resolve(status);
+    },
+  };
+  const files: FakeDeps['files'] = {
+    objects: new Map(),
+    exists(key) {
+      return Promise.resolve(this.objects.has(key));
+    },
+    get(key) {
+      const content = this.objects.get(key);
+      return Promise.resolve(
+        content === undefined
+          ? null
+          : new Response(content, { headers: { 'content-length': String(content.length) } }),
+      );
+    },
+  };
+  const flags: FakeDeps['flags'] = {
+    disabled: new Set(),
+    isEnabled(flag) {
+      return Promise.resolve(!this.disabled.has(flag));
+    },
+  };
+  const downloads: FakeDeps['downloads'] = {
+    counts: new Map(),
+    record(iconId) {
+      this.counts.set(iconId, (this.counts.get(iconId) ?? 0) + 1);
+      return Promise.resolve();
+    },
+  };
+  return { icons, search, rateLimiter, png, packs, files, flags, downloads };
 }
 
 export const testAppOptions = {

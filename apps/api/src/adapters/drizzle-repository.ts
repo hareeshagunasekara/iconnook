@@ -1,9 +1,10 @@
 import { requiresAttribution } from '@iconnook/core';
 import { schema, type Database } from '@iconnook/db';
-import { and, asc, count, eq, gt, inArray, sql, type SQL } from 'drizzle-orm';
+import { and, asc, count, eq, gt, inArray, or, sql, type SQL } from 'drizzle-orm';
 
 import type {
   CategorySummary,
+  Collection,
   IconDetail,
   IconListItem,
   IconRecord,
@@ -12,7 +13,16 @@ import type {
   SetSummary,
 } from '../domain.js';
 
-const { categories, iconCategories, icons, iconSets, iconTags, tags } = schema;
+const {
+  categories,
+  collectionIcons,
+  collections,
+  iconCategories,
+  icons,
+  iconSets,
+  iconTags,
+  tags,
+} = schema;
 type SetRow = typeof iconSets.$inferSelect;
 
 const visible = eq(icons.hidden, false);
@@ -137,6 +147,76 @@ export class DrizzleIconRepository implements IconRepository {
       .innerJoin(icons, and(eq(icons.id, iconCategories.iconId), visible))
       .groupBy(categories.id)
       .orderBy(asc(categories.label));
+  }
+
+  async getIconsByRefs(refs: readonly string[]): Promise<IconListItem[]> {
+    const pairs = refs.map((r) => r.split(':') as [string, string]);
+    const rows: IconListItem[] = [];
+    for (let i = 0; i < pairs.length; i += 200) {
+      const chunk = pairs.slice(i, i + 200);
+      rows.push(
+        ...(await this.db
+          .select({
+            ...iconColumns,
+            setName: iconSets.name,
+            tier: iconSets.licenseTier,
+            isColor: iconSets.isColor,
+          })
+          .from(icons)
+          .innerJoin(iconSets, eq(iconSets.id, icons.setId))
+          .where(
+            and(
+              visible,
+              or(
+                ...chunk.map(([set, name]) => and(eq(iconSets.prefix, set), eq(icons.name, name))),
+              ),
+            ),
+          )),
+      );
+    }
+    const byRef = new Map(rows.map((r) => [`${r.set}:${r.name}`, r]));
+    return refs.flatMap((r) => byRef.get(r) ?? []);
+  }
+
+  async iconExists(id: number): Promise<boolean> {
+    const [row] = await this.db
+      .select({ id: icons.id })
+      .from(icons)
+      .where(and(eq(icons.id, id), visible));
+    return row !== undefined;
+  }
+
+  async createCollection(collection: {
+    id: string;
+    name: string | null;
+    iconIds: readonly number[];
+  }): Promise<void> {
+    await this.db.transaction(async (tx) => {
+      await tx.insert(collections).values({ id: collection.id, name: collection.name });
+      await tx.insert(collectionIcons).values(
+        collection.iconIds.map((iconId, position) => ({
+          collectionId: collection.id,
+          iconId,
+          position,
+        })),
+      );
+    });
+  }
+
+  async getCollection(id: string): Promise<Collection | null> {
+    const [row] = await this.db.select().from(collections).where(eq(collections.id, id));
+    if (!row) return null;
+    const members = await this.db
+      .select({ iconId: collectionIcons.iconId })
+      .from(collectionIcons)
+      .where(eq(collectionIcons.collectionId, id))
+      .orderBy(asc(collectionIcons.position));
+    return {
+      id: row.id,
+      name: row.name,
+      createdAt: row.createdAt.toISOString(),
+      icons: await this.getIconsByIds(members.map((m) => m.iconId)),
+    };
   }
 
   async ping(): Promise<void> {

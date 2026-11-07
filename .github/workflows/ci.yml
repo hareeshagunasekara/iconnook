@@ -77,6 +77,11 @@ jobs:
       MEILI_URL: http://localhost:7700
       MEILI_MASTER_KEY: ci-ephemeral-master-key
       VALKEY_URL: redis://localhost:6379
+      S3_ENDPOINT: http://localhost:8333
+      S3_REGION: auto
+      S3_BUCKET: iconnook-assets
+      S3_ACCESS_KEY_ID: ci-ephemeral-key
+      S3_SECRET_ACCESS_KEY: ci-ephemeral-secret
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
@@ -85,6 +90,14 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Start SeaweedFS (S3)
+        run: |
+          docker run -d --name seaweedfs -p 8333:8333 \
+            -e S3_ACCESS_KEY_ID -e S3_SECRET_ACCESS_KEY -e S3_BUCKET \
+            -v "$PWD/infra/seaweedfs/start.sh:/etc/seaweedfs/start.sh:ro" \
+            --entrypoint /bin/sh chrislusf/seaweedfs:4.52 /etc/seaweedfs/start.sh
+          for i in $(seq 1 60); do docker exec seaweedfs test -f /tmp/bucket-ready && exit 0; sleep 1; done
+          docker logs seaweedfs; exit 1
       - run: pnpm test:integration
       - name: Migrations apply to the service database and are re-runnable
         run: pnpm db:migrate && pnpm db:migrate
@@ -137,6 +150,11 @@ jobs:
       MEILI_API_KEY: ci-ephemeral-master-key
       VALKEY_URL: redis://localhost:6379
       PUBLIC_API_URL: http://localhost:8787
+      S3_ENDPOINT: http://localhost:8333
+      S3_REGION: auto
+      S3_BUCKET: iconnook-assets
+      S3_ACCESS_KEY_ID: ci-ephemeral-key
+      S3_SECRET_ACCESS_KEY: ci-ephemeral-secret
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
@@ -146,6 +164,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - name: Start SeaweedFS (S3)
+        run: |
+          docker run -d --name seaweedfs -p 8333:8333 \
+            -e S3_ACCESS_KEY_ID -e S3_SECRET_ACCESS_KEY -e S3_BUCKET \
+            -v "$PWD/infra/seaweedfs/start.sh:/etc/seaweedfs/start.sh:ro" \
+            --entrypoint /bin/sh chrislusf/seaweedfs:4.52 /etc/seaweedfs/start.sh
+          for i in $(seq 1 60); do docker exec seaweedfs test -f /tmp/bucket-ready && exit 0; sleep 1; done
+          docker logs seaweedfs; exit 1
       - name: Seed fixture icons and build the search index
         run: pnpm db:migrate && pnpm db:seed && pnpm icons:reindex
       - run: pnpm --filter @iconnook/web exec playwright install --with-deps chromium

@@ -10,6 +10,7 @@ const nav = [
   { href: '/sets', label: 'Icon sets' },
   { href: '/categories', label: 'Categories' },
   { href: '/licenses', label: 'Licenses' },
+  { href: '/collection', label: 'Collection' },
 ];
 ---
 
@@ -27,15 +28,21 @@ const nav = [
       <SearchForm query={query} id="site-search" compact landmark="Site search" />
     </div>
     <nav aria-label="Main" class="ml-auto">
-      <ul class="flex gap-1">
+      <ul class="flex flex-wrap justify-end gap-x-1">
         {nav.map((item) => (
           <li>
             <a
               href={item.href}
-              class="inline-flex min-h-11 items-center rounded px-3 hover:bg-[var(--color-surface)]"
+              class="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--color-surface)] sm:px-3"
               aria-current={path.startsWith(item.href) ? 'page' : undefined}
             >
               {item.label}
+              {item.href === '/collection' && (
+                <span
+                  data-collection-count
+                  class="ml-1 hidden rounded-full bg-[var(--color-accent)] px-1.5 text-xs text-[var(--color-accent-contrast)]"
+                />
+              )}
             </a>
           </li>
         ))}

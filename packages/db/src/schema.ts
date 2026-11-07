@@ -167,3 +167,43 @@ export const downloads = pgTable(
     check('downloads_count_non_negative', sql`${t.count} >= 0`),
   ],
 );
+
+/**
+ * Applied download-counter flushes (one row per batch moved from Valkey). Inserting the batch id in
+ * the same transaction as the counts makes each flush exactly-once, even if the worker crashes.
+ */
+export const downloadFlushes = pgTable('download_flushes', {
+  id: text('id').primaryKey(),
+  appliedAt: timestamp('applied_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * Shared collections: immutable snapshots created when someone shares their (browser-local)
+ * collection. No accounts — the unguessable id is the only handle.
+ */
+export const collections = pgTable(
+  'collections',
+  {
+    id: text('id').primaryKey(),
+    name: text('name'),
+    createdAt: timestamps.createdAt,
+  },
+  (t) => [
+    check('collections_id_format', sql`${t.id} ~ '^[A-Za-z0-9_-]{10,32}$'`),
+    check('collections_name_length', sql`${t.name} IS NULL OR char_length(${t.name}) <= 80`),
+  ],
+);
+
+export const collectionIcons = pgTable(
+  'collection_icons',
+  {
+    collectionId: text('collection_id')
+      .notNull()
+      .references(() => collections.id, { onDelete: 'cascade' }),
+    iconId: bigint('icon_id', { mode: 'number' })
+      .notNull()
+      .references(() => icons.id, { onDelete: 'cascade' }),
+    position: integer('position').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.collectionId, t.iconId] })],
+);

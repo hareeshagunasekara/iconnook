@@ -4,6 +4,7 @@ packages:
 allowBuilds:
   esbuild: true
   lefthook: true
+  msgpackr-extract: false
 
 overrides:
   # @astrojs/astro2tsx ships @emnapi/core 1.x, but its @emnapi/runtime peer resolves to a 2.0 beta,

@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 
 /* Design tokens (docs/standards/ui-ux.md). Components use tokens, never raw values.
-   Contrast (WCAG 2.2 AA): text ≥ 4.5:1, UI borders/focus ≥ 3:1 against --color-bg, both themes. */
+   Contrast (WCAG 2.2 AA): text ≥ 4.5:1, UI borders/focus ≥ 3:1 against --color-bg.
+   Light theme only — IconNook has no dark mode (ADR 0004). */
 @theme {
   --color-bg: #ffffff;
   --color-surface: #f4f5f7;
@@ -22,23 +23,6 @@
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #111317;
-    --color-surface: #1b1e24;
-    --color-surface-2: #262a32;
-    --color-border: #7d8592;
-    --color-text: #eceef2;
-    --color-text-muted: #aab0bb;
-    --color-accent: #9aa6ff;
-    --color-accent-contrast: #111317;
-    --color-focus: #9aa6ff;
-    --color-tier-a: #6fd497;
-    --color-tier-b: #f2b25c;
-    --color-tier-c: #f28cb4;
-  }
-}
-
 /* Base styles live in @layer base: unlayered CSS would override every Tailwind utility. */
 @layer base {
   html {
@@ -46,7 +30,7 @@
     color: var(--color-text);
     font-family: var(--font-sans);
     line-height: 1.5;
-    color-scheme: light dark;
+    color-scheme: light;
   }
 
   body {
