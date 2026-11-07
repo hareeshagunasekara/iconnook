@@ -79,7 +79,39 @@ describe('code formats', () => {
     expect(jsx).toContain('fillRule="evenodd"');
     expect(jsx).toContain('xlinkHref="#b"');
     expect(jsx).toContain('xmlnsXlink=');
-    expect(jsx).toContain('style={{ stopColor: "red", opacity: "0.5" }}');
+    expect(jsx).toContain('style={{ "stopColor": "red", "opacity": "0.5" }}');
+  });
+
+  describe('never turns icon content into code (security review finding)', () => {
+    // Passes the SVG sanitizer unchanged (braces and text are harmless in SVG/HTML) …
+    const evil = customizeSvg({
+      body:
+        '<path style="[alert(document.domain)]:x;fill:red" d="M0 0h24"/><text>{alert(1)}</text>' +
+        '<title>{{ \'\'.constructor.constructor(\'alert(2)\')() }}</title><path fill="{alert(3)}" d="M1 1"/>',
+      width: 24,
+      height: 24,
+    });
+    const body = (code: string) => code.slice(code.indexOf('<svg'));
+
+    it('JSX: no expressions or computed keys from the icon', () => {
+      const out = body(toCode('jsx', evil, opts));
+      expect(out).not.toContain('{alert');
+      expect(out).not.toContain('[alert');
+      expect(out).toContain('&#123;alert(1)&#125;');
+      expect(out).toContain('style={{ "fill": "red" }}'); // valid properties kept, quoted
+    });
+
+    it('Svelte: braces in text and attributes are inert', () => {
+      const out = body(toCode('svelte', evil, opts));
+      expect(out).not.toMatch(/\{(?!\.\.\.props\})/); // only the props spread is a real expression
+      expect(out).toContain('fill="&#123;alert(3)&#125;"');
+    });
+
+    it('Vue: no mustache expressions, and the icon is not compiled at all', () => {
+      const out = toCode('vue', evil, opts);
+      expect(out).not.toContain('{{');
+      expect(out).toContain('<svg v-pre ');
+    });
   });
 
   it('produces every format', () => {
