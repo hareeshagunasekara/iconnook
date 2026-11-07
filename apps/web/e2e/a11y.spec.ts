@@ -41,7 +41,7 @@ test('no axe violations with the icon dialog open', async ({ page }) => {
   await page.goto('/sets/iconnook-fixtures');
   await page.waitForFunction(() => document.documentElement.dataset.iconModalReady === 'true');
   await page.locator('a[href="/icons/iconnook-fixtures/circle"]').click();
-  await page.getByRole('dialog', { name: 'circle' }).getByText('Similar icons').waitFor();
+  await page.getByRole('dialog', { name: 'circle' }).getByText('Copy code').waitFor();
   expect(await axe(page)).toEqual([]);
 });
 
