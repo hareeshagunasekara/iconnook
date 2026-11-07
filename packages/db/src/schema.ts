@@ -62,6 +62,8 @@ export const iconSets = pgTable(
     isColor: boolean('is_color').notNull().default(false),
     gridSize: integer('grid_size'),
     version: text('version'),
+    /** Visible icons in the set, maintained by the importer (avoids counting on every request). */
+    iconCount: integer('icon_count').notNull().default(0),
     ...timestamps,
   },
   (t) => [

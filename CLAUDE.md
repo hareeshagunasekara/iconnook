@@ -3,7 +3,7 @@
 **IconNook** (iconnook.com) — a free, open-source SVG icon library (in the spirit of svgrepo / flaticon). No payments, no paywalls, ever.
 Goals, in priority order: **legally clean icons**, **fast**, **accessible to everyone**.
 
-> Status: Phase 3 (importer & SVG sanitizer). Update this file as the project grows.
+> Status: Phase 4 (API). Update this file as the project grows.
 > **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
 > **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
@@ -21,11 +21,12 @@ Goals, in priority order: **legally clean icons**, **fast**, **accessible to eve
 
 ```
 apps/web           Astro site                                            ✅ skeleton
-apps/api           Hono REST API (/v1/...)                               ✅ /healthz
+apps/api           Hono REST API (/v1/..., OpenAPI 3.1)                   ✅
 packages/core      shared pure domain logic (license tiers, types)        ✅
 packages/config    shared tsconfig                                        ✅
 packages/db        Drizzle schema, migrations, client, fixtures           ✅
-packages/svg       SVG build + sanitizer (security-critical, ≥95% cov)    ✅
+packages/svg       SVG sanitizer, customization, code export (≥95% cov)  ✅
+packages/search    search index contract: documents, filters, rebuild     ✅
 packages/importer  @iconify/json → sanitize → Postgres + Meilisearch      ✅
 apps/worker        BullMQ jobs: ZIP packs, PNG pre-render, counters       Phase 6
 deploy/k8s         k3s manifests                                          Phase 8
@@ -81,6 +82,7 @@ pnpm icons:import             # Tier A icon sets → Postgres, then rebuild sear
 pnpm icons:import --sets tabler,lucide --tiers A --no-index   # subset / skip reindex
 pnpm icons:reindex            # rebuild Meilisearch from Postgres (new index, atomic swap)
 pnpm icons:catalog            # regenerate SOURCES.md (never edit it by hand)
+docker run --rm -i -e BASE_URL=http://host.docker.internal:8787 grafana/k6 run - < load/api.js   # API load test
 pnpm --filter @iconnook/api test     # one package
 ```
 

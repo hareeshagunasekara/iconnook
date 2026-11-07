@@ -9,7 +9,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { loadImporterConfig } from '../src/config.js';
 import { fixtureIconifySet, memorySource } from '../src/fixtures.js';
 import { importSets } from '../src/run.js';
-import { rebuildSearchIndex, type SearchDocument } from '../src/search.js';
+import { rebuildSearchIndex, type SearchDocument } from '@iconnook/search';
 import { iconifySource } from '../src/sources/iconify.js';
 import { syncSet } from '../src/sync.js';
 
@@ -43,6 +43,8 @@ describe('importSets', () => {
       deleted: 0,
     });
     expect(await iconCount()).toBe(5);
+    const [stored] = await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'fixture-ui'));
+    expect(stored?.iconCount).toBe(5);
     expect(
       await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'fixture-gpl')),
     ).toHaveLength(0);
@@ -70,6 +72,8 @@ describe('importSets', () => {
     expect(report).toMatchObject({ inserted: 0, updated: 1, deleted: 1, unchanged: 3 });
     expect(report?.links).toEqual({ added: 0, removed: 3 }); // house synonym, Buildings, arrow-down in Arrows
     expect(await iconCount()).toBe(4);
+    const [stored] = await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'fixture-ui'));
+    expect(stored?.iconCount).toBe(4);
   });
 
   it('refuses a tier X set even if called directly, and writes nothing', async () => {

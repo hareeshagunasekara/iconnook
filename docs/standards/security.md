@@ -26,7 +26,8 @@ SVG is XML that can carry `<script>`, `on*` handlers, `javascript:` URLs, `<fore
 3. **Serve SVG safely** — raw `.svg` responses get `Content-Type: image/svg+xml`, `X-Content-Type-Options: nosniff`, and `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox`. Downloads also get `Content-Disposition: attachment`.
 4. **User-uploaded SVGs** (future) are displayed via `<img>` (scripts can't run there) and served from a separate cookieless origin, never inlined, until moderated.
 5. Parameter-driven transforms (color, stroke, size) are applied from validated values only: colors match `^#[0-9a-f]{3,8}$` or `currentColor`; numbers are clamped.
-6. Guard against XML bombs: cap input size (e.g. 512 KB), disable entity expansion, cap element count.
+6. **Code exports are a separate context.** Sanitized markup is safe as SVG/HTML, but in JSX/Vue/Svelte source braces are code. `toCode` encodes `{`/`}` as `&#123;`/`&#125;`, quotes and allowlists JSX style keys, and adds `v-pre` for Vue. Any new export format must get its own context-specific escaping and a test with the payloads in `packages/svg/src/customize.test.ts`.
+7. Guard against XML bombs: cap input size (e.g. 512 KB), disable entity expansion, cap element count.
 
 ## HTTP security headers (web + api)
 
@@ -40,7 +41,7 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()
 Cross-Origin-Opener-Policy: same-origin
 ```
 
-Tighten `style-src` with nonces/hashes if feasible. Public API: CORS `*` for GET asset endpoints only; everything else same-origin.
+Tighten `style-src` with nonces/hashes if feasible. Public API: CORS `*` for GET (the API is public, read-only, unauthenticated and sets no cookies — so this is safe and intended). ZAP flags it as "Cross-Domain Misconfiguration" (10098); that rule is ignored with this justification in `.zap/rules.tsv`. Run ZAP with `zap-api-scan.py -t <api>/v1/openapi.json -f openapi -c rules.tsv`.
 
 ## Abuse & availability
 

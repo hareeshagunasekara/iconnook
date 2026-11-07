@@ -2,7 +2,7 @@ import { createDb } from '@iconnook/db';
 import { Meilisearch } from 'meilisearch';
 
 import { loadImporterConfig } from '../config.js';
-import { rebuildSearchIndex } from '../search.js';
+import { rebuildSearchIndex } from '@iconnook/search';
 
 const config = loadImporterConfig();
 const handle = createDb(config.DATABASE_URL, { max: 2 });

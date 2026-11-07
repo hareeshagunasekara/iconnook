@@ -13,7 +13,7 @@
     },
     "test:integration": {
       "dependsOn": ["^build"],
-      "env": ["DATABASE_URL", "MEILI_URL", "MEILI_MASTER_KEY"],
+      "env": ["DATABASE_URL", "MEILI_URL", "MEILI_MASTER_KEY", "VALKEY_URL"],
       "cache": false
     },
     "dev": {

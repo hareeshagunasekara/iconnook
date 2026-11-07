@@ -2,32 +2,10 @@ import type { Database } from '@iconnook/db';
 import { sql } from 'drizzle-orm';
 import type { Meilisearch } from 'meilisearch';
 
-export const SEARCH_INDEX = 'icons';
+import { SEARCH_INDEX, SEARCH_SETTINGS, type SearchDocument } from './document.js';
+
 const PAGE = 10_000;
 const TASK_TIMEOUT = { timeout: 15 * 60_000, interval: 250 };
-
-export interface SearchDocument {
-  id: number;
-  name: string;
-  /** Name with spaces, so "arrow-left" matches "arrow left". */
-  label: string;
-  set: string;
-  setName: string;
-  tier: string;
-  type: string;
-  color: boolean;
-  tags: string[];
-  categories: string[];
-}
-
-export const SEARCH_SETTINGS = {
-  searchableAttributes: ['label', 'tags', 'categories', 'setName'],
-  filterableAttributes: ['set', 'tier', 'type', 'color', 'categories'],
-  displayedAttributes: ['id', 'name', 'set', 'setName', 'tier', 'type', 'color'],
-  pagination: { maxTotalHits: 5_000 },
-  // Icon names are short: allow one typo from 4 letters ("trsh" → trash), two from 8.
-  typoTolerance: { minWordSizeForTypos: { oneTypo: 4, twoTypos: 8 } },
-};
 
 interface Row extends Record<string, unknown> {
   id: string | number;
@@ -39,6 +17,7 @@ interface Row extends Record<string, unknown> {
   color: boolean;
   tags: string[];
   categories: string[];
+  category_slugs: string[];
 }
 
 async function* readDocuments(db: Database): AsyncGenerator<SearchDocument[]> {
@@ -49,7 +28,9 @@ async function* readDocuments(db: Database): AsyncGenerator<SearchDocument[]> {
         COALESCE((SELECT array_agg(t.label ORDER BY t.label) FROM icon_tags it
                   JOIN tags t ON t.id = it.tag_id WHERE it.icon_id = i.id), '{}') AS tags,
         COALESCE((SELECT array_agg(c.label ORDER BY c.label) FROM icon_categories ic
-                  JOIN categories c ON c.id = ic.category_id WHERE ic.icon_id = i.id), '{}') AS categories
+                  JOIN categories c ON c.id = ic.category_id WHERE ic.icon_id = i.id), '{}') AS categories,
+        COALESCE((SELECT array_agg(c.slug ORDER BY c.slug) FROM icon_categories ic
+                  JOIN categories c ON c.id = ic.category_id WHERE ic.icon_id = i.id), '{}') AS category_slugs
       FROM icons i JOIN icon_sets s ON s.id = i.set_id
       WHERE NOT i.hidden AND i.id > ${lastId}
       ORDER BY i.id LIMIT ${PAGE}`);
@@ -65,6 +46,7 @@ async function* readDocuments(db: Database): AsyncGenerator<SearchDocument[]> {
       color: r.color,
       tags: r.tags,
       categories: r.categories,
+      categorySlugs: r.category_slugs,
     }));
     lastId = Number(rows[rows.length - 1]?.id);
   }

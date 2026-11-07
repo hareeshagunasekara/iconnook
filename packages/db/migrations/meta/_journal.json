@@ -15,6 +15,13 @@
       "when": 1793999067144,
       "tag": "0001_fractional_icon_dimensions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794001512484,
+      "tag": "0002_set_icon_count",
+      "breakpoints": true
     }
   ]
 }

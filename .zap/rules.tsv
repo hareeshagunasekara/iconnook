@@ -1,0 +1,2 @@
+# ZAP rule overrides: <rule id>	<IGNORE|WARN|FAIL>	<reason>
+10098	IGNORE	Public, unauthenticated, read-only API with no cookies: CORS "*" is intended so any site can fetch icons (docs/standards/security.md).

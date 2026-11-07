@@ -7,7 +7,7 @@ import { Meilisearch } from 'meilisearch';
 
 import { loadImporterConfig } from '../config.js';
 import { importSets } from '../run.js';
-import { rebuildSearchIndex } from '../search.js';
+import { rebuildSearchIndex } from '@iconnook/search';
 import { iconifySource } from '../sources/iconify.js';
 
 const { values } = parseArgs({

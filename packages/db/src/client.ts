@@ -14,6 +14,8 @@ export interface DbHandle {
 export interface CreateDbOptions {
   /** Max pooled connections (keep small: PgBouncer sits in front in production). */
   max?: number;
+  /** Server-side statement timeout in ms (the API sets one so slow queries can't pile up). */
+  statementTimeoutMs?: number;
 }
 
 export function createDb(url: string, options: CreateDbOptions = {}): DbHandle {
@@ -22,6 +24,9 @@ export function createDb(url: string, options: CreateDbOptions = {}): DbHandle {
     idle_timeout: 30,
     connect_timeout: 10,
     onnotice: () => undefined,
+    ...(options.statementTimeoutMs
+      ? { connection: { statement_timeout: options.statementTimeoutMs } }
+      : {}),
   });
   return {
     db: drizzle(sql, { schema }),
