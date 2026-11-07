@@ -10,6 +10,7 @@ const PAGES = [
   '/icons/iconnook-fixtures/circle',
   '/licenses',
   '/about',
+  '/privacy',
 ];
 
 test.describe('at 320px wide', () => {
@@ -80,7 +81,8 @@ test.describe('without JavaScript', () => {
       /circle\.svg\?download=1&size=48$/,
     );
     await expect(page.getByRole('link', { name: /Download PNG/ })).toBeVisible();
-    const code = page.locator('#code-panel code');
+    await page.locator('summary', { hasText: 'SVG code' }).click(); // collapsible code to copy by hand
+    const code = page.locator('details pre code');
     await expect(code).toContainText('<svg ');
     await expect(code).toContainText('xmlns="http://www.w3.org/2000/svg"');
   });

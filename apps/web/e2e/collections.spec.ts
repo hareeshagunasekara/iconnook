@@ -48,7 +48,10 @@ test('add icons, download a sprite and a ZIP, share, and save the shared collect
   await add(page, 'plus');
   await expect(page.locator('[data-collection-count]')).toHaveText('2');
 
-  await page.getByRole('link', { name: /Collection/ }).click();
+  await page
+    .getByRole('navigation', { name: 'Main' })
+    .getByRole('link', { name: /Collection/ })
+    .click();
   await expect(page).toHaveURL(/\/collection$/);
   const list = page.getByRole('list', { name: 'Icons in your collection' });
   await expect(list.getByRole('listitem')).toHaveCount(2);
