@@ -12,22 +12,22 @@ interface Props {
 const { icons, name, showSet = false } = Astro.props;
 ---
 
-<ul
-  class="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-2"
-  aria-label={name}
-  data-icon-grid
->
+<!-- Fixed columns (3 / 5 / 9) so a page of 45 icons fills whole rows: 5 rows on desktop. -->
+<ul class="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" aria-label={name} data-icon-grid>
   {icons.map((icon) => (
     <li>
       <a
         href={`/icons/${icon.set}/${icon.name}`}
+        data-icon-link
+        data-set={icon.set}
+        data-name={icon.name}
         class="flex h-full min-h-28 flex-col items-center justify-center gap-2 rounded-lg border border-transparent bg-[var(--color-surface)] p-3 text-center hover:border-[var(--color-border)]"
       >
         <span
           class="text-[2rem] leading-none"
           set:html={inlineSvg(icon, 'h-8 w-auto max-w-full')}
         />
-        <span class="line-clamp-2 text-xs break-all">{label(icon.name)}</span>
+        <span class="line-clamp-2 text-xs [overflow-wrap:anywhere]">{label(icon.name)}</span>
         {showSet && icon.setName && (
           <span class="line-clamp-1 text-[0.7rem] text-[var(--color-text-muted)]">
             {icon.setName}

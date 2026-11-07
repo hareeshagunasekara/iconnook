@@ -7,19 +7,22 @@ import Layout from '../../layouts/Layout.astro';
 import { api, typeLabel, type IconSet, type IconSummary } from '../../lib/api';
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+/** 5 rows of the 9-column grid. */
+const PER_PAGE = 45;
 const prefix = Astro.params.set ?? '';
-const after = Astro.url.searchParams.get('after') ?? undefined;
-if (!SLUG.test(prefix) || (after !== undefined && !SLUG.test(after))) return Astro.rewrite('/404');
+const pageParam = Astro.url.searchParams.get('page') ?? '1';
+const pageNumber = /^[1-9][0-9]{0,3}$/.test(pageParam) ? Number(pageParam) : 0;
+if (!SLUG.test(prefix) || pageNumber === 0) return Astro.rewrite('/404');
 
 let set: IconSet | null = null;
-let page: { items: IconSummary[]; nextCursor: string | null } | null = null;
+let page: { items: IconSummary[] } | null = null;
 let failed = false;
 try {
   [set, page] = await Promise.all([
     api<IconSet>(`/v1/sets/${prefix}`),
-    api<{ items: IconSummary[]; nextCursor: string | null }>(`/v1/sets/${prefix}/icons`, {
-      limit: 96,
-      cursor: after,
+    api<{ items: IconSummary[] }>(`/v1/sets/${prefix}/icons`, {
+      limit: PER_PAGE,
+      page: pageNumber,
     }),
   ]);
 } catch {
@@ -27,11 +30,15 @@ try {
   Astro.response.status = 503;
 }
 if (!failed && !set) return Astro.rewrite('/404');
+const pages = set ? Math.max(1, Math.ceil(set.total / PER_PAGE)) : 1;
+if (set && pageNumber > pages) return Astro.rewrite('/404');
 const fmt = new Intl.NumberFormat('en');
 ---
 
 <Layout
-  title={set ? `${set.name} icons` : 'Icon set'}
+  title={
+    set ? `${set.name} icons${pageNumber > 1 ? ` (page ${String(pageNumber)})` : ''}` : 'Icon set'
+  }
   description={
     set
       ? `${fmt.format(set.total)} free ${set.name} icons (${set.license.spdx}) in SVG and PNG.`
@@ -101,8 +108,11 @@ const fmt = new Intl.NumberFormat('en');
         <div class="mt-6">
           <IconGrid icons={page.items} name={`${set.name} icons`} />
           <Pagination
-            prev={after ? `/sets/${set.prefix}` : undefined}
-            next={page.nextCursor ? `/sets/${set.prefix}?after=${page.nextCursor}` : undefined}
+            page={pageNumber}
+            pages={pages}
+            href={(p) =>
+              p === 1 ? `/sets/${set.prefix}` : `/sets/${set.prefix}?page=${String(p)}`
+            }
           />
         </div>
       )}

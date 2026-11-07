@@ -1,39 +1,107 @@
 ---
+import UiIcon from './UiIcon.astro';
+
 interface Props {
-  /** Link to the previous page, if any. */
-  prev?: string | undefined;
-  /** Link to the next page, if any. */
-  next?: string | undefined;
-  /** e.g. "Page 2 of 14". */
-  status?: string | undefined;
+  /** Current page (1-based). */
+  page: number;
+  /** Total number of pages. */
+  pages: number;
+  /** Builds the link for a page. */
+  href: (page: number) => string;
 }
-const { prev, next, status } = Astro.props;
+const { page, pages, href } = Astro.props;
+
+/** 1 2 3 4 5 … 12 / 1 … 6 7 8 … 12 / 1 … 8 9 10 11 12, always with the first and last page. */
+function pageList(current: number, total: number): (number | 'gap')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, 'gap', total];
+  if (current >= total - 3)
+    return [1, 'gap', ...Array.from({ length: 5 }, (_, i) => total - 4 + i)];
+  return [1, 'gap', current - 1, current, current + 1, 'gap', total];
+}
+const items = pageList(page, pages);
 ---
 
-{(prev || next) && (
-  <nav aria-label="Pagination" class="mt-8 flex items-center justify-between gap-4">
-    {prev ? (
-      <a
-        class="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-4"
-        href={prev}
-        rel="prev"
-      >
-        ← Previous
-      </a>
-    ) : (
-      <span />
-    )}
-    {status && <p class="text-sm text-[var(--color-text-muted)]">{status}</p>}
-    {next ? (
-      <a
-        class="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-4"
-        href={next}
-        rel="next"
-      >
-        Next →
-      </a>
-    ) : (
-      <span />
-    )}
+{pages > 1 && (
+  <nav aria-label="Pagination" class="mt-10 flex flex-col items-center gap-3">
+    <ul class="flex items-center gap-1 sm:gap-2">
+      <li>
+        {page > 1 ? (
+          <a class="page-step" href={href(page - 1)} rel="prev">
+            <UiIcon name="chevron-left" class="size-5" />
+            Previous
+          </a>
+        ) : (
+          <span class="page-step opacity-40" aria-disabled="true">
+            <UiIcon name="chevron-left" class="size-5" />
+            Previous
+          </span>
+        )}
+      </li>
+      {items.map((item) =>
+        item === 'gap' ? (
+          <li class="hidden w-8 text-center font-bold sm:block" aria-hidden="true">
+            …
+          </li>
+        ) : (
+          <li class="hidden sm:block">
+            <a
+              class="page-number"
+              href={href(item)}
+              aria-current={item === page ? 'page' : undefined}
+              aria-label={`Page ${String(item)}`}
+            >
+              {item}
+            </a>
+          </li>
+        ),
+      )}
+      <li>
+        {page < pages ? (
+          <a class="page-step" href={href(page + 1)} rel="next">
+            Next
+            <UiIcon name="chevron-right" class="size-5" />
+          </a>
+        ) : (
+          <span class="page-step opacity-40" aria-disabled="true">
+            Next
+            <UiIcon name="chevron-right" class="size-5" />
+          </span>
+        )}
+      </li>
+    </ul>
+    <p class="text-sm text-text-muted">
+      Page {page} of {pages}
+    </p>
   </nav>
 )}
+
+<style>
+  .page-step,
+  .page-number {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border: 2px solid transparent;
+    border-radius: var(--radius-button);
+    font-weight: 600;
+  }
+  .page-step {
+    padding-inline: 0.5rem;
+  }
+  .page-number {
+    min-width: 2.75rem;
+    padding-inline: 0.5rem;
+  }
+  a.page-step:hover,
+  a.page-number:hover {
+    border-color: var(--color-ink);
+  }
+  .page-number[aria-current='page'] {
+    border-color: var(--color-ink);
+    background: var(--color-surface);
+    box-shadow: 3px 3px 0 var(--color-mustard);
+  }
+</style>
