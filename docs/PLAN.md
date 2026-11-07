@@ -1,6 +1,6 @@
-# IconNook — Build Plan
+# IconNook: Build Plan
 
-**IconNook** (iconnook.com) — a free, open-source SVG icon library. This plan builds it phase by phase. Every phase ends with a **validation gate** (nothing moves on until it passes) and is **merged to `main` via PR and tagged** (`phase-0`, `phase-1`, …).
+**IconNook** (iconnook.com): a free, open-source SVG icon library. This plan builds it phase by phase. Every phase ends with a **validation gate** (nothing moves on until it passes) and is **merged to `main` via PR and tagged** (`phase-0`, `phase-1`, …).
 
 Legend: 👤 = you must do it (account, payment, login) · 🤖 = Claude does it · 🤝 = together (you approve / paste into a secure place).
 
@@ -10,12 +10,12 @@ Legend: 👤 = you must do it (account, payment, login) · 🤖 = Claude does it
 
 1. 🤖 Create a branch from `main`: `phase-N/<short-name>` (bigger phases may use several `feat/…` branches).
 2. 🤖 Commit in small, logical steps using **Conventional Commits** (`feat(api): …`, `chore: …`). Each commit builds and passes tests.
-3. 🤖 Before every commit: `gitleaks` + lint + typecheck run via pre-commit hook. **No secrets, no `.env`, no tokens ever committed** — only `.env.example` with placeholder values.
+3. 🤖 Before every commit: `gitleaks` + lint + typecheck run via pre-commit hook. **No secrets, no `.env`, no tokens ever committed**: only `.env.example` with placeholder values.
 4. 🤖 Push and open a PR with `gh pr create`: what/why/how tested, checklist from `docs/standards/workflow.md`.
 5. CI must be green. 👤 You review and approve (or tell Claude to merge). Squash-merge.
 6. 🤖 Tag the merge commit `phase-N` and update the **Progress** table at the bottom of this file.
 
-**Secrets rule:** secrets live in (a) your local `.env` (gitignored), (b) GitHub Actions Secrets, (c) Kubernetes Secrets encrypted with SOPS. Never in chat if avoidable — you paste tokens directly into the terminal prompt / GitHub UI, not into the conversation.
+**Secrets rule:** secrets live in (a) your local `.env` (gitignored), (b) GitHub Actions Secrets, (c) Kubernetes Secrets encrypted with SOPS. Never in chat if avoidable: you paste tokens directly into the terminal prompt / GitHub UI, not into the conversation.
 
 ---
 
@@ -25,23 +25,23 @@ Legend: 👤 = you must do it (account, payment, login) · 🤖 = Claude does it
 | ------------------------- | ---------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------- |
 | GitHub                    | Phase 0                      | Free                              | ✅ Already connected (`gh` logged in as `hareeshagunasekara`)                                      |
 | Cloudflare                | Phase 0 (domain), 8 (CDN/R2) | Free (domain ≈ $10–11/yr at cost) | You create a scoped **API token** → store as env var / GitHub secret; Claude uses `wrangler` / API |
-| Domain iconnook.com       | Phase 0                      | ≈ $10–11/yr                       | Bought via Cloudflare Registrar (looked unregistered on 2026-11-07 — buy early)                    |
+| Domain iconnook.com       | Phase 0                      | ≈ $10–11/yr                       | Bought via Cloudflare Registrar (looked unregistered on 2026-11-07; buy early)                     |
 | Hetzner Cloud (VPS)       | Phase 8                      | ≈ €5–15/mo                        | You create a project **API token** → Claude uses `hcloud` CLI                                      |
 | Renovate (GitHub App)     | Phase 1                      | Free                              | You click "Install" on the repo                                                                    |
 | Sentry (optional, errors) | Phase 9                      | Free tier                         | DSN stored as secret                                                                               |
 
-Everything else (Postgres, Meilisearch, Valkey, SeaweedFS, Umami analytics, Uptime Kuma, Grafana) is **self-hosted — no accounts**.
+Everything else (Postgres, Meilisearch, Valkey, SeaweedFS, Umami analytics, Uptime Kuma, Grafana) is **self-hosted: no accounts**.
 
 ---
 
-## Phase 0 — Foundations & accounts
+## Phase 0: Foundations & accounts
 
 **Goal:** a clean, safe repo and the name/domain secured.
 
 Steps:
 
 1. 👤 **Buy the domain:** create a Cloudflare account (cloudflare.com, free plan) → Domain Registration → register **iconnook.com**. Turn on 2FA on Cloudflare and GitHub.
-2. 👤 Decide repo visibility. **Recommended: make it public** — it's an open-source project, and on a free GitHub plan public repos get branch protection/rulesets, unlimited Actions minutes and free GHCR. (Private repos on Free can't enforce branch protection.) Nothing secret is in the history today.
+2. 👤 Decide repo visibility. **Recommended: make it public.** It's an open-source project, and on a free GitHub plan public repos get branch protection/rulesets, unlimited Actions minutes and free GHCR. (Private repos on Free can't enforce branch protection.) Nothing secret is in the history today.
 3. 🤝 Rename the repo `vector` → `iconnook` (`gh repo rename iconnook`), set description + topics.
 4. 🤖 Add repo hygiene files:
    - `.gitignore` (node_modules, dist, .astro, .env*, !.env.example, coverage, playwright-report, .DS_Store, *.log, .turbo, k8s secrets plaintext, kubeconfig)
@@ -59,7 +59,7 @@ Steps:
 
 ---
 
-## Phase 1 — Monorepo & tooling
+## Phase 1: Monorepo & tooling
 
 **Goal:** an empty-but-real TypeScript monorepo where quality checks run locally and in CI.
 
@@ -67,7 +67,7 @@ Steps:
 
 1. 🤖 Enable pnpm (`corepack enable pnpm`), create `pnpm-workspace.yaml`, root `package.json` scripts, **Turborepo** for task caching.
 2. 🤖 `packages/config`: shared `tsconfig` (strict + extras from code-principles.md), ESLint (flat config, `import/no-cycle`), Prettier.
-3. 🤖 Skeletons: `apps/web` (Astro + Preact + Tailwind v4), `apps/api` (Hono, `/healthz`), `packages/core` (license tiers) — each with a README and tests. `packages/db`, `packages/importer` and `apps/worker` are created in Phases 2, 3 and 6 when they get real code (YAGNI).
+3. 🤖 Skeletons: `apps/web` (Astro + Preact + Tailwind v4), `apps/api` (Hono, `/healthz`), `packages/core` (license tiers), each with a README and tests. `packages/db`, `packages/importer` and `apps/worker` are created in Phases 2, 3 and 6 when they get real code (YAGNI).
 4. 🤖 Vitest workspace; Lefthook pre-commit (format, lint staged, gitleaks); commitlint for Conventional Commits.
 5. 🤖 CI workflow `.github/workflows/ci.yml`: install (frozen lockfile) → lint → typecheck → test → build; CodeQL; dependency review.
 6. 👤 Install the **Renovate** GitHub App on the repo (one click); 🤖 add `renovate.json`.
@@ -78,23 +78,23 @@ Steps:
 
 ---
 
-## Phase 2 — Local infrastructure & database
+## Phase 2: Local infrastructure & database
 
 **Goal:** the full backing stack runs locally with one command; schema exists.
 
 Steps:
 
-1. 🤖 `docker-compose.yml`: postgres 18, meilisearch, valkey, seaweedfs (+ bucket init; MinIO was archived upstream, see ADR 0003) — pinned versions, healthchecks, named volumes, ports bound to 127.0.0.1.
+1. 🤖 `docker-compose.yml`: postgres 18, meilisearch, valkey, seaweedfs (+ bucket init; MinIO was archived upstream, see ADR 0003), pinned versions, healthchecks, named volumes, ports bound to 127.0.0.1.
 2. 🤖 `packages/core/config`: Zod-validated env loader (process refuses to start on bad config); `.env.example` updated.
 3. 🤖 `packages/db`: Drizzle schema (icon_sets, icons, tags, icon_tags, categories, icon_categories, downloads) + migrations + seed from a tiny fixture.
-4. 🤖 Integration test harness (Testcontainers or compose in CI) — per-test isolated DB.
+4. 🤖 Integration test harness (Testcontainers or compose in CI): per-test isolated DB.
 
 **Validation gate:** `docker compose up -d` → all services healthy · `pnpm db:migrate` from empty succeeds and is re-runnable · integration tests pass in CI with service containers · `.env` still not tracked.
 **Tag:** `phase-2`.
 
 ---
 
-## Phase 3 — Importer & SVG sanitizer (the core)
+## Phase 3: Importer & SVG sanitizer (the core)
 
 **Goal:** real Tier A icons in the database and search index, safely.
 
@@ -102,7 +102,7 @@ Steps:
 
 1. 🤖 `IconSource` interface + Iconify adapter reading `@iconify/json` (pinned version).
 2. 🤖 License-tier mapper (from SOURCES.md rules); **tier X rejected**, archive sets flagged.
-3. 🤖 SVG pipeline: build full SVG → DOMPurify (SVG profile + IconNook hooks) → size/element caps → store. Fail closed. (SVGO deferred to user uploads — Iconify data is already SVGO-optimized upstream.)
+3. 🤖 SVG pipeline: build full SVG → DOMPurify (SVG profile + IconNook hooks) → size/element caps → store. Fail closed. (SVGO deferred to user uploads: Iconify data is already SVGO-optimized upstream.)
 4. 🤖 Sanitizer test corpus (XSS payloads, entity bombs) + property tests; ≥ 95% branch coverage.
 5. 🤖 Upsert into Postgres (idempotent), auto-tags from names, category mapping; build Meilisearch index (new index → atomic swap).
 6. 🤖 Regenerate SOURCES.md from the importer's metadata so docs and data can't drift.
@@ -112,7 +112,7 @@ Steps:
 
 ---
 
-## Phase 4 — API
+## Phase 4: API
 
 **Goal:** a fast, safe, documented public API.
 
@@ -129,13 +129,13 @@ Steps:
 
 ---
 
-## Phase 5 — Web app
+## Phase 5: Web app
 
 **Goal:** the IconNook website: browse, search, customize, download.
 
 Steps:
 
-1. 🤖 Design tokens (light theme only — ADR 0004), layout, header with search, footer with license/FAQ links (consistent help).
+1. 🤖 Design tokens (light theme only, ADR 0004), layout, header with search, footer with license/FAQ links (consistent help).
 2. 🤖 Pages: home, search results (filters in URL), set list + set page, category pages, icon page (preview, editor island, copy-as tabs, downloads, license + attribution), FAQ/licensing, 404.
 3. 🤖 Accessible icon grid (roving tabindex, arrow keys, virtualization), keyboard shortcuts, live-region announcements, reduced motion.
 4. 🤖 SEO basics: titles/meta, sitemap index (many icon pages), robots.txt, Open Graph images, canonical URLs.
@@ -146,7 +146,7 @@ Steps:
 
 ---
 
-## Phase 6 — Worker, collections & downloads
+## Phase 6: Worker, collections & downloads
 
 **Goal:** bulk features without slowing the site.
 
@@ -161,14 +161,14 @@ Steps:
 
 ---
 
-## Phase 7 — Containers & CI/CD
+## Phase 7: Containers & CI/CD
 
 **Goal:** production-grade images built and verified only by CI.
 
 Steps:
 
 1. 🤖 Multi-stage Dockerfiles (non-root, read-only FS, pinned digests, healthchecks), `.dockerignore`.
-2. 🤖 CI: build images → Trivy scan (fail on high/critical) → SBOM + provenance → push to **GHCR** tagged with git SHA (GHCR uses your GitHub account — no new account).
+2. 🤖 CI: build images → Trivy scan (fail on high/critical) → SBOM + provenance → push to **GHCR** tagged with git SHA (GHCR uses your GitHub account, no new account).
 3. 🤖 `docker-compose.prod.yml` to run the built images locally end-to-end.
 
 **Validation gate:** images run as non-root (`docker run … id` ≠ 0) · Trivy clean · full stack from GHCR images passes E2E locally · image sizes reasonable (api < 200 MB).
@@ -176,7 +176,7 @@ Steps:
 
 ---
 
-## Phase 8 — Infrastructure & first deploy (staging, then production)
+## Phase 8: Infrastructure & first deploy (staging, then production)
 
 **Goal:** IconNook live on iconnook.com behind Cloudflare.
 
@@ -197,7 +197,7 @@ Steps:
 
 ---
 
-## Phase 9 — Launch readiness
+## Phase 9: Launch readiness
 
 **Goal:** confident public launch.
 
@@ -205,17 +205,17 @@ Steps:
 
 1. 🤖 Monitoring: Grafana + Prometheus (or k3s-friendly stack), Uptime Kuma, alerts (👤 choose where alerts go: email / Telegram / Discord).
 2. 🤖 Privacy-friendly analytics (self-hosted Umami) + Web Vitals collection. Optional 👤 Sentry free account for error tracking.
-3. 🤖 k6 load tests on staging: baseline, spike (10×), soak, stress, cache-miss — results in `docs/load-tests/`.
+3. 🤖 k6 load tests on staging: baseline, spike (10×), soak, stress, cache-miss; results in `docs/load-tests/`.
 4. 🤖 Full `/security-review`, ZAP full scan on staging, dependency audit; fix findings.
-5. 🤖 Legal & trust pages: license FAQ, privacy policy, terms, trademark notice for logos, **takedown/contact** process (👤 provide a contact email — e.g. set up `hello@iconnook.com` with free Cloudflare Email Routing).
-6. 👤 Submit sitemap to Google Search Console and Bing Webmaster (free accounts, verify via Cloudflare DNS — Claude can add the TXT record).
+5. 🤖 Legal & trust pages: license FAQ, privacy policy, terms, trademark notice for logos, **takedown/contact** process (👤 provide a contact email, e.g. set up `hello@iconnook.com` with free Cloudflare Email Routing).
+6. 👤 Submit sitemap to Google Search Console and Bing Webmaster (free accounts, verify via Cloudflare DNS; Claude can add the TXT record).
 
 **Validation gate:** all load-test pass criteria met · no high/medium security findings · SLO dashboards live and alerts tested · restore + DR rehearsal done · you sign off.
 **Tag:** `phase-9` → 🎉 **v1.0 launch**.
 
 ---
 
-## Phase 10 — After launch (each its own small phase)
+## Phase 10: After launch (each its own small phase)
 
 - Tier B & C sets with attribution UI · extra sources (Open Peeps, Openclipart, AIGA, Natural Earth)
 - Topic categories & better tagging (CLDR synonyms) · "similar icons"
@@ -237,6 +237,6 @@ Steps:
 | 4 API                  | 🟡 in review |                                                             |           | 2026-11-07: 150+ unit & 24 integration tests (every route 400/404/429, contract-checked responses, real PNG pixels); ZAP API scan 0 fail / 118 pass (CORS * documented exception); k6: 10 VUs p95 17–23 ms, 50 VUs 0 errors @ ~840 req/s (see docs/load-tests); /code-review medium: 10 findings fixed; /security-review: 1 medium (code-export injection) fixed                                                                                                                                |
 | 5 Web                  | ✅ done      | [#8](https://github.com/hareeshagunasekara/iconnook/pull/8) | `phase-5` | 2026-11-07: 45 Playwright tests (journeys, keyboard-only, filters in URL, no-JS, 320px, CSP/console clean) on desktop + mobile; axe 0 violations on 9 templates; Lighthouse 100/100/100/100 on 5 templates, LCP ≤ 1.35 s, CLS 0, TBT 0; visual review fixed 4 layout bugs. Pending: VoiceOver smoke test (you); tier B attribution + collections journeys need Phase 6/10 data                                                                                                                  |
 | 6 Worker & collections | 🟡 in review | [#9](https://github.com/hareeshagunasekara/iconnook/pull/9) |           | 2026-11-07: 500-icon ZIP (500 SVG + 500 PNG + LICENSES.md) built via real queue and downloaded through the API (4.9 MB, integrity OK); real `kill -9` at 9–14 % → second worker finished in 34 s; 2,000 concurrent downloads + 3 racing flushers = exactly 2,000; crash between commit and cleanup never double-counts; flags flip packs/PNG to 503 within ~5 s and back; 51 E2E incl. collections journey. PNG pre-render deferred to Phase 9 (needs popularity data; CDN already caches PNGs) |
-| 7 Containers & CI/CD   | —            |                                                             |           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| 8 Infra & deploy       | —            |                                                             |           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| 9 Launch readiness     | —            |                                                             |           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 7 Containers & CI/CD   | -            |                                                             |           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 8 Infra & deploy       | -            |                                                             |           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 9 Launch readiness     | -            |                                                             |           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |

@@ -1,10 +1,10 @@
 # Contributing to IconNook
 
-Thanks for helping! IconNook is early in development — see [docs/PLAN.md](docs/PLAN.md) for what's being built now.
+Thanks for helping! IconNook is early in development: see [docs/PLAN.md](docs/PLAN.md) for what's being built now.
 
 ## Ground rules
 
-- Be kind — see the [Code of Conduct](CODE_OF_CONDUCT.md).
+- Be kind: see the [Code of Conduct](CODE_OF_CONDUCT.md).
 - Read the [engineering standards](docs/standards/README.md) for the area you're changing.
 - **Never commit secrets.** Only `.env.example` is tracked. Pre-commit hooks and CI run gitleaks.
 - **Icons must be legally clean.** Proposing a new icon source? Open a "New icon source" issue with a link to its official license. GPL and non-commercial licenses can't be accepted. Never submit icons copied from Flaticon, Icons8, Freepik, Noun Project or unDraw.

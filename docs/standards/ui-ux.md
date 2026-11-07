@@ -1,19 +1,19 @@
 # UI/UX Rules
 
-Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 10 usability heuristics** (should follow). Accessibility is not a final pass — it's part of "done" for every component.
+Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 10 usability heuristics** (should follow). Accessibility is not a final pass: it's part of "done" for every component.
 
 ## Nielsen's heuristics → how they apply to an icon library
 
-1. **Visibility of system status** — search shows result count and a loading state; copy/download actions confirm ("Copied SVG").
-2. **Match the real world** — say "Download", "Copy SVG", "Color"; not "Export artifact". Search understands synonyms (trash = delete = bin).
-3. **User control & freedom** — every filter is removable in one click; "Clear all"; editor has Reset; browser Back restores search + scroll position (filters live in the URL).
-4. **Consistency & standards** — same icon card, same action order, same keyboard shortcuts everywhere. Follow platform conventions (links look like links).
-5. **Error prevention** — invalid color input can't be applied; disabled states explain why.
-6. **Recognition over recall** — show recently used colors/sizes, recent searches, and the user's collections inline.
-7. **Flexibility & efficiency** — keyboard shortcuts (`/` focuses search, arrows move in grid, `Enter` opens, `c` copies) for power users; plain clicks for everyone else.
-8. **Aesthetic & minimalist design** — the icons are the content; chrome stays quiet. One primary action per view.
-9. **Help users recover from errors** — "No results for 'hosue'. Did you mean 'house'?" plus suggestions, never a dead end.
-10. **Help & documentation** — short license explanation on every icon page; an FAQ on licensing and attribution.
+1. **Visibility of system status**: search shows result count and a loading state; copy/download actions confirm ("Copied SVG").
+2. **Match the real world**: say "Download", "Copy SVG", "Color"; not "Export artifact". Search understands synonyms (trash = delete = bin).
+3. **User control & freedom**: every filter is removable in one click; "Clear all"; editor has Reset; browser Back restores search + scroll position (filters live in the URL).
+4. **Consistency & standards**: same icon card, same action order, same keyboard shortcuts everywhere. Follow platform conventions (links look like links).
+5. **Error prevention**: invalid color input can't be applied; disabled states explain why.
+6. **Recognition over recall**: show recently used colors/sizes, recent searches, and the user's collections inline.
+7. **Flexibility & efficiency**: keyboard shortcuts (`/` focuses search, arrows move in grid, `Enter` opens, `c` copies) for power users; plain clicks for everyone else.
+8. **Aesthetic & minimalist design**: the icons are the content; chrome stays quiet. One primary action per view.
+9. **Help users recover from errors**: "No results for 'hosue'. Did you mean 'house'?" plus suggestions, never a dead end.
+10. **Help & documentation**: short license explanation on every icon page; an FAQ on licensing and attribution.
 
 ## WCAG 2.2 AA checklist (the parts that bite icon sites)
 
@@ -47,7 +47,7 @@ Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 1
 
 ## Design system rules
 
-- **Design tokens** (CSS custom properties) for color, spacing, radius, type, motion — no raw hex values or magic numbers in components. **Light theme only — no dark mode** (ADR 0004). Don't add `prefers-color-scheme` styles or a theme toggle.
+- **Design tokens** (CSS custom properties) for color, spacing, radius, type, motion: no raw hex values or magic numbers in components. **Light theme only: no dark mode** (ADR 0004). Don't add `prefers-color-scheme` styles or a theme toggle.
 - **Spacing** on a 4px scale. **Type** scale with ≤ 6 sizes; body ≥ 16px; line height 1.5 for body text.
 - **Visual identity** (playful, retro-modern): warm cream background, near-black text and 2px ink outlines, purple (`#552CB7`) for actions and links, and six accents (mustard, pink, coral, purple, green, blue) for tiles, pills and offset "printed paper" shadows. Tokens live in `apps/web/src/styles/global.css` (`@theme static`). Ink text on the `-soft` tints and on every accent except purple passes AA; text on purple is white. No gradients, glassmorphism or blurred drop shadows.
 - **Fonts:** Bricolage Grotesque (headings) and DM Sans (body), self-hosted variable fonts (OFL, via Fontsource) with `font-display: swap`, weight axis only, Latin subsets loaded by `unicode-range`. The heading font is preloaded.
@@ -59,7 +59,7 @@ Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 1
 ## Icon-library-specific UX
 
 - **Search is the homepage's main action.** Instant results as you type (debounced ~150ms), typo tolerance, filters for style / set / license tier / color-vs-mono, all reflected in the URL so results are shareable.
-- **Icon card:** icon preview on a neutral background; hover/focus reveals quick actions (copy SVG, download, add to collection) — and those actions are reachable by keyboard, not hover-only.
+- **Icon card:** icon preview on a neutral background; hover/focus reveals quick actions (copy SVG, download, add to collection), and those actions are reachable by keyboard, not hover-only.
 - **Icon page:** large preview on a light and a dark background (an icon preview, not a site theme), live controls (color, size, stroke), copy-as tabs (SVG / JSX / Vue / Svelte / data URI / CSS), download SVG/PNG, license badge + attribution text (tier B/C), author link, set link, similar icons.
 - **License clarity is a UX feature:** tier badge on every card in tier B/C views; plain-language explanation ("Free for commercial use. Credit required: copy this line"). Never hide license info behind a click.
 - **Collections:** no sign-up required (stored locally, shareable by link). Bulk download as ZIP or SVG sprite.

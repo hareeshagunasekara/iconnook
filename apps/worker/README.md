@@ -1,6 +1,6 @@
 # @iconnook/worker
 
-Background jobs on BullMQ (Valkey). Stateless — run as many replicas as you like.
+Background jobs on BullMQ (Valkey). Stateless: run as many replicas as you like.
 
 ```sh
 pnpm --filter @iconnook/worker dev                 # needs docker compose (Postgres, Valkey, SeaweedFS)

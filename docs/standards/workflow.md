@@ -7,6 +7,7 @@
 - **Conventional Commits:** `feat(api): add PNG endpoint`, `fix(importer): skip hidden icons`, `docs:`, `chore:`, `refactor:`, `test:`, `perf:`, `ci:`. Scope = app/package name. `!` or `BREAKING CHANGE:` for breaking changes.
 - Small PRs (aim < 400 changed lines, excluding generated files). One concern per PR.
 - Squash-merge; the PR title becomes the commit message.
+- **Wording:** no em dashes (U+2014) in commit messages, PR titles or descriptions, or docs. No phase or step numbers in commit messages or PR titles: say what changed (`feat(worker): build ZIP packs`, not `feat: phase 6`).
 
 ## Pull requests
 
@@ -48,6 +49,6 @@ Pre-commit hooks (lefthook or husky + lint-staged): format, lint staged files, g
 
 ## Documentation
 
-- `CLAUDE.md` — how to work in this repo (stack, layout, commands).
-- `docs/standards/` — these rules. `docs/adr/` — decisions and why. `SOURCES.md` — icon sources and licenses.
+- `CLAUDE.md`: how to work in this repo (stack, layout, commands).
+- `docs/standards/`: these rules. `docs/adr/`: decisions and why. `SOURCES.md`: icon sources and licenses.
 - README per app/package: what it is, how to run it, env vars it needs.
