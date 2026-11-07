@@ -1,7 +1,7 @@
 ---
 /**
  * A responsive illustration from src/assets/illustrations. The AVIF/WebP variants are generated
- * once by `pnpm --filter @iconnook/web illustrations` and bundled as hashed, immutable files.
+ * once by `pnpm --filter @iconnook/web images` and bundled as hashed, immutable files.
  */
 import type { HTMLAttributes } from 'astro/types';
 
@@ -29,8 +29,7 @@ const { name, sizes, alt = '', ...attrs } = Astro.props;
 
 function url(width: number, format: 'avif' | 'webp'): string {
   const file = files[`../assets/illustrations/${name}-${String(width)}.${format}`];
-  if (!file)
-    throw new Error(`Missing ${name}-${String(width)}.${format}: run the illustrations script`);
+  if (!file) throw new Error(`Missing ${name}-${String(width)}.${format}: run the images script`);
   return file;
 }
 const srcset = (format: 'avif' | 'webp') =>

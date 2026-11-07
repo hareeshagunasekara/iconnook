@@ -1,17 +1,36 @@
 ---
+/** The IconNook logo (its "ICON NOOK" lettering is the wordmark). Sources: src/assets/brand. */
 interface Props {
-  /** Size of the mark in px; the wordmark scales with it. */
+  /** Rendered size in CSS px. */
   size?: number;
+  /** Empty when a surrounding link already names it (e.g. "IconNook home"). */
+  alt?: string;
 }
-const { size = 34 } = Astro.props;
+const { size = 48, alt = '' } = Astro.props;
+
+const files = import.meta.glob<string>('../assets/brand/iconnook-logo-*.{avif,webp}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const url = (px: number, format: 'avif' | 'webp') => {
+  const file = files[`../assets/brand/iconnook-logo-${String(px)}.${format}`];
+  if (!file)
+    throw new Error(`Missing iconnook-logo-${String(px)}.${format}: run the images script`);
+  return file;
+};
+// Pick the smallest file that is at least `size` × density.
+const srcset = (format: 'avif' | 'webp') =>
+  [1, 2, 3]
+    .map((density) => {
+      const px = [64, 128, 192].find((w) => w >= size * density) ?? 192;
+      return `${url(px, format)} ${String(density)}x`;
+    })
+    .join(', ');
 ---
 
-<span class="inline-flex items-center gap-2.5">
-  <img src="/favicon.svg" alt="" width={size} height={size} />
-  <span
-    class="font-display font-extrabold tracking-[-0.02em]"
-    style={`font-size: ${String(size * 0.7)}px`}
-  >
-    IconNook
-  </span>
-</span>
+<picture class="shrink-0">
+  <source type="image/avif" srcset={srcset('avif')} />
+  <source type="image/webp" srcset={srcset('webp')} />
+  <img src={url(128, 'webp')} alt={alt} width={size} height={size} class="block" />
+</picture>

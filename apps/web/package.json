@@ -11,7 +11,7 @@
     "typecheck": "astro check",
     "start": "node dist/server/entry.mjs",
     "test:e2e": "playwright test",
-    "illustrations": "node scripts/illustrations.mjs"
+    "images": "node scripts/images.mjs"
   },
   "dependencies": {
     "@astrojs/node": "11.1.9",

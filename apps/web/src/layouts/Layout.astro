@@ -36,7 +36,8 @@ const ogImage = new URL(image, Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {!index && <meta name="robots" content="noindex, follow" />}
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- Headings are the largest text on most pages: fetch their font early. -->
     <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
     <link rel="preconnect" href={new URL(PUBLIC_API_URL).origin} crossorigin />
