@@ -109,6 +109,9 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 - The importer writes per-set rejections and sanitizer changes to `.data/import-report.json` (gitignored) — review it after upgrading `@iconify/json`. Expected today: 3 rejected (2 over 512 KB, 1 with 0×0 size upstream), 0 changed.
 - **Light theme only — no dark mode** (ADR 0004, your decision): no `prefers-color-scheme` styles, no theme toggle, no dark-mode tests, and don't propose it. The dark _background_ in the icon-page preview is an icon preview, not a theme.
 - Web CSS: base styles go in `@layer base` / `@layer components` — unlayered CSS overrides every Tailwind utility (this broke button contrast once).
+- Web tokens use `@theme static`: components read them through `var()` in inline styles, and plain `@theme` drops variables no utility uses.
+- Astro drops a line break between text and an element: write `{' '}` where a space must survive (Prettier won't add it).
+- Illustrations: add the PNG to `apps/web/src/assets/illustrations/`, run `pnpm --filter @iconnook/web illustrations`, commit the AVIF/WebP output (no runtime image processing).
 - Web CSP comes from Astro (`security.csp`, hashed scripts, sent as a header in SSR); `src/middleware.ts` appends `frame-ancestors` and other headers. Never add `'unsafe-inline'` to script-src.
 - Each `role="search"` form needs a unique `aria-label` (axe `landmark-unique`).
 - BullMQ: worker connections need `maxRetriesPerRequest: null`; API/producer connections fail fast. Tests use Valkey db 15 and a random BullMQ `prefix` — never the default keys.
