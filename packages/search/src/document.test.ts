@@ -7,14 +7,14 @@ describe('buildFilter', () => {
     expect(
       buildFilter({
         set: 'tabler',
-        type: 'ui',
+        type: 'solid',
         tier: 'A',
         color: false,
         category: 'audio-and-video',
       }),
     ).toEqual([
       'set = "tabler"',
-      'type = "ui"',
+      'type = "solid"',
       'categorySlugs = "audio-and-video"',
       'tier = "A"',
       'color = false',

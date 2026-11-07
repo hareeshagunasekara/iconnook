@@ -19,7 +19,7 @@ import type {
 export const fakeSet = (overrides: Partial<SetSummary> = {}): SetSummary => ({
   prefix: 'tabler',
   name: 'Tabler Icons',
-  type: 'ui',
+  type: 'solid',
   total: 2,
   isColor: false,
   gridSize: 24,

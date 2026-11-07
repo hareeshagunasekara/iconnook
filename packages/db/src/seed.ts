@@ -15,7 +15,7 @@ export const FIXTURE_SET = {
   licenseSpdx: 'CC0-1.0',
   licenseTier: 'A',
   licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
-  type: 'ui',
+  type: 'solid',
   isColor: false,
   gridSize: 24,
   version: '1',
@@ -39,7 +39,11 @@ export async function seedFixtures(db: Database): Promise<{ setId: number; icons
       .values(FIXTURE_SET)
       .onConflictDoUpdate({
         target: iconSets.prefix,
-        set: { name: FIXTURE_SET.name, sampleIcons: FIXTURE_SET.sampleIcons },
+        set: {
+          name: FIXTURE_SET.name,
+          type: FIXTURE_SET.type,
+          sampleIcons: FIXTURE_SET.sampleIcons,
+        },
       })
       .returning({ id: iconSets.id });
     if (!set) throw new Error('Fixture set upsert returned no row');

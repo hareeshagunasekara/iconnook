@@ -1,19 +1,8 @@
 import { z } from '@hono/zod-openapi';
+import { SET_TYPES } from '@iconnook/core';
 import { CODE_FORMATS, COLOR_PATTERN, SIZE_RANGE, STROKE_RANGE } from '@iconnook/svg';
 
 export const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-export const SET_TYPES = [
-  'ui',
-  'color',
-  'developer',
-  'logos',
-  'emoji',
-  'flags',
-  'maps',
-  'themed',
-  'illustrations',
-  'archive',
-] as const;
 
 const slug = (name: string, example: string) =>
   z
