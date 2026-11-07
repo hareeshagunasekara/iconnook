@@ -26,10 +26,10 @@ pnpm --filter @iconnook/api test:integration   # real Postgres + Meilisearch + V
 ## Behavior
 
 - **Errors:** RFC 9457 `application/problem+json`. 400 validation (with `errors[]`), 404, 429 + `Retry-After`, 503 + `Retry-After` when search is down, 504 after 10 s; internal details never leak.
-- **Caching:** `Cache-Control` per endpoint (assets cache for a year at the CDN), `ETag` + `304`. Asset URLs are canonical — non-canonical query params are 301-redirected (sorted, lowercased color, unknown params dropped).
+- **Caching:** `Cache-Control` per endpoint (assets cache for a year at the CDN), `ETag` + `304`. Asset URLs are canonical: non-canonical query params are 301-redirected (sorted, lowercased color, unknown params dropped).
 - **Security:** CSP / nosniff / frame / referrer / permissions headers on every response; raw SVG gets `default-src 'none'; style-src 'unsafe-inline'; sandbox`. CORS `*` for GET (public, unauthenticated, no cookies). Customized SVGs are re-sanitized.
-- **Rate limits:** per client (hashed IP — raw IPs never stored), 300/min general, 60/min PNG; fails open if Valkey is down.
-- **Logs:** one JSON line per request (method, path, status, ms, request id) — no IPs, user agents or query strings.
+- **Rate limits:** per client (hashed IP; raw IPs are never stored), 300/min general, 60/min PNG; fails open if Valkey is down.
+- **Logs:** one JSON line per request (method, path, status, ms, request id): no IPs, user agents or query strings.
 
 ## Environment
 

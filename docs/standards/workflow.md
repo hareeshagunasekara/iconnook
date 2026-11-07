@@ -49,6 +49,6 @@ Pre-commit hooks (lefthook or husky + lint-staged): format, lint staged files, g
 
 ## Documentation
 
-- `CLAUDE.md` — how to work in this repo (stack, layout, commands).
-- `docs/standards/` — these rules. `docs/adr/` — decisions and why. `SOURCES.md` — icon sources and licenses.
+- `CLAUDE.md`: how to work in this repo (stack, layout, commands).
+- `docs/standards/`: these rules. `docs/adr/`: decisions and why. `SOURCES.md`: icon sources and licenses.
 - README per app/package: what it is, how to run it, env vars it needs.

@@ -1,15 +1,15 @@
 # IconNook
 
-**IconNook** (iconnook.com) — a free, open-source SVG icon library (in the spirit of svgrepo / flaticon). No payments, no paywalls, ever.
+**IconNook** (iconnook.com): a free, open-source SVG icon library (in the spirit of svgrepo / flaticon). No payments, no paywalls, ever.
 Goals, in priority order: **legally clean icons**, **fast**, **accessible to everyone**.
 
 > Status: Phase 6 (worker, collections, downloads). Update this file as the project grows.
-> **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
+> **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)**. Work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
 > **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
 > **Writing rules:** never use the em dash (U+2014) in commit messages, PR titles and descriptions, documentation or user-facing text; use a period, comma, colon or parentheses. Never mention phases or steps (e.g. "Phase 6", "step 2") in commit messages or PR titles; describe the change itself.
 
-## Stack (decided — don't re-propose alternatives)
+## Stack (decided: don't re-propose alternatives)
 
 - **Language:** TypeScript everywhere (strict mode). Node 24, pnpm workspaces.
 - **Web:** Astro + Preact islands + Tailwind CSS v4. Ship minimal JS; pages must work without JS for browse/download.
@@ -42,18 +42,18 @@ Packages are created when they get real code (YAGNI), not as empty shells.
 
 Every icon must have a known license. Tiers (see `SOURCES.md`):
 
-- **A** — MIT, Apache-2.0, ISC, CC0, Unlicense, BSD, OFL-1.1, MPL-2.0: no visible attribution. Import first.
-- **B** — CC-BY: show author credit + copy-ready attribution line.
-- **C** — CC-BY-SA: as B, plus share-alike notice.
-- **X** — GPL, any NC license: **never import**.
+- **A**: MIT, Apache-2.0, ISC, CC0, Unlicense, BSD, OFL-1.1, MPL-2.0: no visible attribution. Import first.
+- **B**: CC-BY: show author credit + copy-ready attribution line.
+- **C**: CC-BY-SA: as B, plus share-alike notice.
+- **X**: GPL, any NC license: **never import**.
 
 Never import from Flaticon, Icons8, Freepik, Noun Project or unDraw (proprietary / license forbids competing libraries), and never scrape any icon site.
-Logos & brand icons: the license covers the drawing, not the trademark — show a trademark notice.
+Logos & brand icons: the license covers the drawing, not the trademark, so show a trademark notice.
 Adding a new source: verify the license at its official source, assign a tier, add it to `SOURCES.md`, then to the importer.
 Tier A imports by default; a Tier B/C set only after a one-by-one review in `packages/importer/src/approved.ts` (`APPROVED_SETS`, plus `CREDITS` when the licensor asks for specific wording). Sets outside Iconify live in `src/sources/external.ts`, pinned to a commit, SHA-256 or npm version, and every file is verified before use.
 Set kinds (`/sets?type=…`) come from `packages/importer/src/set-kinds.ts`: Iconify's category, then curated lists (Material, pixel, design systems, frameworks), size, and line vs solid. After an `@iconify/json` upgrade, check new interface sets' samples and add a line/solid override where the "Uses Stroke" tag is wrong.
 
-## Standards — read before working
+## Standards: read before working
 
 Full rules live in [`docs/standards/`](docs/standards/README.md). Before writing code, read the file for the area you're touching:
 `code-principles.md` (SOLID, TS rules, errors, tests) · `architecture.md` (boundaries, layers, 12-factor, API, data) ·
@@ -78,11 +78,11 @@ Node 24 (`.nvmrc`), pnpm 11 via corepack (`corepack enable pnpm`; version pinned
 cp .env.example .env         # first time only; fill in local passwords (gitignored)
 pnpm install                 # also installs git hooks (lefthook)
 docker compose up -d         # postgres, meilisearch, valkey, seaweedfs (all bound to 127.0.0.1)
-pnpm db:migrate              # apply migrations (re-runnable)  ·  pnpm db:seed — tiny CC0 fixture set
+pnpm db:migrate              # apply migrations (re-runnable)  ·  pnpm db:seed: tiny CC0 fixture set
 pnpm dev                     # all apps: web http://localhost:4321, api http://localhost:8787
 pnpm check                   # everything CI's quality job runs: format:check, build, lint, typecheck, test
 pnpm test:integration        # needs the compose stack; each test file gets its own throwaway database
-pnpm db:generate --name <x>  # after editing packages/db/src/schema.ts — review the SQL, commit it
+pnpm db:generate --name <x>  # after editing packages/db/src/schema.ts: review the SQL, commit it
 pnpm icons:import             # Tier A icon sets → Postgres, then rebuild search (~2–3 min, ~370k icons)
 pnpm icons:import --sets tabler,lucide --tiers A --no-index   # subset / skip reindex
 pnpm icons:reindex            # rebuild Meilisearch from Postgres (new index, atomic swap)
@@ -104,20 +104,20 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 
 - **TypeScript 6.0.x**, not 7: typescript-eslint and `@astrojs/check` support `<6.1` only (Renovate is capped too).
 - **pnpm 11**, not 12: corepack can't run pnpm 12 yet.
-- pnpm's `minimumReleaseAge` blocks very new releases (supply-chain protection) — pin versions a few days old instead of adding exclusions.
+- pnpm's `minimumReleaseAge` blocks very new releases (supply-chain protection): pin versions a few days old instead of adding exclusions.
 - `pnpm-workspace.yaml` overrides `@emnapi/runtime` to 1.11.x: the 2.0 beta crashes `astro check`. Remove once upstream fixes it.
 - `pnpm-workspace.yaml` forces drizzle-kit's old `@esbuild-kit` loader onto esbuild 0.25 (GHSA-67mh-4wv8-2f99). Remove when drizzle-kit drops `@esbuild-kit`.
 - CI dependency review allows **GHSA-g3hv-75wg-m249** (minimatch 10.x, dev-only via ESLint; forcing minimatch 11 breaks `eslint-plugin-import-x` 4.17). Remove the exception once import-x ≥ 4.18 is installed.
 - `@iconify/json` is ~600 MB unpacked: fine for dev/CI, but keep it out of runtime images (Phase 7: run the importer as its own Job image).
-- The importer writes per-set rejections and sanitizer changes to `.data/import-report.json` (gitignored) — review it after upgrading `@iconify/json`. Expected today: 13 rejected (2 over 512 KB, 1 with 0×0 size upstream, 10 Blobmoji skin-tone files with broken path data upstream), ~230 changed (amCharts and Blobmoji markup re-serialized, nothing removed that matters).
-- **Light theme only — no dark mode** (ADR 0004, your decision): no `prefers-color-scheme` styles, no theme toggle, no dark-mode tests, and don't propose it. The dark _background_ in the icon-page preview is an icon preview, not a theme.
-- Web CSS: base styles go in `@layer base` / `@layer components` — unlayered CSS overrides every Tailwind utility (this broke button contrast once).
+- The importer writes per-set rejections and sanitizer changes to `.data/import-report.json` (gitignored): review it after upgrading `@iconify/json`. Expected today: 13 rejected (2 over 512 KB, 1 with 0×0 size upstream, 10 Blobmoji skin-tone files with broken path data upstream), ~230 changed (amCharts and Blobmoji markup re-serialized, nothing removed that matters).
+- **Light theme only: no dark mode** (ADR 0004, your decision): no `prefers-color-scheme` styles, no theme toggle, no dark-mode tests, and don't propose it. The dark _background_ in the icon-page preview is an icon preview, not a theme.
+- Web CSS: base styles go in `@layer base` / `@layer components`: unlayered CSS overrides every Tailwind utility (this broke button contrast once).
 - Web tokens use `@theme static`: components read them through `var()` in inline styles, and plain `@theme` drops variables no utility uses.
 - Astro drops a line break between text and an element: write `{' '}` where a space must survive (Prettier won't add it).
 - Images: illustrations are PNGs in `apps/web/src/assets/illustrations/`, the logo is `apps/web/src/assets/brand/iconnook-logo.png`. After changing one, run `pnpm --filter @iconnook/web images` and commit the AVIF/WebP/favicon output (no runtime image processing).
 - Web CSP comes from Astro (`security.csp`, hashed scripts, sent as a header in SSR); `src/middleware.ts` appends `frame-ancestors` and other headers. Never add `'unsafe-inline'` to script-src.
 - Each `role="search"` form needs a unique `aria-label` (axe `landmark-unique`).
-- BullMQ: worker connections need `maxRetriesPerRequest: null`; API/producer connections fail fast. Tests use Valkey db 15 and a random BullMQ `prefix` — never the default keys.
+- BullMQ: worker connections need `maxRetriesPerRequest: null`; API/producer connections fail fast. Tests use Valkey db 15 and a random BullMQ `prefix`, never the default keys.
 - `msgpackr-extract` install script is deliberately denied (`allowBuilds`); BullMQ falls back to pure JS.
 - Install scripts are blocked except those in `allowBuilds` (approve with `pnpm approve-builds <pkg>`).
 - ESLint and Prettier are configured once at the root; `packages/config` holds the shared tsconfig. `.astro` files are checked by `astro check`, not ESLint (yet).
@@ -127,5 +127,5 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 Third-party skills, reviewed before install and pinned in `skills-lock.json`: `astro`, `hono` (official, honojs/skills), `drizzle-orm-patterns`, `tailwind-4-docs`, `typescript-advanced-types`, `multi-stage-dockerfile`, `kubernetes-specialist`, `accessibility`.
 
 - **`docs/standards/` and this file win** over any skill advice that conflicts (e.g. a skill's k8s example vs our Restricted pod rules).
-- Local edits (don't lose them on update): `tailwind-4-docs` — docs-snapshot sync script removed (Tailwind docs aren't open source; never commit a snapshot); `drizzle-orm-patterns` — `allowed-tools` removed so it can't pre-approve Bash.
+- Local edits (don't lose them on update): `tailwind-4-docs`: docs-snapshot sync script removed (Tailwind docs aren't open source; never commit a snapshot); `drizzle-orm-patterns`: `allowed-tools` removed so it can't pre-approve Bash.
 - Don't run `npx skills update` blindly: re-review the diff (scripts, `allowed-tools`, pipe-to-shell, injected instructions) and re-apply the edits above.

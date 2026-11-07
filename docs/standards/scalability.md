@@ -10,12 +10,12 @@ How IconNook stays fast and up when many users arrive at once (launch day, a vir
 
 ## Layers of defense (in order)
 
-1. **Cloudflare edge** — caches HTML, assets, icon files and popular search responses (see performance.md for headers). Target **≥ 90% cache hit ratio**. Also provides DDoS protection, WAF, and bot management for free.
-2. **Origin shield / tiered cache** — avoids many edge POPs hitting origin for the same miss.
-3. **Static generation** — home, set pages and the top N icon pages are prebuilt; the long tail is rendered on demand and then cached.
-4. **Application caches** — Valkey caches hot DB/search results with short TTLs; request coalescing so 1,000 simultaneous misses for the same key produce one backend query.
-5. **Stateless replicas** — `web`, `api`, `worker` scale horizontally.
-6. **Data tier** — Postgres sized for writes + cache misses only; search served by Meilisearch replicas.
+1. **Cloudflare edge**: caches HTML, assets, icon files and popular search responses (see performance.md for headers). Target **≥ 90% cache hit ratio**. Also provides DDoS protection, WAF, and bot management for free.
+2. **Origin shield / tiered cache**: avoids many edge POPs hitting origin for the same miss.
+3. **Static generation**: home, set pages and the top N icon pages are prebuilt; the long tail is rendered on demand and then cached.
+4. **Application caches**: Valkey caches hot DB/search results with short TTLs; request coalescing so 1,000 simultaneous misses for the same key produce one backend query.
+5. **Stateless replicas**: `web`, `api`, `worker` scale horizontally.
+6. **Data tier**: Postgres sized for writes + cache misses only; search served by Meilisearch replicas.
 
 ## Scaling stages
 
@@ -39,7 +39,7 @@ Move up a stage based on **measured** saturation (CPU > 70% sustained, p95 laten
 ## Protecting the system under overload
 
 - **Rate limits** per IP and per API key (Valkey token bucket), stricter on expensive endpoints (PNG render, ZIP). Return `429` + `Retry-After`. Cloudflare rate limiting as an outer layer.
-- **Timeouts everywhere** (DB, search, storage, outbound HTTP) — a slow dependency must not tie up all workers.
+- **Timeouts everywhere** (DB, search, storage, outbound HTTP): a slow dependency must not tie up all workers.
 - **Bounded concurrency** for CPU-heavy work (resvg rendering, ZIP creation): fixed worker pools, queue the rest.
 - **Load shedding:** when queues or in-flight requests exceed limits, reject early with `503` + `Retry-After` rather than slowing down for everyone.
 - **Circuit breakers** around Meilisearch and storage: after repeated failures, fail fast for a short window.
