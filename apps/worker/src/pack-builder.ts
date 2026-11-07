@@ -44,6 +44,8 @@ export function licensesMarkdown(icons: readonly PackIcon[], missing: readonly s
     '# Icon licenses',
     '',
     'Icons downloaded from IconNook (https://iconnook.com). Each icon keeps the license of its set.',
+    'IconNook optimizes every icon (cleaned and minified, plus any color, size or stroke you chose),',
+    'so these files are modified from the originals.',
     '',
   ];
   for (const { icon, names } of [...sets.values()].sort((a, b) =>

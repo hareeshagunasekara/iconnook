@@ -28,6 +28,21 @@ const escapeHtml = (s: string) =>
     (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] ?? ch,
   );
 const escapeMd = (s: string) => s.replace(/([\\[\]()*_`])/g, '\\$1');
+
+/**
+ * Every downloaded SVG names its source and license, so the notice travels with the file (MIT and
+ * Apache-2.0 keep the license with copies; CC BY asks for credit and a note of changes).
+ */
+export function creditComment(icon: IconDetail): string {
+  const { setInfo } = icon;
+  const by = setInfo.author ? ` by ${setInfo.author.name}` : '';
+  const url = setInfo.license.url ? ` (${setInfo.license.url})` : '';
+  const text =
+    `"${icon.name}" from ${setInfo.name}${by}. License: ${setInfo.license.spdx}${url}. ` +
+    'Optimized by IconNook (iconnook.com); modified from the original.';
+  // "--" can't appear inside an XML comment.
+  return `<!-- ${text.replace(/-{2,}/g, '-')} -->\n`;
+}
 /** Only plain http(s) URLs without whitespace or angle brackets are linked; anything else is dropped. */
 const safeUrl = (url: string | null) => (url && /^https?:\/\/[^\s<>]+$/.test(url) ? url : null);
 
@@ -44,7 +59,8 @@ export class IconService {
   }
 
   async svg(set: string, name: string, c: Customization): Promise<string> {
-    return customizeSvg(await this.getIcon(set, name), c);
+    const icon = await this.getIcon(set, name);
+    return creditComment(icon) + customizeSvg(icon, c);
   }
 
   async png(set: string, name: string, c: Customization & { size: number }): Promise<Buffer> {
@@ -69,8 +85,11 @@ export class IconService {
     const licenseUrl = safeUrl(setInfo.license.url);
     const shareAlike = setInfo.license.tier === 'C';
 
-    // CC-BY-SA requires the share-alike notice in every form the user might paste.
-    const notice = shareAlike ? '. Modified versions must use the same license.' : '';
+    // CC BY asks to indicate changes (we optimize every icon); CC BY-SA also needs the
+    // share-alike notice in every form the user might paste.
+    const notice =
+      (setInfo.license.attributionRequired ? '. Modified from the original.' : '') +
+      (shareAlike ? ' Modified versions must use the same license.' : '');
     const plain =
       `"${name}" icon from ${setInfo.name} by ${author}, licensed under ${setInfo.license.spdx}` +
       (licenseUrl ? ` (${licenseUrl})` : '') +
