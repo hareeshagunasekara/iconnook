@@ -224,9 +224,16 @@ describe('JSON endpoints', () => {
     });
   });
 
+  it('browses by filter without a search term (placeholder search)', async () => {
+    const { app } = setup();
+    expect((await app.request('/v1/search?category=arrows')).status).toBe(200);
+    expect((await app.request('/v1/search?set=tabler')).status).toBe(200);
+  });
+
   it.each([
     '/v1/search',
     '/v1/search?q=',
+    '/v1/search?q=%20%20&tier=A',
     `/v1/search?q=${'a'.repeat(101)}`,
     '/v1/search?q=x&limit=1000',
     '/v1/search?q=x&tier=X',
