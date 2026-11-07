@@ -52,6 +52,10 @@ describe('Iconify adapter', () => {
     );
   });
 
+  it('keeps samples that exist, resolving aliases and dropping hidden or missing ones', () => {
+    expect(loaded.set.samples).toEqual(['home', 'arrow-up']);
+  });
+
   it('keeps only categories with visible members', () => {
     expect(Object.fromEntries(loaded.categories)).toEqual({
       Buildings: ['home'],

@@ -49,6 +49,7 @@ async function upsertSet(tx: Tx, loaded: LoadedSet): Promise<number> {
     isColor: set.isColor,
     gridSize: set.gridSize,
     version: set.version,
+    sampleIcons: set.samples,
   };
 
   const [existing] = await tx.select().from(iconSets).where(eq(iconSets.prefix, set.prefix));
@@ -57,8 +58,9 @@ async function upsertSet(tx: Tx, loaded: LoadedSet): Promise<number> {
     if (!row) throw new Error(`Insert of set "${set.prefix}" returned no row`);
     return row.id;
   }
+  // Compare by value (arrays like sampleIcons are new objects every run) so re-runs stay change-free.
   const changed = (Object.keys(values) as (keyof typeof values)[]).some(
-    (k) => existing[k] !== values[k],
+    (k) => JSON.stringify(existing[k]) !== JSON.stringify(values[k]),
   );
   if (changed) await tx.update(iconSets).set(values).where(eq(iconSets.id, existing.id));
   return existing.id;
