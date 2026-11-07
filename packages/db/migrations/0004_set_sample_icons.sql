@@ -1,0 +1,1 @@
+ALTER TABLE "icon_sets" ADD COLUMN "sample_icons" text[] DEFAULT '{}'::text[] NOT NULL;
