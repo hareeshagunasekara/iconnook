@@ -185,9 +185,17 @@ export function fakeDeps(
     status(id) {
       return Promise.resolve(this.jobs.get(id) ?? null);
     },
+    rebuild(id, request) {
+      const status: PackStatus = { id, state: 'queued', progress: 0, format: request.format };
+      this.jobs.set(id, status);
+      return Promise.resolve(status);
+    },
   };
   const files: FakeDeps['files'] = {
     objects: new Map(),
+    exists(key) {
+      return Promise.resolve(this.objects.has(key));
+    },
     get(key) {
       const content = this.objects.get(key);
       return Promise.resolve(

@@ -246,14 +246,18 @@ describe('download counters', () => {
 
 describe('cleanup', () => {
   it('deletes packs older than the retention period and keeps recent ones', async () => {
-    const key = packKey(randomBytes(16).toString('hex'), 'zip');
+    // An isolated prefix: cleanup must never touch real packs in a shared bucket.
+    const prefix = `test-packs-${randomBytes(4).toString('hex')}/`;
+    const key = `${prefix}${randomBytes(16).toString('hex')}.zip`;
     await storage.put(key, new Uint8Array([1, 2, 3]), 'application/zip');
+    const real = (await storage.list('packs/')).length;
 
-    await cleanup(storage, t.db, new Date());
-    expect(await storage.get(key)).not.toBeNull();
+    await cleanup(storage, t.db, { now: new Date(), prefix });
+    expect(await storage.exists(key)).toBe(true);
 
-    await cleanup(storage, t.db, new Date(Date.now() + 8 * 86_400_000));
-    expect(await storage.get(key)).toBeNull();
+    await cleanup(storage, t.db, { now: new Date(Date.now() + 8 * 86_400_000), prefix });
+    expect(await storage.exists(key)).toBe(false);
+    expect((await storage.list('packs/')).length).toBe(real); // real packs untouched
   });
 });
 

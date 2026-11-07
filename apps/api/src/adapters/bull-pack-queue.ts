@@ -52,6 +52,16 @@ export class BullPackQueue implements PackQueue {
     return this.toStatus(job);
   }
 
+  async rebuild(id: string, request: PackRequest): Promise<PackStatus> {
+    const existing = await this.queue.getJob(id);
+    if (existing) await existing.remove();
+    const job = (await this.queue.add('pack', request, {
+      ...PACK_JOB_OPTIONS,
+      jobId: id,
+    })) as Job<PackRequest>;
+    return this.toStatus(job);
+  }
+
   async status(id: string): Promise<PackStatus | null> {
     const job = (await this.queue.getJob(id)) as Job<PackRequest> | undefined;
     return job ? this.toStatus(job) : null;

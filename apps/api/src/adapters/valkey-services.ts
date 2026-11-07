@@ -26,4 +26,7 @@ export class StorageFileStore implements FileStore {
   get(key: string): Promise<Response | null> {
     return this.storage.get(key);
   }
+  exists(key: string): Promise<boolean> {
+    return this.storage.exists(key);
+  }
 }

@@ -166,7 +166,13 @@ export function registerCollections(app: OpenAPIHono, ctx: WriteRouteContext): v
       if (!(await deps.flags.isEnabled('packs')))
         throw unavailable('Packs are temporarily disabled');
       const request = c.req.valid('json');
-      const status = await deps.packs.enqueue(packId(request), request);
+      const id = packId(request);
+      let status = await deps.packs.enqueue(id, request);
+      // The file can outlive neither retention nor a storage lifecycle rule: never promise a download
+      // that would 404 — rebuild instead.
+      if (status.state === 'completed' && !(await deps.files.exists(packKey(id, request.format)))) {
+        status = await deps.packs.rebuild(id, request);
+      }
       c.header('Cache-Control', 'no-store');
       c.header('Location', `${apiUrl}/v1/packs/${status.id}`);
       return c.json(packView(status), 202);

@@ -7,6 +7,7 @@ export interface ObjectStorage {
   /** The raw response (stream it); null if the object doesn't exist. */
   get(key: string): Promise<Response | null>;
   delete(key: string): Promise<void>;
+  exists(key: string): Promise<boolean>;
   list(prefix: string): Promise<{ key: string; lastModified: Date }[]>;
 }
 
@@ -76,6 +77,16 @@ export class S3Storage implements ObjectStorage {
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`S3 GET ${key} failed: ${String(res.status)}`);
     return res;
+  }
+
+  async exists(key: string): Promise<boolean> {
+    const res = await this.client.fetch(this.url(key), {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (res.status === 404) return false;
+    if (!res.ok) throw new Error(`S3 HEAD ${key} failed: ${String(res.status)}`);
+    return true;
   }
 
   async delete(key: string): Promise<void> {

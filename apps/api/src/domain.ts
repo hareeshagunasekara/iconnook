@@ -99,12 +99,15 @@ export interface PackStatus {
 export interface PackQueue {
   /** Enqueues the pack, or returns the existing job for this id (content-addressed). */
   enqueue(id: string, request: PackRequest): Promise<PackStatus>;
+  /** Discards a finished job whose file is gone and builds the pack again. */
+  rebuild(id: string, request: PackRequest): Promise<PackStatus>;
   status(id: string): Promise<PackStatus | null>;
 }
 
 export interface FileStore {
   /** Streams a stored file; null if it doesn't exist (e.g. a pack past retention). */
   get(key: string): Promise<Response | null>;
+  exists(key: string): Promise<boolean>;
 }
 
 export interface FeatureFlags {

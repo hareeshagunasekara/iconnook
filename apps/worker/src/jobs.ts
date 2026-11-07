@@ -139,10 +139,10 @@ export async function flushDownloads(
 export async function cleanup(
   storage: ObjectStorage,
   db: Database,
-  now = new Date(),
+  { now = new Date(), prefix = 'packs/' }: { now?: Date; prefix?: string } = {},
 ): Promise<{ packs: number }> {
   const cutoff = new Date(now.getTime() - PACK_RETENTION_DAYS * 86_400_000);
-  const old = (await storage.list('packs/')).filter((o) => o.lastModified < cutoff);
+  const old = (await storage.list(prefix)).filter((o) => o.lastModified < cutoff);
   for (const o of old) await storage.delete(o.key);
   // Batches are deleted from Valkey right after they're applied, so month-old records are never needed.
   await db

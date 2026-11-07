@@ -539,6 +539,24 @@ describe('collections, packs and downloads', () => {
     expect(await res.text()).toBe('<svg/>');
   });
 
+  it('rebuilds a "completed" pack whose file has expired instead of promising a 404', async () => {
+    const { app, deps } = setup();
+    const request = { icons: ['tabler:home'], format: 'zip' };
+    const { id } = (await (await post(app, '/v1/packs', request)).json()) as { id: string };
+    deps.packs.jobs.set(id, { id, state: 'completed', progress: 100, format: 'zip' }); // file never stored
+
+    const again = (await (await post(app, '/v1/packs', request)).json()) as {
+      state: string;
+      downloadUrl: string | null;
+    };
+    expect(again).toMatchObject({ state: 'queued', downloadUrl: null });
+
+    deps.packs.jobs.set(id, { id, state: 'completed', progress: 100, format: 'zip' });
+    deps.files.objects.set(`packs/${id}.zip`, 'PK');
+    const ready = (await (await post(app, '/v1/packs', request)).json()) as { state: string };
+    expect(ready.state).toBe('completed'); // file present: no rebuild
+  });
+
   it.each([
     [{ icons: ['tabler:home'], format: 'tar' }],
     [{ icons: ['tabler:home'], format: 'sprite', png: 64 }],
