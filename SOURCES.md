@@ -77,7 +77,7 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 | `iconamoon` | IconaMoon | 1,781 | CC-BY-4.0 | B |  | [Dariush Habibpour](https://github.com/dariushhpg1/IconaMoon) |
 | `lets-icons` | Lets Icons | 1,528 | CC-BY-4.0 | B |  | [Leonid Tsvetkov](https://www.figma.com/community/file/886554014393250663) |
 
-## Solid & glyph icons — 36 sets, 36,044 icons
+## Solid & glyph icons — 34 sets, 34,804 icons
 
 | Prefix | Set | Icons | License | Tier | Color | Author |
 |---|---|---:|---|:-:|:-:|---|
@@ -105,9 +105,7 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 | `pepicons-print` | Pepicons Print | 1,275 | CC-BY-4.0 | B |  | [CyCraft](https://github.com/CyCraft/pepicons) |
 | `pepicons-pencil` | Pepicons Pencil | 1,275 | CC-BY-4.0 | B |  | [CyCraft](https://github.com/CyCraft/pepicons) |
 | `streamline-freehand` | Freehand free icons | 1,000 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
-| `streamline-pixel` | Pixel free icons | 662 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
 | `nrk` | NRK Core Icons | 637 | CC-BY-4.0 | B |  | [Norsk rikskringkasting](https://github.com/nrkno/core-icons) |
-| `pixel` | Pixel Icon | 578 | CC-BY-4.0 | B |  | [HackerNoon](https://github.com/hackernoon/pixel-icon-library) |
 | `cil` | CoreUI Free | 554 | CC-BY-4.0 | B |  | [creativeLabs Łukasz Holeczek](https://github.com/coreui/coreui-icons) |
 | `streamline-cyber` | Cyber free icons | 500 | CC-BY-4.0 | B |  | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
 | `basil` | Basil | 493 | CC-BY-4.0 | B |  | [Craftwork](https://www.figma.com/community/file/931906394678748246) |
@@ -164,13 +162,15 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 | `ep` | Element Plus | 293 | MIT | A |  | [Element Plus](https://github.com/element-plus/element-plus-icons) |
 | `weui` | WeUI Icon | 162 | MIT | A |  | [WeUI](https://github.com/weui/weui-icon) |
 
-## Pixel & retro — 3 sets, 2,885 icons
+## Pixel & retro — 5 sets, 4,125 icons
 
 | Prefix | Set | Icons | License | Tier | Color | Author |
 |---|---|---:|---|:-:|:-:|---|
 | `dinkie-icons` | Dinkie Icons | 1,198 | MIT | A |  | [atelierAnchor](https://github.com/atelier-anchor/dinkie-icons) |
 | `pixelarticons` | Pixelarticons | 1,036 | MIT | A |  | [Gerrit Halfmann](https://github.com/halfmage/pixelarticons) |
 | `memory` | Memory Icons | 651 | Apache-2.0 | A |  | [Pictogrammers](https://github.com/Pictogrammers/Memory) |
+| `streamline-pixel` | Pixel free icons | 662 | CC-BY-4.0 | B |  | [Streamline](https://www.streamlinehq.com) |
+| `pixel` | Pixel Icon | 578 | CC-BY-4.0 | B |  | [HackerNoon](https://github.com/hackernoon/pixel-icon-library) |
 
 ## Animated — 3 sets, 1,711 icons
 
@@ -180,7 +180,15 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 | `meteocons` | Meteocons | 447 | MIT | A | ● | [Bas Milius](https://github.com/basmilius/weather-icons) |
 | `svg-spinners` | SVG Spinners | 46 | MIT | A |  | [Utkarsh Verma](https://github.com/n3r4zzurr0/svg-spinners) |
 
-## Color icons — 40 sets, 39,419 icons
+## Cute & kawaii — 3 sets, 3,000 icons
+
+| Prefix | Set | Icons | License | Tier | Color | Author |
+|---|---|---:|---|:-:|:-:|---|
+| `withicons-coquette` | with icons Coquette | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-anime` | with icons Anime | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+| `withicons-kawaii` | with icons Kawaii | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
+
+## Color icons — 37 sets, 36,419 icons
 
 | Prefix | Set | Icons | License | Tier | Color | Author |
 |---|---|---:|---|:-:|:-:|---|
@@ -190,12 +198,9 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 | `withicons-sticker` | with icons Sticker | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
 | `withicons-pastel` | with icons Pastel | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
 | `withicons-plush` | with icons Plush | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
-| `withicons-coquette` | with icons Coquette | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
-| `withicons-anime` | with icons Anime | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
 | `withicons-gothic` | with icons Gothic | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
 | `withicons-bauhaus` | with icons Bauhaus | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
 | `withicons-glass` | with icons Glass | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
-| `withicons-kawaii` | with icons Kawaii | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
 | `withicons-luxe` | with icons Luxe | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
 | `withicons-retro` | with icons Retro | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
 | `withicons-bento` | with icons Bento | 1,000 | MIT | A | ● | [Evergrow](https://github.com/withevergrow/withicons) |
@@ -272,10 +277,10 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 | `noto-v1` | Noto Emoji (v1) | 2,162 | Apache-2.0 | A | ● | [Google Inc](https://github.com/googlefonts/noto-emoji) |
 | `fluent-emoji-high-contrast` | Fluent Emoji High Contrast | 1,595 | MIT | A |  | [Microsoft Corporation](https://github.com/microsoft/fluentui-emoji) |
 | `fxemoji` | Firefox OS Emoji | 1,034 | Apache-2.0 | A | ● | [Mozilla](https://github.com/mozilla/fxemoji) |
-| `twemoji` | Twitter Emoji | 3,988 | CC-BY-4.0 | B | ● | [Twitter](https://github.com/jdecked/twemoji) |
-| `emojione` | Emoji One (Colored) | 1,834 | CC-BY-4.0 | B | ● | [Emoji One](https://github.com/EmojiTwo/emojitwo) |
-| `emojione-monotone` | Emoji One (Monotone) | 1,403 | CC-BY-4.0 | B |  | [Emoji One](https://github.com/EmojiTwo/emojitwo) |
-| `streamline-emojis` | Streamline Emojis | 787 | CC-BY-4.0 | B | ● | [Streamline](https://github.com/webalys-hq/streamline-vectors) |
+| `twemoji` | Twitter Emoji | 3,988 | CC-BY-4.0 | B | ● | [Twitter, Inc. and other contributors](https://github.com/jdecked/twemoji) |
+| `emojione` | Emoji One (Colored) | 1,834 | CC-BY-4.0 | B | ● | [Ranks.com and the Emojitwo contributors](https://github.com/EmojiTwo/emojitwo) |
+| `emojione-monotone` | Emoji One (Monotone) | 1,403 | CC-BY-4.0 | B |  | [Ranks.com and the Emojitwo contributors](https://github.com/EmojiTwo/emojitwo) |
+| `streamline-emojis` | Streamline Emojis | 787 | CC-BY-4.0 | B | ● | [Streamline](https://www.streamlinehq.com) |
 | `openmoji` | OpenMoji | 4,545 | CC-BY-SA-4.0 | C | ● | [OpenMoji](https://github.com/hfg-gmuend/openmoji) |
 | `emojione-v1` | Emoji One (v1) | 1,262 | CC-BY-SA-4.0 | C | ● | [Emoji One](https://github.com/joypixels/emojione-legacy) |
 
@@ -353,10 +358,31 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 | `et` | Elegant | 100 | GPL-3.0-or-later | X |  | [Kenny Sing](https://github.com/pprince/etlinefont-bower) |
 | `gala` | Gala Icons | 51 | GPL-3.0 | X |  | [Jake Wells](https://github.com/cyberalien/gala-icons) |
 
+## Reviewed and imported beyond Tier A
+
+Imported by default after a one-by-one review (license checked at the source on 2026-11-07, credit
+wording checked; see `packages/importer/src/approved.ts`). Every icon page shows a copy-ready credit,
+every downloaded SVG carries the credit in a comment, and ZIP packs include a LICENSES file.
+
+| Set | License | Credited as |
+|---|---|---|
+| `pixel` HackerNoon Pixel Icon Library | CC BY 4.0 | HackerNoon, linking the library |
+| `streamline-pixel`, `streamline-emojis` | CC BY 4.0 | Streamline, linking streamlinehq.com (as their license asks) |
+| `twemoji` Twemoji | CC BY 4.0 (graphics) | Twitter, Inc. and other contributors |
+| `emojione`, `emojione-monotone` Emoji One 2.x | CC BY 4.0 | Ranks.com and the Emojitwo contributors, in the set "Emoji One" (as Emojitwo asks) |
+| `amcharts-weather` amCharts Animated Weather | CC BY 4.0 | amCharts |
+
+
 ## Sources outside Iconify
 
 | Source | Type | License | Status |
 |---|---|---|---|
+| [SVG Loaders](https://github.com/SamHerbert/SVG-Loaders) | Animated loaders | MIT | ✅ Imported (`svg-loaders`, pinned commit; white made currentColor) |
+| [amCharts weather icons](https://www.amcharts.com/free-animated-svg-weather-icons/) | Animated weather | CC BY 4.0 | ✅ Imported (`amcharts-weather`, pinned zip SHA-256) |
+| [Blobmoji](https://github.com/C1710/blobmoji) | Emoji (Google's blob style) | Apache-2.0 | ✅ Imported (`blobmoji`, pinned commit; not named "Noto", a Google trademark) |
+| [React Kawaii](https://github.com/elizabetdev/react-kawaii) | Cute characters | MIT | ✅ Imported (`react-kawaii`, npm 1.6.0 rendered to SVG) |
+| [Lordicon](https://lordicon.com/licenses) | Animated icons | Modified CC BY-ND | ❌ No-derivatives; terms bar icon-library use |
+| [Tossface](https://github.com/toss/tossface) | Emoji | Custom | ❌ Forbids unapproved modified versions |
 | [Open Peeps](https://openpeeps.com) | Illustrations (people) | CC0 | ✅ Import |
 | [Open Doodles](https://www.opendoodles.com) | Illustrations | CC0 | ✅ Import |
 | [Openclipart](https://openclipart.org) | Clipart | Public domain / CC0 | ✅ Import (no current bulk archive, needs per-item fetch or old 0.19 release) |
