@@ -64,12 +64,14 @@ describe('prepareIcons', () => {
       { name: 'Bad Name', body: '<path/>', width: 24, height: 24 },
       { name: 'flat', body: '<path/>', width: 0, height: 0 },
       { name: 'huge', body: `<path d="${'M0 0'.repeat(200_000)}"/>`, width: 24, height: 24 },
+      // A color pasted into path data (seen in upstream Blobmoji skin-tone files).
+      { name: 'broken', body: '<path d="M1 2.#232020.8z"/>', width: 24, height: 24 },
     ]);
 
     expect(result.icons.map((i) => i.name)).toEqual(['ok', 'evil']);
     expect(result.icons[1]?.body).not.toContain('onclick');
     expect(result.modified).toEqual(['evil']);
-    expect(result.rejected.map((r) => r.name)).toEqual(['Bad Name', 'flat', 'huge']);
+    expect(result.rejected.map((r) => r.name)).toEqual(['Bad Name', 'flat', 'huge', 'broken']);
   });
 });
 

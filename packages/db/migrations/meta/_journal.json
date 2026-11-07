@@ -43,6 +43,13 @@
       "when": 1794060492731,
       "tag": "0005_set_kinds",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794062427733,
+      "tag": "0006_cute_kind",
+      "breakpoints": true
     }
   ]
 }

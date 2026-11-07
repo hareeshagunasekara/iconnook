@@ -110,6 +110,7 @@ export const SET_TYPES = [
   { value: 'frameworks', label: 'Framework icons', icon: 'blocks', color: 'pink' },
   { value: 'pixel', label: 'Pixel & retro', icon: 'gamepad-2', color: 'purple' },
   { value: 'animated', label: 'Animated', icon: 'loader', color: 'mustard' },
+  { value: 'cute', label: 'Cute & kawaii', icon: 'cat', color: 'pink' },
   { value: 'color', label: 'Color icons', icon: 'palette', color: 'pink' },
   { value: 'developer', label: 'Developer & tech', icon: 'code-xml', color: 'green' },
   { value: 'logos', label: 'Logos & brands', icon: 'tag', color: 'blue' },

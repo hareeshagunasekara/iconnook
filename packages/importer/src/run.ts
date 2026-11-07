@@ -1,4 +1,4 @@
-import type { ImportableTier } from '@iconnook/core';
+import { isImportable, type ImportableTier } from '@iconnook/core';
 import type { Database } from '@iconnook/db';
 
 import { prepareIcons } from './prepare.js';
@@ -9,6 +9,8 @@ export interface ImportOptions {
   tiers: readonly ImportableTier[];
   /** Limit to these prefixes (default: every set in the selected tiers). */
   prefixes?: readonly string[];
+  /** Reviewed sets imported even though their tier isn't selected (never Tier X). */
+  approved?: readonly string[];
   log?: (line: string) => void;
 }
 
@@ -37,8 +39,14 @@ export class ImportError extends Error {
 
 export function selectSets(sets: readonly SourceSet[], options: ImportOptions): SourceSet[] {
   const tiers = new Set<string>(options.tiers);
+  const approved = new Set(options.approved);
   const prefixes = options.prefixes ? new Set(options.prefixes) : null;
-  return sets.filter((s) => tiers.has(s.licenseTier) && (!prefixes || prefixes.has(s.prefix)));
+  return sets.filter(
+    (s) =>
+      isImportable(s.licenseTier) &&
+      (tiers.has(s.licenseTier) || approved.has(s.prefix)) &&
+      (!prefixes || prefixes.has(s.prefix)),
+  );
 }
 
 /** Imports the selected sets one by one; each set is its own transaction. */

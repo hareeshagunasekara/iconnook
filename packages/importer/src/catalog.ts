@@ -11,6 +11,7 @@ const GROUPS: readonly [SetType, string][] = [
   ['frameworks', 'Framework icons'],
   ['pixel', 'Pixel & retro'],
   ['animated', 'Animated'],
+  ['cute', 'Cute & kawaii'],
   ['color', 'Color icons'],
   ['developer', 'Developer & tech'],
   ['logos', 'Logos & brands'],
@@ -24,10 +25,32 @@ const GROUPS: readonly [SetType, string][] = [
 
 const TIER_ORDER: Readonly<Record<LicenseTier, number>> = { A: 0, B: 1, C: 2, X: 3 };
 
+const REVIEWED = `## Reviewed and imported beyond Tier A
+
+Imported by default after a one-by-one review (license checked at the source on 2026-11-07, credit
+wording checked; see \`packages/importer/src/approved.ts\`). Every icon page shows a copy-ready credit,
+every downloaded SVG carries the credit in a comment, and ZIP packs include a LICENSES file.
+
+| Set | License | Credited as |
+|---|---|---|
+| \`pixel\` HackerNoon Pixel Icon Library | CC BY 4.0 | HackerNoon, linking the library |
+| \`streamline-pixel\`, \`streamline-emojis\` | CC BY 4.0 | Streamline, linking streamlinehq.com (as their license asks) |
+| \`twemoji\` Twemoji | CC BY 4.0 (graphics) | Twitter, Inc. and other contributors |
+| \`emojione\`, \`emojione-monotone\` Emoji One 2.x | CC BY 4.0 | Ranks.com and the Emojitwo contributors, in the set "Emoji One" (as Emojitwo asks) |
+| \`amcharts-weather\` amCharts Animated Weather | CC BY 4.0 | amCharts |
+
+`;
+
 const EXTRA_SOURCES = `## Sources outside Iconify
 
 | Source | Type | License | Status |
 |---|---|---|---|
+| [SVG Loaders](https://github.com/SamHerbert/SVG-Loaders) | Animated loaders | MIT | ✅ Imported (\`svg-loaders\`, pinned commit; white made currentColor) |
+| [amCharts weather icons](https://www.amcharts.com/free-animated-svg-weather-icons/) | Animated weather | CC BY 4.0 | ✅ Imported (\`amcharts-weather\`, pinned zip SHA-256) |
+| [Blobmoji](https://github.com/C1710/blobmoji) | Emoji (Google's blob style) | Apache-2.0 | ✅ Imported (\`blobmoji\`, pinned commit; not named "Noto", a Google trademark) |
+| [React Kawaii](https://github.com/elizabetdev/react-kawaii) | Cute characters | MIT | ✅ Imported (\`react-kawaii\`, npm 1.6.0 rendered to SVG) |
+| [Lordicon](https://lordicon.com/licenses) | Animated icons | Modified CC BY-ND | ❌ No-derivatives; terms bar icon-library use |
+| [Tossface](https://github.com/toss/tossface) | Emoji | Custom | ❌ Forbids unapproved modified versions |
 | [Open Peeps](https://openpeeps.com) | Illustrations (people) | CC0 | ✅ Import |
 | [Open Doodles](https://www.opendoodles.com) | Illustrations | CC0 | ✅ Import |
 | [Openclipart](https://openclipart.org) | Clipart | Public domain / CC0 | ✅ Import (no current bulk archive, needs per-item fetch or old 0.19 release) |
@@ -97,6 +120,6 @@ export function renderCatalog(
     out.push('');
   }
 
-  out.push(EXTRA_SOURCES);
+  out.push(REVIEWED, EXTRA_SOURCES);
   return out.join('\n');
 }
