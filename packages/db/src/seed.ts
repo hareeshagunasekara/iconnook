@@ -19,6 +19,7 @@ export const FIXTURE_SET = {
   isColor: false,
   gridSize: 24,
   version: '1',
+  sampleIcons: ['plus'] as string[],
 } as const;
 
 export const FIXTURE_ICONS = [
@@ -36,7 +37,10 @@ export async function seedFixtures(db: Database): Promise<{ setId: number; icons
     const [set] = await tx
       .insert(iconSets)
       .values(FIXTURE_SET)
-      .onConflictDoUpdate({ target: iconSets.prefix, set: { name: FIXTURE_SET.name } })
+      .onConflictDoUpdate({
+        target: iconSets.prefix,
+        set: { name: FIXTURE_SET.name, sampleIcons: FIXTURE_SET.sampleIcons },
+      })
       .returning({ id: iconSets.id });
     if (!set) throw new Error('Fixture set upsert returned no row');
 

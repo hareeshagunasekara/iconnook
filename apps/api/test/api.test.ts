@@ -128,8 +128,9 @@ describe('against real Postgres, Meilisearch and Valkey', () => {
   });
 
   it('previews each set with its first existing sample icon (a real icon from the set)', async () => {
+    await t.raw`UPDATE icon_sets SET sample_icons = '{}' WHERE prefix = 'iconnook-fixtures'`;
     const before = await contract('/v1/sets/iconnook-fixtures', IconSet);
-    expect(before.preview).toBeNull(); // no samples recorded yet
+    expect(before.preview).toBeNull(); // no samples recorded
 
     await t.raw`UPDATE icon_sets SET sample_icons = ARRAY['not-in-set', 'plus', 'circle']
                 WHERE prefix = 'iconnook-fixtures'`;
