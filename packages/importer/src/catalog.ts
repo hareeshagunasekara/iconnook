@@ -100,7 +100,7 @@ export function renderCatalog(
       .sort((a, b) => TIER_ORDER[a.licenseTier] - TIER_ORDER[b.licenseTier] || b.total - a.total);
     if (rows.length === 0) continue;
     out.push(
-      `## ${title} — ${n(rows.length)} sets, ${n(rows.reduce((t, s) => t + s.total, 0))} icons`,
+      `## ${title}: ${n(rows.length)} sets, ${n(rows.reduce((t, s) => t + s.total, 0))} icons`,
       '',
     );
     out.push(

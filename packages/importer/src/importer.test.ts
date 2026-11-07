@@ -114,7 +114,7 @@ describe('renderCatalog', () => {
     expect(md).toContain('| **A** | MIT, Apache-2.0');
     expect(md).toMatch(/\| \*\*A\*\* .*\| 15 \|/);
     expect(md).toMatch(/\| \*\*X\*\* .*\| 2 \|/);
-    expect(md).toContain('## Logos & brands — 1 sets, 5 icons');
+    expect(md).toContain('## Logos & brands: 1 sets, 5 icons');
     expect(md).toContain('Pipe \\| Set');
     expect(md).toContain('## Sources outside Iconify');
   });
