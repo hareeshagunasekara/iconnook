@@ -6,7 +6,7 @@
 /* static: inline styles reference tokens with var(), so emit them even if no utility uses them. */
 @theme static {
   /* Brand palette. Ink text passes AA on every brand color except purple (use white there). */
-  --color-cream: #fff9f0;
+  --color-cream: #fffff0;
   --color-ink: #111111;
   --color-mustard: #ffc567;
   --color-pink: #fb7da8;
