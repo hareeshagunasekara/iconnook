@@ -1,49 +1,72 @@
 ---
 // Help lives in the same place on every page (WCAG 3.2.6 Consistent Help).
+import Doodle from './Doodle.astro';
+import Logo from './Logo.astro';
 ---
 
-<footer class="mt-16 border-t border-[var(--color-surface-2)] bg-[var(--color-surface)]">
-  <div class="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
-    <div>
-      <p class="font-semibold">IconNook</p>
-      <p class="mt-1 text-[var(--color-text-muted)]">
-        Free, open-source SVG icons. Every icon clearly licensed. No sign-up, no payments.
-      </p>
-    </div>
-    <nav aria-label="Help">
-      <p class="font-semibold">Help</p>
-      <ul class="mt-1 space-y-1">
-        <li>
-          <a class="link" href="/licenses">
-            Licenses &amp; attribution FAQ
-          </a>
-        </li>
-        <li>
-          <a class="link" href="https://github.com/hareeshagunasekara/iconnook/issues">
-            Report a problem
-          </a>
-        </li>
-        <li>
-          <a
-            class="link"
-            href="https://github.com/hareeshagunasekara/iconnook/security/advisories/new"
-          >
-            Report a security issue
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <div>
-      <p class="font-semibold">Open source</p>
-      <ul class="mt-1 space-y-1">
-        <li>
+<footer class="relative mt-20 overflow-hidden lg:mt-28">
+  <Doodle kind="blob" color="green" class="absolute bottom-0 left-0 w-28 sm:w-36" />
+  <Doodle kind="blob" color="coral" class="absolute right-0 bottom-0 w-24 -scale-x-100 sm:w-32" />
+  <div class="wrap relative">
+    <div class="grid gap-8 border-t-2 border-ink pt-10 pb-24 text-sm sm:grid-cols-3 sm:gap-0 sm:pb-20">
+      <div class="sm:pr-8">
+        <Logo size={30} />
+        <p class="mt-3 max-w-[18rem]">
+          Free, open-source SVG icons. Every icon clearly licensed. No sign-up, no payments.
+        </p>
+      </div>
+      <nav aria-label="Help" class="footer-col">
+        <p class="font-display text-base font-bold">Help</p>
+        <ul class="mt-2 space-y-1">
+          <li>
+            <a class="link inline-flex min-h-6 items-center" href="/licenses">
+              Licenses &amp; attribution FAQ
+            </a>
+          </li>
+          <li>
+            <a class="link inline-flex min-h-6 items-center" href="/about">
+              About IconNook
+            </a>
+          </li>
+          <li>
+            <a
+              class="link inline-flex min-h-6 items-center"
+              href="https://github.com/hareeshagunasekara/iconnook/issues"
+            >
+              Report a problem
+            </a>
+          </li>
+          <li>
+            <a
+              class="link inline-flex min-h-6 items-center"
+              href="https://github.com/hareeshagunasekara/iconnook/security/advisories/new"
+            >
+              Report a security issue
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="footer-col">
+        <p class="font-display text-base font-bold">Open source</p>
+        <p class="mt-2">
           <a class="link" href="https://github.com/hareeshagunasekara/iconnook">
             Source code
           </a>{' '}
           (Apache-2.0)
-        </li>
-        <li>Icons keep their original licenses, shown on every icon page.</li>
-      </ul>
+        </p>
+        <p class="mt-1 max-w-[18rem]">
+          Icons keep their original licenses, shown on every icon page.
+        </p>
+      </div>
     </div>
   </div>
 </footer>
+
+<style>
+  @media (width >= 40rem) {
+    .footer-col {
+      border-left: 1px solid var(--color-ink);
+      padding-inline: 2rem;
+    }
+  }
+</style>
