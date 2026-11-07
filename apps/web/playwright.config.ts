@@ -36,7 +36,10 @@ export default defineConfig({
       command: 'node --env-file-if-exists=../../.env ../worker/dist/main.js',
       url: 'http://localhost:8788/healthz',
       reuseExistingServer: !CI,
-      env: { LOG_LEVEL: 'warn', DOWNLOADS_FLUSH_EVERY_MS: '1000' },
+      // Worker logs go to the test output, so CI failures in background jobs are visible.
+      stdout: 'pipe',
+      stderr: 'pipe',
+      env: { LOG_LEVEL: 'info', DOWNLOADS_FLUSH_EVERY_MS: '1000' },
     },
     {
       command: 'node dist/server/entry.mjs',

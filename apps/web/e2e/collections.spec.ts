@@ -1,9 +1,33 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Download, type Page } from '@playwright/test';
 
 /** Collections journey (docs/standards/testing.md #5): no account, browser storage, share, download. */
 
 const SET = 'iconnook-fixtures';
+
+/**
+ * Clicks a pack button and returns the download. If no download arrives, fails with everything
+ * needed to diagnose it: the POST response, the pack's current status and any error on the page.
+ */
+async function downloadPack(page: Page, button: string): Promise<Download> {
+  const created = page.waitForResponse(
+    (r) => r.url().endsWith('/v1/packs') && r.request().method() === 'POST',
+  );
+  const download = page.waitForEvent('download', { timeout: 60_000 }).catch((e: unknown) => e);
+  await page.getByRole('button', { name: button }).click();
+  const response = await created;
+  const body = (await response.json()) as { statusUrl?: string };
+  const result = await download;
+  if (result instanceof Error) {
+    const status = body.statusUrl ? await (await page.request.get(body.statusUrl)).text() : 'n/a';
+    const alerts = await page.getByRole('alert').allTextContents();
+    throw new Error(
+      `No download after "${button}". POST ${String(response.status())} ${JSON.stringify(body)}; ` +
+        `status now ${status}; page alerts: ${JSON.stringify(alerts)}`,
+    );
+  }
+  return result as Download;
+}
 
 async function add(page: Page, name: string) {
   await page.goto(`/icons/${SET}/${name}`);
@@ -30,9 +54,7 @@ test('add icons, download a sprite and a ZIP, share, and save the shared collect
   await expect(list.getByRole('listitem')).toHaveCount(2);
 
   // SVG sprite, built by the worker.
-  const spriteDownload = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download SVG sprite' }).click();
-  const sprite = await spriteDownload;
+  const sprite = await downloadPack(page, 'Download SVG sprite');
   expect(sprite.suggestedFilename()).toBe('iconnook-sprite.svg');
   const spriteText = await (await sprite.createReadStream()).toArray();
   expect(Buffer.concat(spriteText).toString()).toMatch(
@@ -41,9 +63,7 @@ test('add icons, download a sprite and a ZIP, share, and save the shared collect
 
   // ZIP with PNGs.
   await page.getByLabel('PNG files in the ZIP').selectOption('64');
-  const zipDownload = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download ZIP' }).click();
-  const zip = await zipDownload;
+  const zip = await downloadPack(page, 'Download ZIP');
   expect(zip.suggestedFilename()).toBe('iconnook-icons.zip');
   const zipBytes = Buffer.concat(await (await zip.createReadStream()).toArray());
   expect(zipBytes.subarray(0, 2).toString()).toBe('PK');
