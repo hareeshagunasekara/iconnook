@@ -1,0 +1,28 @@
+---
+import { PUBLIC_API_URL } from 'astro:env/client';
+
+import { CollectionView } from '../islands/CollectionView.tsx';
+import Layout from '../layouts/Layout.astro';
+
+Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=86400');
+---
+
+<Layout
+  title="My collection"
+  description="Your saved icons: download them as a ZIP or SVG sprite, or share a link."
+  index={false}
+>
+  <h1 class="text-3xl font-bold">My collection</h1>
+  <p class="mt-2 text-[var(--color-text-muted)]">
+    Saved in this browser only — no account, nothing sent until you share.
+  </p>
+  <div class="mt-6">
+    <CollectionView client:load apiUrl={PUBLIC_API_URL} />
+    <noscript>
+      <p class="rounded-xl bg-[var(--color-surface)] p-6">
+        Collections are stored in your browser and need JavaScript. Shared collection links work
+        without it.
+      </p>
+    </noscript>
+  </div>
+</Layout>

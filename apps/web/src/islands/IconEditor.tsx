@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
+import {
+  addToCollection,
+  announce as announceLive,
+  inCollection,
+  onCollectionChange,
+  removeFromCollection,
+} from '../lib/collection';
+
 /**
  * Icon page editor (Preact island). Server-rendered with defaults, so preview, downloads and the SVG
  * code all work without JavaScript; with JS, controls update everything live.
@@ -34,6 +42,8 @@ interface Props {
    * Shown until the user customizes, so the page's largest element needs no extra request.
    */
   initialSvg: string;
+  /** For the anonymous download counter. */
+  iconId: number;
 }
 
 function canonical(base: string, params: Record<string, string | number | undefined>): string {
@@ -46,13 +56,7 @@ function canonical(base: string, params: Record<string, string | number | undefi
   return query ? `${base}?${query}` : base;
 }
 
-function announce(message: string) {
-  const el = document.getElementById('announcer');
-  if (el) {
-    el.textContent = '';
-    window.setTimeout(() => (el.textContent = message), 50);
-  }
-}
+const announce = announceLive;
 
 export function IconEditor({
   apiUrl,
@@ -62,7 +66,27 @@ export function IconEditor({
   hasStroke,
   initialCode,
   initialSvg,
+  iconId,
 }: Props) {
+  const ref = `${set}:${name}`;
+  // false on the server and first render (no storage there), then synced from this browser.
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    const sync = () => {
+      setSaved(inCollection(ref));
+    };
+    sync();
+    return onCollectionChange(sync);
+  }, [ref]);
+  /** Counts the download without delaying it (keepalive survives the navigation). */
+  const countDownload = () => {
+    void fetch(`${apiUrl}/v1/downloads`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ iconId }),
+      keepalive: true,
+    }).catch(() => undefined);
+  };
   const [color, setColor] = useState('');
   const [colorText, setColorText] = useState('');
   const [size, setSize] = useState(48);
@@ -295,6 +319,7 @@ export function IconEditor({
             href={svgDownload}
             class="inline-flex min-h-11 items-center rounded-lg bg-[var(--color-accent)] px-4 font-medium text-[var(--color-accent-contrast)]"
             download
+            onClick={countDownload}
           >
             Download SVG
           </a>
@@ -302,9 +327,27 @@ export function IconEditor({
             href={pngDownload}
             class="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-4 font-medium"
             download
+            onClick={countDownload}
           >
             Download PNG ({Math.max(16, size)} px)
           </a>
+          <button
+            type="button"
+            aria-pressed={saved}
+            onClick={() => {
+              if (saved) {
+                removeFromCollection(ref);
+                announce(`Removed ${name.replaceAll('-', ' ')} from your collection`);
+              } else if (addToCollection([ref])) {
+                announce(`Added ${name.replaceAll('-', ' ')} to your collection`);
+              } else {
+                announce('Your collection is full (500 icons)');
+              }
+            }}
+            class="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-4 font-medium"
+          >
+            {saved ? '✓ In collection' : '+ Add to collection'}
+          </button>
         </div>
       </div>
 

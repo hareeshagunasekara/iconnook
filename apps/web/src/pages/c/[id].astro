@@ -1,0 +1,60 @@
+---
+import { PUBLIC_API_URL } from 'astro:env/client';
+
+import ErrorState from '../../components/ErrorState.astro';
+import IconGrid from '../../components/IconGrid.astro';
+import { PackDownloader } from '../../islands/PackDownloader.tsx';
+import { SaveCollection } from '../../islands/SaveCollection.tsx';
+import Layout from '../../layouts/Layout.astro';
+import { api, type IconSummary } from '../../lib/api';
+
+interface SharedCollection {
+  id: string;
+  name: string | null;
+  createdAt: string;
+  items: IconSummary[];
+}
+
+const id = Astro.params.id ?? '';
+if (!/^[A-Za-z0-9_-]{10,32}$/.test(id)) return Astro.rewrite('/404');
+
+let collection: SharedCollection | null = null;
+let failed = false;
+try {
+  collection = await api<SharedCollection>(`/v1/collections/${id}`);
+} catch {
+  failed = true;
+  Astro.response.status = 503;
+}
+if (!failed && !collection) return Astro.rewrite('/404');
+const refs = collection?.items.map((i) => `${i.set}:${i.name}`) ?? [];
+const title = collection?.name ? collection.name : 'Shared collection';
+---
+
+<Layout
+  title={title}
+  description={
+    collection
+      ? `${String(collection.items.length)} free icons shared on IconNook.`
+      : 'Shared collection.'
+  }
+  index={false}
+>
+  {failed && <ErrorState title="This collection is temporarily unavailable" />}
+  {collection && (
+    <>
+      <h1 class="text-3xl font-bold">{title}</h1>
+      <p class="mt-1 text-[var(--color-text-muted)]">
+        {collection.items.length} icons · shared{' '}
+        {new Date(collection.createdAt).toLocaleDateString('en', { dateStyle: 'medium' })}
+      </p>
+      <div class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+        <PackDownloader client:visible apiUrl={PUBLIC_API_URL} refs={refs} />
+        <SaveCollection client:visible refs={refs} />
+      </div>
+      <div class="mt-8">
+        <IconGrid icons={collection.items} name={`${title} icons`} showSet />
+      </div>
+    </>
+  )}
+</Layout>
