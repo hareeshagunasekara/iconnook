@@ -1,0 +1,100 @@
+---
+import Doodle from '../components/Doodle.astro';
+import UiIcon from '../components/UiIcon.astro';
+import Layout from '../layouts/Layout.astro';
+import type { UiIconName } from '../lib/ui-icons';
+
+const PRINCIPLES: { icon: UiIconName; color: string; title: string; body: string }[] = [
+  {
+    icon: 'badge-check',
+    color: 'mustard',
+    title: 'Legally clean',
+    body: 'Every icon comes from an open-source set with a verified license, shown on its page. Copyleft and non-commercial licenses are never included.',
+  },
+  {
+    icon: 'zap',
+    color: 'coral',
+    title: 'Fast',
+    body: 'Pages are small, icons are plain SVG, and everything is cached close to you. Browsing and downloading work even without JavaScript.',
+  },
+  {
+    icon: 'accessibility',
+    color: 'green',
+    title: 'For everyone',
+    body: 'Built to WCAG 2.2 AA: full keyboard support, screen-reader labels, visible focus and readable contrast. No account, no paywall.',
+  },
+];
+---
+
+<Layout
+  title="About"
+  description="IconNook is a free, open-source SVG icon library: every icon clearly licensed, no sign-up, no payments."
+>
+  <article class="max-w-3xl">
+    <h1 class="section-title relative">
+      About{' '}
+      <span class="relative inline-block">
+        IconNook
+        <Doodle
+          kind="swoosh"
+          color="pink"
+          class="absolute -bottom-[0.16em] left-0 h-[0.2em] w-full"
+        />
+      </span>
+    </h1>
+    <p class="mt-6 text-lg sm:text-xl">
+      IconNook is a free library of open-source SVG icons. Search hundreds of thousands of icons,
+      customize them, and copy or download them for your projects. No sign-up, no payments, ever.
+    </p>
+
+    <ul class="mt-10 grid gap-5 sm:grid-cols-3">
+      {PRINCIPLES.map((p) => (
+        <li class="pop-card p-5" style={`--pop: var(--color-${p.color})`}>
+          <span
+            class="grid size-10 place-items-center rounded-full border-2 border-ink"
+            style={`background: var(--color-${p.color}-soft)`}
+          >
+            <UiIcon name={p.icon} class="size-5" />
+          </span>
+          <h2 class="mt-3 text-xl font-bold">{p.title}</h2>
+          <p class="mt-1 text-[0.9375rem]">{p.body}</p>
+        </li>
+      ))}
+    </ul>
+
+    <h2 class="mt-14 text-2xl font-bold">Where the icons come from</h2>
+    <p class="mt-3">
+      The icons are drawn by the authors of open-source icon sets, and IconNook credits each of them
+      by name. We get the icon data from the open-source{' '}
+      <a class="link" href="https://github.com/iconify/icon-sets">
+        Iconify collection
+      </a>{' '}
+      and check every set's license before adding it. Each icon page tells you whether you need to
+      give credit, and{' '}
+      <a class="link" href="/licenses">
+        Licenses &amp; attribution
+      </a>{' '}
+      explains the rules.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-bold">Your privacy</h2>
+    <p class="mt-3">
+      There are no accounts and nothing to sign up for. Downloads are counted only as totals per
+      icon, and our logs contain no personal data. Your collection stays in your own browser unless
+      you choose to share it.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-bold">Open source</h2>
+    <p class="mt-3">
+      IconNook's code is open source under the Apache-2.0 license. The{' '}
+      <a class="link" href="https://github.com/hareeshagunasekara/iconnook">
+        source code
+      </a>{' '}
+      is on GitHub: found a bug or a wrongly labeled license? Please{' '}
+      <a class="link" href="https://github.com/hareeshagunasekara/iconnook/issues">
+        report a problem
+      </a>{' '}
+      there.
+    </p>
+  </article>
+</Layout>

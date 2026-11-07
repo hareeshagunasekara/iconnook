@@ -49,7 +49,9 @@ Two frameworks guide every screen: **WCAG 2.2 AA** (must pass) and **Nielsen's 1
 
 - **Design tokens** (CSS custom properties) for color, spacing, radius, type, motion — no raw hex values or magic numbers in components. **Light theme only — no dark mode** (ADR 0004). Don't add `prefers-color-scheme` styles or a theme toggle.
 - **Spacing** on a 4px scale. **Type** scale with ≤ 6 sizes; body ≥ 16px; line height 1.5 for body text.
-- **System font stack** (or one self-hosted variable font with `font-display: swap`) — no font-loading layout shift.
+- **Visual identity** (playful, retro-modern): warm cream background, near-black text and 2px ink outlines, purple (`#552CB7`) for actions and links, and six accents (mustard, pink, coral, purple, green, blue) for tiles, pills and offset "printed paper" shadows. Tokens live in `apps/web/src/styles/global.css` (`@theme static`). Ink text on the `-soft` tints and on every accent except purple passes AA; text on purple is white. No gradients, glassmorphism or blurred drop shadows.
+- **Fonts:** Bricolage Grotesque (headings) and DM Sans (body), self-hosted variable fonts (OFL, via Fontsource) with `font-display: swap`, weight axis only, Latin subsets loaded by `unicode-range`. The heading font is preloaded.
+- **Decoration** (squiggles, bursts, blobs) is tiny inline SVG (`Doodle.astro`), `aria-hidden`, never over text or controls. Illustrations are transparent PNG sources turned into AVIF/WebP variants by `pnpm --filter @iconnook/web images` (committed output), served with explicit width/height; only the hero one loads eagerly.
 - **States for every interactive component:** default, hover, focus-visible, active, disabled, loading, error, empty.
 - **Responsive:** mobile-first; grid adapts columns to width; touch targets bigger on coarse pointers.
 - **Motion:** ≤ 200ms for UI feedback; never animate layout on load; honor reduced motion.

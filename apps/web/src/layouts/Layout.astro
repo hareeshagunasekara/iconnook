@@ -1,4 +1,7 @@
 ---
+import '@fontsource-variable/bricolage-grotesque/wght.css';
+import '@fontsource-variable/dm-sans/wght.css';
+import headingFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
 import { PUBLIC_API_URL } from 'astro:env/client';
 
 import '../styles/global.css';
@@ -19,7 +22,7 @@ interface Props {
 const { title, description, image = '/og.png', index = true, query = '' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const fullTitle =
-  title === 'IconNook' ? 'IconNook — free, open-source SVG icons' : `${title} · IconNook`;
+  title === 'IconNook' ? 'IconNook: free, open-source SVG icons' : `${title} · IconNook`;
 const ogImage = new URL(image, Astro.site);
 ---
 
@@ -33,7 +36,10 @@ const ogImage = new URL(image, Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {!index && <meta name="robots" content="noindex, follow" />}
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Headings are the largest text on most pages: fetch their font early. -->
+    <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
     <link rel="preconnect" href={new URL(PUBLIC_API_URL).origin} crossorigin />
     <meta property="og:site_name" content="IconNook" />
     <meta property="og:title" content={fullTitle} />
@@ -46,16 +52,12 @@ const ogImage = new URL(image, Astro.site);
   <body>
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-[var(--color-bg)] focus:px-4 focus:py-2 focus:shadow"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:border-2 focus:border-ink focus:bg-surface focus:px-4 focus:py-2"
     >
       Skip to main content
     </a>
     <Header query={query} />
-    <main
-      id="main"
-      tabindex="-1"
-      class="mx-auto w-full max-w-6xl flex-1 px-4 py-8 focus:outline-none"
-    >
+    <main id="main" tabindex="-1" class="wrap flex-1 py-8 focus:outline-none">
       <slot />
     </main>
     <Footer />
@@ -64,6 +66,7 @@ const ogImage = new URL(image, Astro.site);
     <script>
       import '../scripts/shortcuts.ts';
       import '../scripts/grid-nav.ts';
+      import '../scripts/menu.ts';
     </script>
   </body>
 </html>

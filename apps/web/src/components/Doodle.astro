@@ -1,0 +1,50 @@
+---
+/**
+ * Hand-drawn decorations (swooshes, squiggles, bursts, blobs) as tiny inline SVGs.
+ * Purely decorative: hidden from assistive tech and never interactive. Color comes from `color`
+ * (a brand color name); position and size from `class`.
+ */
+type Kind = 'swoosh' | 'squiggle' | 'burst' | 'blob';
+type Color = 'ink' | 'mustard' | 'pink' | 'coral' | 'purple' | 'green' | 'blue';
+
+interface Props {
+  kind: Kind;
+  color?: Color;
+  class?: string;
+}
+const { kind, color = 'ink', class: className = '' } = Astro.props;
+
+const SHAPES: Record<Kind, { viewBox: string; body: string; stretch?: boolean }> = {
+  swoosh: {
+    viewBox: '0 0 200 28',
+    body: '<path d="M3 19C34 9 62 7 84 13s34 9 58 3 38-8 55-4" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>',
+    stretch: true,
+  },
+  squiggle: {
+    viewBox: '0 0 180 18',
+    body: '<path d="M3 11c9-9 18-9 27 0s18 9 27 0 18-9 27 0 18 9 27 0 18-9 27 0 18 9 27 0" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>',
+    stretch: true,
+  },
+  burst: {
+    viewBox: '0 0 40 40',
+    body: '<path d="M15 25 4 19M21 16 17 4M29 15l4-11" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>',
+  },
+  /** A soft mound filling the bottom-left corner of its box (mirror it for the right corner). */
+  blob: {
+    viewBox: '0 0 120 100',
+    body: '<path d="M0 14C28 4 64 12 86 38c16 19 24 42 26 62H0Z" fill="currentColor"/>',
+  },
+};
+const shape = SHAPES[kind];
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={shape.viewBox}
+  preserveAspectRatio={shape.stretch ? 'none' : undefined}
+  aria-hidden="true"
+  focusable="false"
+  class:list={['pointer-events-none', className]}
+  style={`color: var(--color-${color})`}
+  set:html={shape.body}
+/>

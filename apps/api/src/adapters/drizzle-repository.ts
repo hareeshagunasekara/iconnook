@@ -10,6 +10,7 @@ import type {
   IconRecord,
   IconRepository,
   Page,
+  SetPreview,
   SetSummary,
 } from '../domain.js';
 
@@ -27,8 +28,9 @@ type SetRow = typeof iconSets.$inferSelect;
 
 const visible = eq(icons.hidden, false);
 
-function toSetSummary(row: SetRow): SetSummary {
+function toSetSummary(row: SetRow, preview: SetPreview | null): SetSummary {
   return {
+    preview,
     prefix: row.prefix,
     name: row.name,
     type: row.type,
@@ -44,6 +46,37 @@ function toSetSummary(row: SetRow): SetSummary {
       attributionRequired: requiresAttribution(row.licenseTier),
     },
   };
+}
+
+interface PreviewRow extends Record<string, unknown> {
+  set_id: number;
+  name: string;
+  body: string;
+  width: number;
+  height: number;
+}
+
+/**
+ * Preview icon per set: the first of the set's sample icons that exists and is visible, in the
+ * order the set's authors listed them. One query for any number of sets (uses the set_id+name index).
+ */
+async function loadPreviews(
+  db: Database,
+  setIds: readonly number[],
+): Promise<Map<number, SetPreview>> {
+  if (setIds.length === 0) return new Map();
+  const rows = await db.execute<PreviewRow>(sql`
+    SELECT DISTINCT ON (s.id) s.id AS set_id, i.name, i.body, i.width, i.height
+    FROM icon_sets s
+    JOIN icons i ON i.set_id = s.id AND i.name = ANY (s.sample_icons) AND NOT i.hidden
+    WHERE s.id IN (${sql.join(
+      setIds.map((id) => sql`${id}`),
+      sql`, `,
+    )})
+    ORDER BY s.id, array_position(s.sample_icons, i.name)`);
+  return new Map(
+    rows.map((r) => [r.set_id, { name: r.name, body: r.body, width: r.width, height: r.height }]),
+  );
 }
 
 const iconColumns = {
@@ -83,7 +116,10 @@ export class DrizzleIconRepository implements IconRepository {
 
     return {
       ...row.icon,
-      setInfo: toSetSummary(row.setRow),
+      setInfo: toSetSummary(
+        row.setRow,
+        (await loadPreviews(this.db, [row.setRow.id])).get(row.setRow.id) ?? null,
+      ),
       synonyms: synonyms.map((s) => s.label),
       categories: cats,
     };
@@ -114,12 +150,17 @@ export class DrizzleIconRepository implements IconRepository {
       .from(iconSets)
       .where(and(...where))
       .orderBy(asc(iconSets.name));
-    return rows.map(toSetSummary);
+    const previews = await loadPreviews(
+      this.db,
+      rows.map((r) => r.id),
+    );
+    return rows.map((r) => toSetSummary(r, previews.get(r.id) ?? null));
   }
 
   async getSet(prefix: string): Promise<SetSummary | null> {
     const [row] = await this.db.select().from(iconSets).where(eq(iconSets.prefix, prefix));
-    return row ? toSetSummary(row) : null;
+    if (!row) return null;
+    return toSetSummary(row, (await loadPreviews(this.db, [row.id])).get(row.id) ?? null);
   }
 
   async listSetIcons(

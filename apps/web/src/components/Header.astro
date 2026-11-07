@@ -1,5 +1,7 @@
 ---
+import Logo from './Logo.astro';
 import SearchForm from './SearchForm.astro';
+import UiIcon from './UiIcon.astro';
 
 interface Props {
   query?: string;
@@ -11,36 +13,44 @@ const nav = [
   { href: '/categories', label: 'Categories' },
   { href: '/licenses', label: 'Licenses' },
   { href: '/collection', label: 'Collection' },
+  { href: '/about', label: 'About' },
+  { href: 'https://github.com/hareeshagunasekara/iconnook', label: 'Open source' },
 ];
 ---
 
-<header class="sticky top-0 z-40 border-b border-[var(--color-surface-2)] bg-[var(--color-bg)]/95 backdrop-blur">
-  <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-    <a
-      href="/"
-      class="flex min-h-11 items-center gap-2 text-lg font-bold"
-      aria-label="IconNook home"
-    >
-      <img src="/favicon.svg" alt="" width="28" height="28" />
-      <span>IconNook</span>
+<header class="sticky top-0 z-40 border-b border-ink/10 bg-cream/95 backdrop-blur">
+  <div class="wrap flex flex-wrap items-center gap-x-5 gap-y-3 py-3">
+    <a href="/" class="flex min-h-11 items-center" aria-label="IconNook home">
+      <Logo />
     </a>
-    <div class="order-3 w-full sm:order-none sm:w-auto sm:flex-1">
+    <div class="order-last w-full lg:order-none lg:w-auto lg:max-w-md lg:flex-1">
       <SearchForm query={query} id="site-search" compact landmark="Site search" />
     </div>
-    <nav aria-label="Main" class="ml-auto">
-      <ul class="flex flex-wrap justify-end gap-x-1">
+    <button
+      type="button"
+      class="menu-button ml-auto inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-button)] border-2 border-ink bg-surface px-3 font-semibold xl:hidden"
+      aria-expanded="false"
+      aria-controls="main-nav"
+      data-menu-button
+    >
+      <UiIcon name="menu" class="icon-closed size-5" />
+      <UiIcon name="x" class="icon-open size-5" />
+      Menu
+    </button>
+    <nav id="main-nav" aria-label="Main" class="w-full xl:ml-auto xl:w-auto" data-menu>
+      <ul class="flex flex-col xl:flex-row xl:items-center xl:gap-x-1">
         {nav.map((item) => (
-          <li>
+          <li class="max-xl:border-t max-xl:border-ink/10">
             <a
               href={item.href}
-              class="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--color-surface)] sm:px-3"
+              class="nav-link inline-flex min-h-11 w-full items-center rounded-lg px-1 text-[0.9375rem] font-medium xl:w-auto xl:px-2.5"
               aria-current={path.startsWith(item.href) ? 'page' : undefined}
             >
               {item.label}
               {item.href === '/collection' && (
                 <span
                   data-collection-count
-                  class="ml-1 hidden rounded-full bg-[var(--color-accent)] px-1.5 text-xs text-[var(--color-accent-contrast)]"
+                  class="ml-1.5 hidden rounded-full bg-accent px-1.5 text-xs leading-5 text-accent-contrast"
                 />
               )}
             </a>
@@ -49,12 +59,38 @@ const nav = [
       </ul>
     </nav>
   </div>
+  <!-- Without JavaScript the menu can't toggle, so it's simply always shown. -->
+  <noscript>
+    <style is:inline>
+      [data-menu-button] {
+        display: none !important;
+      }
+      [data-menu] {
+        display: block !important;
+      }
+    </style>
+  </noscript>
 </header>
 
 <style>
-  [aria-current='page'] {
+  @media (width < 80rem) {
+    [data-menu]:not([data-open]) {
+      display: none;
+    }
+  }
+  .menu-button[aria-expanded='true'] :global(.icon-closed),
+  .menu-button[aria-expanded='false'] :global(.icon-open) {
+    display: none;
+  }
+  .nav-link:hover {
     text-decoration: underline;
-    text-underline-offset: 6px;
     text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+  .nav-link[aria-current='page'] {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
   }
 </style>

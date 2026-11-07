@@ -1,8 +1,9 @@
 import { defineMiddleware } from 'astro:middleware';
 
 /**
- * Security headers a CSP <meta> can't express (docs/standards/security.md), plus a default HTML
- * cache policy (docs/standards/performance.md). Pages may set their own Cache-Control.
+ * Security headers a CSP <meta> can't express (docs/standards/security.md), a default HTML cache
+ * policy and gzip for rendered pages (docs/standards/performance.md). Pages may set their own
+ * Cache-Control.
  */
 const HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
@@ -15,7 +16,32 @@ const HEADERS: Record<string, string> = {
     : {}),
 };
 
-export const onRequest = defineMiddleware(async (_context, next) => {
+const COMPRESSIBLE = /^(text\/|application\/(xml|json))/;
+
+/**
+ * Long listings (e.g. /sets) are ~10× smaller gzipped. The CDN would compress too, but compressing
+ * at the origin also shrinks origin → CDN traffic. Pages hold no secrets, so BREACH doesn't apply.
+ */
+function gzip(request: Request, response: Response): Response {
+  if (
+    !response.body ||
+    response.headers.has('Content-Encoding') ||
+    !COMPRESSIBLE.test(response.headers.get('content-type') ?? '') ||
+    !/\bgzip\b/.test(request.headers.get('accept-encoding') ?? '')
+  )
+    return response;
+  const headers = new Headers(response.headers);
+  headers.set('Content-Encoding', 'gzip');
+  headers.append('Vary', 'Accept-Encoding');
+  headers.delete('Content-Length');
+  return new Response(response.body.pipeThrough(new CompressionStream('gzip')), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+export const onRequest = defineMiddleware(async (context, next) => {
   const response = await next();
   for (const [name, value] of Object.entries(HEADERS)) {
     if (!response.headers.has(name)) response.headers.set(name, value);
@@ -39,5 +65,5 @@ export const onRequest = defineMiddleware(async (_context, next) => {
       'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
     );
   }
-  return response;
+  return gzip(context.request, response);
 });

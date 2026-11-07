@@ -108,6 +108,19 @@ test('keyboard only: "/" focuses search, arrows move through the grid, Enter ope
   await expect(page).toHaveURL(new RegExp(`/icons/${SET}/circle$`));
 });
 
+test('set cards preview a real icon from each set and link to it', async ({ page }) => {
+  await page.goto('/sets');
+  const card = page.locator(`a[href="/sets/${SET}"]`);
+  await expect(card).toContainText('No attribution needed');
+  // The set's sample icon, as a lazy image of its cacheable SVG URL.
+  await expect(card.locator('img')).toHaveAttribute(
+    'src',
+    /\/v1\/icons\/iconnook-fixtures\/plus\.svg$/,
+  );
+  await card.click();
+  await expect(page).toHaveURL(new RegExp(`/sets/${SET}$`));
+});
+
 test('no results suggests next steps instead of a dead end', async ({ page }) => {
   await page.goto('/search?q=zzqxqzzq&type=flags');
   await expect(page.getByRole('status')).toHaveText('No icons found.');

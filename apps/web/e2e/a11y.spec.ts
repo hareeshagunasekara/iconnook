@@ -12,6 +12,7 @@ const PAGES = [
   '/categories',
   '/icons/iconnook-fixtures/circle',
   '/licenses',
+  '/about',
   '/collection',
   '/does-not-exist',
 ];

@@ -1,0 +1,77 @@
+---
+import Doodle from '../Doodle.astro';
+import Illustration from '../Illustration.astro';
+import SearchForm from '../SearchForm.astro';
+import FeatureHighlights from './FeatureHighlights.astro';
+
+interface Props {
+  totalIcons: number;
+  setCount: number;
+}
+const { totalIcons, setCount } = Astro.props;
+
+const POPULAR_SEARCHES = ['home', 'arrow', 'user', 'settings', 'heart', 'search', 'mail', 'star'];
+const fmt = new Intl.NumberFormat('en');
+---
+
+<section class="grid items-center gap-x-12 gap-y-10 pt-6 sm:pt-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:pt-12">
+  <div class="hero-text">
+    <h1 class="relative text-ink">
+      <Doodle kind="burst" class="absolute -top-7 -left-3 size-9 -rotate-12 sm:-left-6" />
+      <span class="relative inline-block">
+        Free,
+        <Doodle
+          kind="swoosh"
+          color="pink"
+          class="absolute -bottom-[0.14em] -left-[0.2em] h-[0.2em] w-[118%]"
+        />
+      </span>{' '}
+      <span class="whitespace-nowrap">open-source</span> <br class="max-sm:hidden" />
+      SVG icons
+    </h1>
+    <p class="mt-5 max-w-[34rem] text-lg text-pretty sm:text-xl">
+      {totalIcons > 0
+        ? `${fmt.format(totalIcons)} icons from ${String(setCount)} sets`
+        : 'Hundreds of thousands of icons'}
+    </p>
+    <div class="mt-7 max-w-[34rem]">
+      <SearchForm id="home-search" />
+    </div>
+    <p class="mt-3 max-w-[34rem] text-sm">
+      <span class="text-text-muted">Popular:</span>{' '}
+      {POPULAR_SEARCHES.map((q, i) => (
+        <>
+          {i > 0 && <span aria-hidden="true"> · </span>}
+          <a class="link" href={`/search?q=${encodeURIComponent(q)}`}>
+            {q}
+          </a>
+        </>
+      ))}
+    </p>
+    <div class="mt-8">
+      <FeatureHighlights />
+    </div>
+  </div>
+  <div class="mx-auto w-full max-w-[38rem] lg:max-w-none">
+    <Illustration
+      name="iconnook-hero-illustration"
+      sizes="(min-width: 80rem) 560px, (min-width: 64rem) 45vw, (min-width: 38rem) 608px, 100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="h-auto w-full"
+    />
+  </div>
+</section>
+
+<style>
+  /* Headline scales with its column, so "Free, open-source" stays on one line beside the art. */
+  .hero-text {
+    container-type: inline-size;
+  }
+  h1 {
+    font-size: clamp(2.5rem, 11.2cqi, 4.75rem);
+    font-weight: 800;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+  }
+</style>

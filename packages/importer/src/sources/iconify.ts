@@ -47,6 +47,7 @@ export function toSourceSet(prefix: string, info: IconifyInfo): SourceSet {
     isColor: info.palette ?? false,
     gridSize: typeof info.height === 'number' ? info.height : null,
     version: info.version ?? null,
+    samples: info.samples ?? [],
   };
 }
 
@@ -95,7 +96,18 @@ export function splitIconifySet(data: IconifyJSON, set: SourceSet): LoadedSet {
     if (members.length > 0) categories.set(label, members);
   }
 
-  return { set, icons, synonyms, categories };
+  // Keep samples that exist as imported icons; a plain-alias sample points at its parent icon.
+  const samples = [
+    ...new Set(
+      set.samples.flatMap((name) => {
+        if (visible.has(name)) return [name];
+        const parent = data.aliases?.[name]?.parent;
+        return parent && visible.has(parent) ? [parent] : [];
+      }),
+    ),
+  ];
+
+  return { set: { ...set, samples }, icons, synonyms, categories };
 }
 
 export const iconifySource: IconSource = {

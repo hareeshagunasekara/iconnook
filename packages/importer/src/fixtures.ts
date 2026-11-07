@@ -15,6 +15,8 @@ export function fixtureIconifySet(overrides: Partial<IconifyJSON> = {}): Iconify
       height: 24,
       category: 'UI 24px',
       palette: false,
+      // alias → parent, duplicate, hidden and missing samples are all exercised
+      samples: ['house', 'arrow-up', 'home', 'legacy', 'does-not-exist'],
     },
     width: 24,
     height: 24,

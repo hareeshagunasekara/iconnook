@@ -11,14 +11,16 @@ const meaning = license.attributionRequired
     ? 'Credit + share-alike'
     : 'Credit required'
   : 'No attribution needed';
-const color = { A: 'var(--color-tier-a)', B: 'var(--color-tier-b)', C: 'var(--color-tier-c)' }[
-  license.tier
-];
+const fill = {
+  A: 'var(--color-green-pale)',
+  B: 'var(--color-mustard-pale)',
+  C: 'var(--color-pink-pale)',
+}[license.tier];
 ---
 
 <span
-  class="inline-flex w-fit max-w-full flex-wrap items-center gap-x-1.5 self-start rounded-full border px-2.5 py-0.5 text-xs font-medium"
-  style={`border-color: ${color}; color: ${color}`}
+  class="inline-flex w-fit max-w-full flex-wrap items-center gap-x-1.5 self-start rounded-full border-[1.5px] border-ink px-2.5 py-0.5 text-xs font-semibold text-ink"
+  style={`background: ${fill}`}
 >
   <span>{license.spdx}</span>
   <span aria-hidden="true">·</span>

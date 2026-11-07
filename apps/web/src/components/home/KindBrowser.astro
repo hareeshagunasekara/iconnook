@@ -1,0 +1,45 @@
+---
+import { SET_TYPES } from '../../lib/api';
+import Doodle from '../Doodle.astro';
+import Illustration from '../Illustration.astro';
+import UiIcon from '../UiIcon.astro';
+
+// The archive (retired sets) is reachable from the sets page, not promoted here.
+const KINDS = SET_TYPES.filter((t) => t.value !== 'archive');
+---
+
+<section
+  aria-labelledby="browse"
+  class="grid items-center gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,0.55fr)]"
+>
+  <div>
+    <h2 id="browse" class="section-title">
+      <span class="relative inline-block pr-2">
+        Browse by kind
+        <Doodle kind="burst" color="mustard" class="absolute -top-5 -right-8 size-9 rotate-12" />
+      </span>
+    </h2>
+    <ul class="mt-8 flex flex-wrap gap-3">
+      {KINDS.map((t) => (
+        <li>
+          <a
+            href={`/sets?type=${t.value}`}
+            class="pill min-h-12 px-5 text-lg"
+            style={`--pill: var(--color-${t.color}-soft)`}
+          >
+            <UiIcon name={t.icon} class="size-6" />
+            {t.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <div class="mx-auto w-full max-w-[26rem] lg:max-w-[30rem]">
+    <Illustration
+      name="iconnook-reader-illustration"
+      sizes="(min-width: 64rem) 480px, (min-width: 26rem) 416px, 100vw"
+      loading="lazy"
+      class="h-auto w-full"
+    />
+  </div>
+</section>

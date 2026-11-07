@@ -127,6 +127,20 @@ describe('against real Postgres, Meilisearch and Valkey', () => {
     await contract('/v1/categories', Category.array());
   });
 
+  it('previews each set with its first existing sample icon (a real icon from the set)', async () => {
+    await t.raw`UPDATE icon_sets SET sample_icons = '{}' WHERE prefix = 'iconnook-fixtures'`;
+    const before = await contract('/v1/sets/iconnook-fixtures', IconSet);
+    expect(before.preview).toBeNull(); // no samples recorded
+
+    await t.raw`UPDATE icon_sets SET sample_icons = ARRAY['not-in-set', 'plus', 'circle']
+                WHERE prefix = 'iconnook-fixtures'`;
+    const sets = await contract('/v1/sets', IconSet.array());
+    expect(sets[0]?.preview).toMatchObject({ name: 'plus', width: 24, height: 24 });
+    expect(sets[0]?.preview?.body).toContain('<path');
+    const icon = await contract('/v1/icons/iconnook-fixtures/circle', IconDetail);
+    expect(icon.setInfo.preview?.name).toBe('plus');
+  });
+
   it('counts only visible icons in categories', async () => {
     await t.raw`INSERT INTO categories (slug, label) VALUES ('shapes', 'Shapes')`;
     await t.raw`INSERT INTO icons (set_id, name, body, width, height, hidden)

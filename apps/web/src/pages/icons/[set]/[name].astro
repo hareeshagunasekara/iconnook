@@ -46,7 +46,7 @@ const similarIcons = (similar?.items ?? [])
   .filter((i) => !(i.set === set && i.name === name))
   .slice(0, 12);
 const hasStroke = Boolean(icon?.body.includes('stroke-width'));
-const title = icon ? `${label(icon.name)} icon — ${icon.setInfo.name}` : 'Icon';
+const title = icon ? `${label(icon.name)} icon from ${icon.setInfo.name}` : 'Icon';
 ---
 
 <Layout
@@ -97,7 +97,7 @@ const title = icon ? `${label(icon.name)} icon — ${icon.setInfo.name}` : 'Icon
             License
           </h2>
           <p class="mt-2">
-            <strong>{icon.setInfo.license.spdx}</strong> — from{' '}
+            <strong>{icon.setInfo.license.spdx}</strong>, from{' '}
             <a class="link" href={`/sets/${icon.set}`}>
               {icon.setInfo.name}
             </a>
@@ -116,8 +116,8 @@ const title = icon ? `${label(icon.name)} icon — ${icon.setInfo.name}` : 'Icon
                 </p>
               ) : (
                 <p class="text-[var(--color-text-muted)]">
-                  Free for personal and commercial use. No attribution needed — a credit is always
-                  appreciated:
+                  Free for personal and commercial use. No attribution needed, but a credit is
+                  always appreciated:
                 </p>
               )}
               <p class="mt-2 rounded-lg bg-[var(--color-surface)] p-3 font-mono text-xs [overflow-wrap:anywhere]">

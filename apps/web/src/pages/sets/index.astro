@@ -1,6 +1,7 @@
 ---
 import ErrorState from '../../components/ErrorState.astro';
-import LicenseBadge from '../../components/LicenseBadge.astro';
+import IconSetCard from '../../components/IconSetCard.astro';
+import UiIcon from '../../components/UiIcon.astro';
 import Layout from '../../layouts/Layout.astro';
 import { api, SET_TYPES, typeLabel, type IconSet } from '../../lib/api';
 
@@ -15,22 +16,17 @@ const groups = SET_TYPES.map((t) => ({
   ...t,
   sets: (sets ?? []).filter((s) => s.type === t.value).sort((a, b) => b.total - a.total),
 })).filter((g) => g.sets.length > 0);
-const fmt = new Intl.NumberFormat('en');
 ---
 
 <Layout
-  title={type ? `${typeLabel(type)} — icon sets` : 'Icon sets'}
+  title={type ? `${typeLabel(type)}: icon sets` : 'Icon sets'}
   description="Every open-source icon set on IconNook, with its license and number of icons."
 >
-  <h1 class="text-3xl font-bold">{type ? typeLabel(type) : 'All icon sets'}</h1>
+  <h1 class="section-title">{type ? typeLabel(type) : 'All icon sets'}</h1>
   <nav aria-label="Filter by kind" class="mt-4">
     <ul class="flex flex-wrap gap-2">
       <li>
-        <a
-          href="/sets"
-          aria-current={!type ? 'page' : undefined}
-          class="inline-flex min-h-11 items-center rounded-full border border-[var(--color-border)] px-4"
-        >
+        <a href="/sets" aria-current={!type ? 'page' : undefined} class="pill">
           All
         </a>
       </li>
@@ -39,8 +35,10 @@ const fmt = new Intl.NumberFormat('en');
           <a
             href={`/sets?type=${t.value}`}
             aria-current={t.value === type ? 'page' : undefined}
-            class="inline-flex min-h-11 items-center rounded-full border border-[var(--color-border)] px-4"
+            class="pill"
+            style={`--pill: var(--color-${t.color}-soft)`}
           >
+            <UiIcon name={t.icon} class="size-5" />
             {t.label}
           </a>
         </li>
@@ -56,22 +54,16 @@ const fmt = new Intl.NumberFormat('en');
 
   {groups.map((group) => (
     <section aria-labelledby={`g-${group.value}`} class="mt-10">
-      <h2 id={`g-${group.value}`} class="text-xl font-semibold">
+      <h2 id={`g-${group.value}`} class="text-2xl font-bold">
         {group.label}{' '}
         <span class="text-base font-normal text-[var(--color-text-muted)]">
           ({group.sets.length})
         </span>
       </h2>
-      <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {group.sets.map((set) => (
+      <ul class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        {group.sets.map((set, i) => (
           <li>
-            <a href={`/sets/${set.prefix}`} class="set-card">
-              <span class="font-semibold">{set.name}</span>
-              <span class="text-sm text-[var(--color-text-muted)]">
-                {fmt.format(set.total)} icons{set.author ? ` · by ${set.author.name}` : ''}
-              </span>
-              <LicenseBadge license={set.license} />
-            </a>
+            <IconSetCard set={set} index={i} lazy />
           </li>
         ))}
       </ul>
@@ -80,8 +72,8 @@ const fmt = new Intl.NumberFormat('en');
 </Layout>
 
 <style>
-  [aria-current='page'] {
-    background: var(--color-text);
-    color: var(--color-bg);
+  .pill[aria-current='page'] {
+    background: var(--color-ink);
+    color: var(--color-cream);
   }
 </style>
