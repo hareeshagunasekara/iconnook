@@ -73,7 +73,10 @@ export interface IconRepository {
   listSets(filter: { type?: string; tier?: string }): Promise<SetSummary[]>;
   getSet(prefix: string): Promise<SetSummary | null>;
   /** Icons of a set ordered by name; `cursor` is the last name of the previous page. */
-  listSetIcons(prefix: string, page: { cursor?: string; limit: number }): Promise<Page<IconRecord>>;
+  listSetIcons(
+    prefix: string,
+    page: { cursor?: string; offset?: number; limit: number },
+  ): Promise<Page<IconRecord>>;
   listCategories(): Promise<CategorySummary[]>;
   /** Icons by "set:name", in request order; unknown refs are skipped. */
   getIconsByRefs(refs: readonly string[]): Promise<IconListItem[]>;

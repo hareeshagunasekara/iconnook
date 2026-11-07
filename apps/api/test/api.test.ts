@@ -121,6 +121,8 @@ describe('against real Postgres, Meilisearch and Valkey', () => {
     const page = await contract('/v1/sets/iconnook-fixtures/icons?limit=2', SetIconsPage);
     expect(page.items.map((i) => i.name)).toEqual(['circle', 'plus']);
     expect(page.nextCursor).toBe('plus');
+    const second = await contract('/v1/sets/iconnook-fixtures/icons?limit=2&page=2', SetIconsPage);
+    expect(second.items.map((i) => i.name)).toEqual(['square']);
 
     const icon = await contract('/v1/icons/iconnook-fixtures/plus', IconDetail);
     expect(icon.setInfo.prefix).toBe('iconnook-fixtures');

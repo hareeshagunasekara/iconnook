@@ -247,7 +247,7 @@ export function registerV1(app: OpenAPIHono, ctx: RouteContext): void {
       method: 'get',
       path: '/v1/sets/{set}/icons',
       tags: ['Sets'],
-      summary: 'Icons in a set (cursor pagination, ordered by name)',
+      summary: 'Icons in a set (cursor or numbered pages, ordered by name)',
       request: { params: SetParams, query: SetIconsQuery },
       responses: {
         200: json(SetIconsPage, 'A page of icons'),
@@ -257,9 +257,13 @@ export function registerV1(app: OpenAPIHono, ctx: RouteContext): void {
     }),
     async (c) => {
       const { set } = c.req.valid('param');
-      const { cursor, limit } = c.req.valid('query');
+      const { cursor, page: pageNumber, limit } = c.req.valid('query');
       if (!(await deps.icons.getSet(set))) throw notFound(`Icon set "${set}" does not exist`);
-      const page = await deps.icons.listSetIcons(set, { limit, ...(cursor ? { cursor } : {}) });
+      const page = await deps.icons.listSetIcons(set, {
+        limit,
+        ...(cursor ? { cursor } : {}),
+        ...(pageNumber ? { offset: (pageNumber - 1) * limit } : {}),
+      });
       setCache(c, 'metadata');
       return c.json({ items: page.items.map(summary), nextCursor: page.nextCursor }, 200);
     },

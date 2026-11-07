@@ -90,8 +90,10 @@ export function fakeDeps(
       ),
     getSet: (prefix) => Promise.resolve(sets().find((s) => s.prefix === prefix) ?? null),
     listSetIcons: (prefix, page) => {
-      const all = data.filter((i) => i.set === prefix && (!page.cursor || i.name > page.cursor));
-      all.sort((a, b) => a.name.localeCompare(b.name));
+      const all = data
+        .filter((i) => i.set === prefix && (!page.cursor || i.name > page.cursor))
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .slice(page.offset ?? 0);
       const items = all.slice(0, page.limit);
       return Promise.resolve({
         items,
