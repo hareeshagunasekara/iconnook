@@ -39,7 +39,16 @@ const TYPE_BY_CATEGORY: Readonly<Record<string, SetType>> = {
 /** Google's Material family (the animated Material Line Icons are listed under Animated). */
 const MATERIAL = new Set(['material-symbols', 'material-symbols-light', 'ic', 'mdi', 'mdi-light']);
 
-const PIXEL = new Set(['pixelarticons', 'dinkie-icons', 'memory']);
+const PIXEL = new Set([
+  'pixelarticons',
+  'dinkie-icons',
+  'memory',
+  'pixel', // HackerNoon
+  'streamline-pixel',
+]);
+
+/** Sets drawn in a cute / kawaii style (the with icons styles are restyles of one library). */
+const CUTE = new Set(['withicons-kawaii', 'withicons-anime', 'withicons-coquette']);
 
 /** Icons from a company's or organization's product design system. */
 const DESIGN_SYSTEMS = new Set([
@@ -111,6 +120,7 @@ const COLOR_OVERRIDES = new Set(['glyphs-poly']);
 export function setKindFor({ prefix, category, tags, total }: KindInput): SetType {
   if (category === 'Archive / Unmaintained') return 'archive';
   if (tags.includes('Contains Animations')) return 'animated';
+  if (CUTE.has(prefix)) return 'cute';
   if (!category || !INTERFACE_CATEGORIES.has(category))
     return (category ? TYPE_BY_CATEGORY[category] : undefined) ?? 'themed';
 

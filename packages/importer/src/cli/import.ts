@@ -6,8 +6,10 @@ import { createDb } from '@iconnook/db';
 import { Meilisearch } from 'meilisearch';
 
 import { loadImporterConfig } from '../config.js';
-import { importSets } from '../run.js';
+import { importSets, type SetReport } from '../run.js';
 import { rebuildSearchIndex } from '@iconnook/search';
+import { APPROVED_SETS } from '../approved.js';
+import { externalSource } from '../sources/external.js';
 import { iconifySource } from '../sources/iconify.js';
 
 const { values } = parseArgs({
@@ -30,13 +32,17 @@ const handle = createDb(config.DATABASE_URL, { max: 2 });
 const started = Date.now();
 
 try {
-  const reports = await importSets(handle.db, iconifySource, {
+  const options = {
     tiers,
+    approved: APPROVED_SETS,
     ...(values.sets ? { prefixes: values.sets.split(',').map((s) => s.trim()) } : {}),
-    log: (line) => {
+    log: (line: string) => {
       console.log(line);
     },
-  });
+  };
+  const reports: SetReport[] = [];
+  for (const source of [iconifySource, externalSource])
+    reports.push(...(await importSets(handle.db, source, options)));
 
   const sum = (key: 'icons' | 'inserted' | 'updated' | 'deleted' | 'unchanged') =>
     reports.reduce((n, r) => n + r[key], 0);

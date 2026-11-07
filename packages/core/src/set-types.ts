@@ -11,6 +11,7 @@ export const SET_TYPES = [
   'frameworks',
   'pixel',
   'animated',
+  'cute',
   'color',
   'developer',
   'logos',

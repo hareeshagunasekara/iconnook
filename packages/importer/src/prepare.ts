@@ -17,6 +17,8 @@ export interface PrepareResult {
 }
 
 const NAME_FORMAT = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+/** Path data holds only commands, numbers and separators; anything else is a broken upstream file. */
+const BAD_PATH_DATA = /\sd="[^"]*[^"MmZzLlHhVvCcSsQqTtAa0-9.,eE+\s-]/;
 
 /** Runs every icon through the sanitizer. Anything that fails is rejected, never stored (fail closed). */
 export function prepareIcons(icons: readonly SourceIcon[]): PrepareResult {
@@ -37,6 +39,10 @@ export function prepareIcons(icons: readonly SourceIcon[]): PrepareResult {
     const sanitized = sanitizeSvg(svg);
     if (!sanitized.ok) {
       result.rejected.push({ name: icon.name, reason: sanitized.reason });
+      continue;
+    }
+    if (BAD_PATH_DATA.test(sanitized.body)) {
+      result.rejected.push({ name: icon.name, reason: 'malformed path data' });
       continue;
     }
     if (sanitized.removed > 0) result.modified.push(icon.name);

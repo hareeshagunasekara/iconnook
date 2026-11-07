@@ -312,10 +312,31 @@ describe('JSON endpoints', () => {
     expect(body['html']).not.toContain('<script>');
     expect(body['html']).not.toContain('javascript:');
     expect(body['html']).toContain('&lt;script&gt;');
-    // CC-BY-SA: the share-alike notice must be in every pasteable form.
+    // CC BY-SA: the change note and the share-alike notice must be in every pasteable form.
     for (const format of ['plain', 'html', 'markdown']) {
+      expect(body[format]).toContain('Modified from the original');
       expect(body[format]).toContain('same license');
     }
+  });
+
+  it('puts the credit and license inside every SVG file', async () => {
+    const set = fakeSet({
+      name: 'Twemoji',
+      author: { name: 'Twitter -- and others', url: null },
+      license: {
+        spdx: 'CC-BY-4.0',
+        tier: 'B',
+        url: 'https://creativecommons.org/licenses/by/4.0/',
+        attributionRequired: true,
+      },
+    });
+    const { app } = setup({}, fakeDeps([fakeIcon({ setInfo: set })]));
+    const svg = await (await app.request('/v1/icons/tabler/arrow-left.svg')).text();
+    const comment = /^<!-- (.*) -->\n<svg /.exec(svg)?.[1];
+    expect(comment).toContain('"arrow-left" from Twemoji by Twitter - and others');
+    expect(comment).toContain('License: CC-BY-4.0 (https://creativecommons.org/licenses/by/4.0/)');
+    expect(comment).toContain('modified from the original');
+    expect(comment).not.toContain('--'); // would end the XML comment early
   });
 
   it('keeps Markdown links intact for URLs containing parentheses', async () => {

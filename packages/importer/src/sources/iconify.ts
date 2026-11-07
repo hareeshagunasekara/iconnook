@@ -3,6 +3,7 @@ import type { IconifyInfo, IconifyJSON } from '@iconify/types';
 import { getIconData, iconToSVG } from '@iconify/utils';
 import { licenseTier } from '@iconnook/core';
 
+import { CREDITS } from '../approved.js';
 import { setKindFor } from '../set-kinds.js';
 import type { IconSource, LoadedSet, SourceIcon, SourceSet } from '../types.js';
 
@@ -13,8 +14,8 @@ export function toSourceSet(prefix: string, info: IconifyInfo): SourceSet {
     prefix,
     name: info.name,
     total: info.total ?? 0,
-    authorName: info.author.name || null,
-    authorUrl: info.author.url ?? null,
+    authorName: CREDITS[prefix]?.authorName ?? (info.author.name || null),
+    authorUrl: CREDITS[prefix]?.authorUrl ?? info.author.url ?? null,
     licenseSpdx: info.license.spdx ?? info.license.title,
     licenseTitle: info.license.title,
     licenseUrl: info.license.url ?? null,
