@@ -1,0 +1,21 @@
+---
+interface Props {
+  title?: string;
+}
+const { title = 'Something went wrong on our side' } = Astro.props;
+---
+
+<section class="rounded-xl bg-[var(--color-surface)] p-8 text-center" role="alert">
+  <h2 class="text-xl font-semibold">{title}</h2>
+  <p class="mt-2 text-[var(--color-text-muted)]">
+    This is usually temporary. Please try again in a few seconds.
+  </p>
+  <p class="mt-4 flex justify-center gap-4">
+    <a class="link" href={Astro.url.pathname + Astro.url.search}>
+      Try again
+    </a>
+    <a class="link" href="/sets">
+      Browse icon sets
+    </a>
+  </p>
+</section>

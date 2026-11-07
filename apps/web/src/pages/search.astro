@@ -1,0 +1,200 @@
+---
+import ErrorState from '../components/ErrorState.astro';
+import IconGrid from '../components/IconGrid.astro';
+import Pagination from '../components/Pagination.astro';
+import Layout from '../layouts/Layout.astro';
+import { api, ApiError, SET_TYPES, type SearchResult } from '../lib/api';
+
+const PER_PAGE = 96;
+const params = Astro.url.searchParams;
+const q = (params.get('q') ?? '').trim().slice(0, 100);
+const type = SET_TYPES.some((t) => t.value === params.get('type'))
+  ? (params.get('type') ?? undefined)
+  : undefined;
+const tier = ['A', 'B', 'C'].includes(params.get('tier') ?? '')
+  ? (params.get('tier') ?? undefined)
+  : undefined;
+const color = ['true', 'false'].includes(params.get('color') ?? '')
+  ? (params.get('color') ?? undefined)
+  : undefined;
+const set = /^[a-z0-9]+(-[a-z0-9]+)*$/.test(params.get('set') ?? '')
+  ? (params.get('set') ?? undefined)
+  : undefined;
+const page = Math.min(50, Math.max(1, Number.parseInt(params.get('page') ?? '1', 10) || 1));
+
+let result: SearchResult | null = null;
+let failed = false;
+if (q) {
+  try {
+    result = await api<SearchResult>('/v1/search', {
+      q,
+      type,
+      tier,
+      color,
+      set,
+      page,
+      limit: PER_PAGE,
+    });
+  } catch (error) {
+    failed = true;
+    Astro.response.status = error instanceof ApiError && error.status < 500 ? 400 : 503;
+  }
+}
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, max-age=60, s-maxage=300, stale-while-revalidate=600',
+);
+
+const pageUrl = (p: number) => {
+  const next = new URLSearchParams(params);
+  next.set('page', String(p));
+  return `/search?${next.toString()}`;
+};
+const pages = result ? Math.ceil(Math.min(result.total, 5_000) / PER_PAGE) : 0;
+const hasFilters = Boolean(type || tier || color || set);
+const fmt = new Intl.NumberFormat('en');
+const SUGGESTIONS = ['home', 'arrow', 'user', 'settings', 'heart', 'mail'];
+---
+
+<Layout
+  title={q ? `“${q}” icons` : 'Search'}
+  description={
+    q
+      ? `Free ${q} icons in SVG and PNG — clearly licensed.`
+      : 'Search hundreds of thousands of free icons.'
+  }
+  index={false}
+  query={q}
+>
+  <h1 class="text-3xl font-bold">{q ? `Icons for “${q}”` : 'Search icons'}</h1>
+
+  <form
+    method="get"
+    action="/search"
+    class="mt-4 flex flex-wrap items-end gap-3"
+    data-autosubmit
+    aria-label="Filters"
+  >
+    <input type="hidden" name="q" value={q} />
+    {set && <input type="hidden" name="set" value={set} />}
+    <label class="flex flex-col text-sm">
+      Kind
+      <select
+        name="type"
+        class="min-h-11 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-2"
+      >
+        <option value="">All kinds</option>
+        {SET_TYPES.map((t) => (
+          <option value={t.value} selected={t.value === type}>
+            {t.label}
+          </option>
+        ))}
+      </select>
+    </label>
+    <label class="flex flex-col text-sm">
+      License
+      <select
+        name="tier"
+        class="min-h-11 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-2"
+      >
+        <option value="">Any license</option>
+        <option value="A" selected={tier === 'A'}>
+          No attribution needed
+        </option>
+        <option value="B" selected={tier === 'B'}>
+          Credit required
+        </option>
+        <option value="C" selected={tier === 'C'}>
+          Credit + share-alike
+        </option>
+      </select>
+    </label>
+    <label class="flex flex-col text-sm">
+      Color
+      <select
+        name="color"
+        class="min-h-11 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-2"
+      >
+        <option value="">Any</option>
+        <option value="false" selected={color === 'false'}>
+          Single color (recolorable)
+        </option>
+        <option value="true" selected={color === 'true'}>
+          Multicolor
+        </option>
+      </select>
+    </label>
+    <button type="submit" class="min-h-11 rounded-lg border border-[var(--color-border)] px-4">
+      Apply filters
+    </button>
+    {hasFilters && (
+      <a class="link min-h-11 content-center" href={`/search?q=${encodeURIComponent(q)}`}>
+        Clear filters
+      </a>
+    )}
+  </form>
+
+  {failed && (
+    <div class="mt-8">
+      <ErrorState title="Search is temporarily unavailable" />
+    </div>
+  )}
+
+  {result && (
+    <>
+      <p class="mt-6 text-[var(--color-text-muted)]" role="status">
+        {result.total === 0
+          ? 'No icons found.'
+          : `${fmt.format(result.total)} icons${set ? ` in ${set}` : ''}`}
+      </p>
+      {result.total > 0 ? (
+        <div class="mt-4">
+          <IconGrid icons={result.items} name={`Search results for ${q}`} showSet />
+          <Pagination
+            prev={page > 1 ? pageUrl(page - 1) : undefined}
+            next={page < pages ? pageUrl(page + 1) : undefined}
+            status={`Page ${String(page)} of ${String(Math.max(pages, 1))}`}
+          />
+        </div>
+      ) : (
+        <section class="mt-6 rounded-xl bg-[var(--color-surface)] p-6">
+          <h2 class="font-semibold">Try something else</h2>
+          <ul class="mt-2 list-disc pl-5 text-[var(--color-text-muted)]">
+            <li>Check the spelling, or use a simpler word (“house” instead of “houses”).</li>
+            {hasFilters && (
+              <li>
+                <a class="link" href={`/search?q=${encodeURIComponent(q)}`}>
+                  Search again without filters
+                </a>
+              </li>
+            )}
+            <li>
+              Popular:{' '}
+              {SUGGESTIONS.map((s, i) => (
+                <>
+                  {i > 0 && ', '}
+                  <a class="link" href={`/search?q=${s}`}>
+                    {s}
+                  </a>
+                </>
+              ))}
+            </li>
+            <li>
+              Or{' '}
+              <a class="link" href="/sets">
+                browse all icon sets
+              </a>
+              .
+            </li>
+          </ul>
+        </section>
+      )}
+    </>
+  )}
+
+  {!q && (
+    <p class="mt-6 text-[var(--color-text-muted)]">
+      Type a word above — for example “home”, “arrow” or “mail”.
+    </p>
+  )}
+</Layout>

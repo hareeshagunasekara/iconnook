@@ -1,0 +1,64 @@
+---
+import ErrorState from '../../components/ErrorState.astro';
+import IconGrid from '../../components/IconGrid.astro';
+import Pagination from '../../components/Pagination.astro';
+import Layout from '../../layouts/Layout.astro';
+import { api, type Category, type SearchResult } from '../../lib/api';
+
+const PER_PAGE = 96;
+const slug = Astro.params.slug ?? '';
+if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) return Astro.rewrite('/404');
+const page = Math.min(
+  50,
+  Math.max(1, Number.parseInt(Astro.url.searchParams.get('page') ?? '1', 10) || 1),
+);
+
+let category: Category | undefined;
+let result: SearchResult | null = null;
+let failed = false;
+try {
+  const [categories, found] = await Promise.all([
+    api<Category[]>('/v1/categories'),
+    api<SearchResult>('/v1/search', { category: slug, page, limit: PER_PAGE }),
+  ]);
+  category = categories?.find((c) => c.slug === slug);
+  result = found;
+} catch {
+  failed = true;
+  Astro.response.status = 503;
+}
+if (!failed && !category) return Astro.rewrite('/404');
+const pages = result ? Math.ceil(Math.min(result.total, 5_000) / PER_PAGE) : 0;
+const fmt = new Intl.NumberFormat('en');
+---
+
+<Layout
+  title={category ? `${category.label} icons` : 'Category'}
+  description={
+    category
+      ? `${fmt.format(category.total)} free ${category.label} icons in SVG and PNG.`
+      : 'Icon category.'
+  }
+>
+  {failed && <ErrorState title="This category is temporarily unavailable" />}
+  {category && result && (
+    <>
+      <nav aria-label="Breadcrumb" class="text-sm text-[var(--color-text-muted)]">
+        <a class="link" href="/categories">
+          Categories
+        </a>{' '}
+        › <span aria-current="page">{category.label}</span>
+      </nav>
+      <h1 class="mt-2 text-3xl font-bold">{category.label} icons</h1>
+      <p class="mt-1 text-[var(--color-text-muted)]">{fmt.format(category.total)} icons</p>
+      <div class="mt-6">
+        <IconGrid icons={result.items} name={`${category.label} icons`} showSet />
+        <Pagination
+          prev={page > 1 ? `/categories/${slug}?page=${String(page - 1)}` : undefined}
+          next={page < pages ? `/categories/${slug}?page=${String(page + 1)}` : undefined}
+          status={`Page ${String(page)} of ${String(Math.max(pages, 1))}`}
+        />
+      </div>
+    </>
+  )}
+</Layout>

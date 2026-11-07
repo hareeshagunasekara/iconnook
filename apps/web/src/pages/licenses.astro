@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Licenses & attribution"
+  description="How icon licenses work on IconNook: what you can do, when to give credit, and how to copy a ready-made credit line."
+>
+  <article class="max-w-3xl">
+    <h1 class="text-3xl font-bold">Licenses &amp; attribution</h1>
+    <p class="mt-3 text-lg text-[var(--color-text-muted)]">
+      Every icon on IconNook comes from an open-source set and keeps that set's license. The license
+      is shown on every icon page — no surprises.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-semibold">The three license groups</h2>
+    <dl class="mt-4 space-y-4">
+      <div class="rounded-xl bg-[var(--color-surface)] p-4">
+        <dt class="font-semibold">No attribution needed</dt>
+        <dd class="mt-1">
+          MIT, Apache-2.0, ISC, CC0, Unlicense, BSD, OFL and MPL. Use the icons in personal and
+          commercial projects without visible credit. (The license text stays with the original
+          set.)
+        </dd>
+      </div>
+      <div class="rounded-xl bg-[var(--color-surface)] p-4">
+        <dt class="font-semibold">Credit required</dt>
+        <dd class="mt-1">
+          Creative Commons Attribution (CC-BY). Free to use, but you must credit the author. Each
+          icon page gives you a ready-made credit line in plain text, HTML and Markdown.
+        </dd>
+      </div>
+      <div class="rounded-xl bg-[var(--color-surface)] p-4">
+        <dt class="font-semibold">Credit + share-alike</dt>
+        <dd class="mt-1">
+          CC-BY-SA. Like the previous group, and if you modify the icon, share your version under
+          the same license.
+        </dd>
+      </div>
+    </dl>
+    <p class="mt-4">Icons under copyleft (GPL) or non-commercial licenses are never included.</p>
+
+    <h2 class="mt-10 text-2xl font-semibold">Questions</h2>
+    <div class="mt-4 space-y-6">
+      <section>
+        <h3 class="font-semibold">Can I use these icons in a commercial product?</h3>
+        <p class="mt-1">
+          Yes — every license on IconNook allows commercial use. Follow the credit rule for its
+          group.
+        </p>
+      </section>
+      <section>
+        <h3 class="font-semibold">Can I change colors, sizes or shapes?</h3>
+        <p class="mt-1">
+          Yes. For share-alike icons, publish your modified version under the same license.
+        </p>
+      </section>
+      <section>
+        <h3 class="font-semibold">What about logos and brand icons?</h3>
+        <p class="mt-1">
+          The license covers the drawing, not the brand. Logos and brand names belong to their
+          owners — use them to refer to the brand, and follow the owner's brand guidelines.
+        </p>
+      </section>
+      <section>
+        <h3 class="font-semibold">Do I need an account or an API key?</h3>
+        <p class="mt-1">No. IconNook is free, with no sign-up and no payments.</p>
+      </section>
+      <section>
+        <h3 class="font-semibold">Something looks wrong?</h3>
+        <p class="mt-1">
+          If an icon is mislabeled or you're a rights holder with a concern,
+          <a class="link" href="https://github.com/hareeshagunasekara/iconnook/issues">
+            open an issue
+          </a>{' '}
+          and we'll look at it quickly.
+        </p>
+      </section>
+    </div>
+  </article>
+</Layout>
