@@ -1,4 +1,4 @@
-# 0003 — SeaweedFS for local object storage, PostgreSQL 18
+# 0003: SeaweedFS for local object storage, PostgreSQL 18
 
 - **Status:** Accepted (amends ADR 0001)
 - **Date:** 2026-11-07
@@ -14,9 +14,9 @@ ADR 0001 chose MinIO as the local S3-compatible store (production uses Cloudflar
 
 ## Alternatives considered
 
-- Garage — AGPL-3.0 and needs a config file before first start; fine for dev but more setup.
-- RustFS — closest to MinIO's UX but still alpha.
-- Building MinIO from source — unmaintained upstream; no security fixes.
+- Garage: AGPL-3.0 and needs a config file before first start; fine for dev but more setup.
+- RustFS: closest to MinIO's UX but still alpha.
+- Building MinIO from source: unmaintained upstream; no security fixes.
 
 ## Consequences
 

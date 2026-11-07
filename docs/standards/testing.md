@@ -32,7 +32,7 @@ Goal: confidence to deploy `main` any time. Tests are part of "done" (see workfl
 
 ## What to test where
 
-- **Sanitizer (security-critical, ≥ 95% branch coverage):** a corpus of known SVG XSS payloads (`<script>`, `onload=`, `javascript:` hrefs, `<foreignObject>`, `<use href="http://…">`, `@import` in `<style>`, entity bombs, huge files) — each must be neutralized or rejected. Add a test for every new bypass we learn about. Property-based tests (fast-check): sanitize(sanitize(x)) === sanitize(x); output never contains `on*` attributes or external refs.
+- **Sanitizer (security-critical, ≥ 95% branch coverage):** a corpus of known SVG XSS payloads (`<script>`, `onload=`, `javascript:` hrefs, `<foreignObject>`, `<use href="http://…">`, `@import` in `<style>`, entity bombs, huge files); each must be neutralized or rejected. Add a test for every new bypass we learn about. Property-based tests (fast-check): sanitize(sanitize(x)) === sanitize(x); output never contains `on*` attributes or external refs.
 - **Importer (≥ 90%):** a small fixture of 3–4 sets (one per tier + one tier X) → assert tier X is skipped, licenses stored, re-run is idempotent, hidden icons excluded, search index matches DB.
 - **API:** every route: happy path, validation failure (400 + Problem Details), not found (404), limits (oversized PNG → 400, rate limit → 429), cache headers present and correct.
 - **Web:** the islands' behavior and accessibility; Astro pages via E2E rather than unit tests.
@@ -45,9 +45,9 @@ Goal: confidence to deploy `main` any time. Tests are part of "done" (see workfl
 
 ## Rules
 
-- Test behavior through public interfaces, not private internals. Mock only at boundaries (network, clock, randomness) — prefer real Postgres over mocking the DB.
+- Test behavior through public interfaces, not private internals. Mock only at boundaries (network, clock, randomness): prefer real Postgres over mocking the DB.
 - Every bug fix includes a test that fails before the fix.
 - Arrange–Act–Assert; one behavior per test; descriptive names (`rejects SVG with javascript: href`).
-- **Flaky tests are bugs:** quarantine within a day, fix or delete within a week. No `sleep` — wait for conditions.
+- **Flaky tests are bugs:** quarantine within a day, fix or delete within a week. No `sleep`: wait for conditions.
 - Coverage is reported per package; thresholds enforced only for sanitizer and importer. Don't chase 100% elsewhere.
 - Keep PR CI under ~10 minutes: parallelize, cache, run full browser matrix nightly.

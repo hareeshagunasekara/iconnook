@@ -1,4 +1,4 @@
-# 0001 — Tech stack
+# 0001: Tech stack
 
 - **Status:** Accepted
 - **Date:** 2026-11-07
@@ -13,14 +13,14 @@ IconNook is a free icon library serving hundreds of thousands of mostly static, 
 - **Astro + Preact islands + Tailwind v4** for the web: static-first, near-zero client JS.
 - **Hono + Zod** for the API: small, fast, OpenAPI from schemas.
 - **PostgreSQL + Drizzle** as source of truth; **Meilisearch** for search (derived, rebuildable); **Valkey** for cache, rate limits and BullMQ queues.
-- **MinIO** locally (superseded by SeaweedFS — ADR 0003) / **Cloudflare R2** in production for files (no egress fees). **SVGO + DOMPurify** for SVG cleanup/sanitizing, **resvg-js** for PNG.
+- **MinIO** locally (superseded by SeaweedFS, ADR 0003) / **Cloudflare R2** in production for files (no egress fees). **SVGO + DOMPurify** for SVG cleanup/sanitizing, **resvg-js** for PNG.
 - **Docker Compose** for development; **k3s on a single Hetzner VPS** behind **Cloudflare** (CDN, WAF, DNS) for production; **GitHub Actions → GHCR** for CI/CD.
 
 ## Alternatives considered
 
-- Next.js — heavier client runtime for a content site; Astro ships less JS.
-- Managed Kubernetes (EKS/GKE/AKS) — ~$70–150/month before any users; k3s gives the same manifests for ~€5–15/month and can migrate later.
-- Plain Docker Compose in production — simpler, viable; rejected only because Kubernetes experience is a goal. Manifests stay portable.
+- Next.js: heavier client runtime for a content site; Astro ships less JS.
+- Managed Kubernetes (EKS/GKE/AKS): ~$70–150/month before any users; k3s gives the same manifests for ~€5–15/month and can migrate later.
+- Plain Docker Compose in production: simpler, viable; rejected only because Kubernetes experience is a goal. Manifests stay portable.
 
 ## Consequences
 

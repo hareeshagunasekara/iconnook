@@ -1,4 +1,4 @@
-# 0004 — Light theme only (no dark mode)
+# 0004: Light theme only (no dark mode)
 
 - **Status:** Accepted
 - **Date:** 2026-11-07
