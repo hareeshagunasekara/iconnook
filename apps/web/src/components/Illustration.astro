@@ -5,7 +5,7 @@
  */
 import type { HTMLAttributes } from 'astro/types';
 
-type Name = 'hero-team' | 'reader';
+type Name = 'iconnook-hero-illustration' | 'iconnook-reader-illustration';
 
 interface Props extends Omit<HTMLAttributes<'img'>, 'src' | 'srcset' | 'width' | 'height'> {
   name: Name;
@@ -15,8 +15,8 @@ interface Props extends Omit<HTMLAttributes<'img'>, 'src' | 'srcset' | 'width' |
 
 /** Intrinsic size of each source PNG (keeps the aspect ratio stable before load: no CLS). */
 const SIZE: Record<Name, { width: number; height: number }> = {
-  'hero-team': { width: 1374, height: 1145 },
-  reader: { width: 1422, height: 1106 },
+  'iconnook-hero-illustration': { width: 1374, height: 1145 },
+  'iconnook-reader-illustration': { width: 1422, height: 1106 },
 };
 const WIDTHS = [480, 800, 1280];
 
