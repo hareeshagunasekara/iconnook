@@ -1,4 +1,4 @@
-import type { LicenseTier } from '@iconnook/core';
+import { SET_TYPES, type LicenseTier } from '@iconnook/core';
 import { sql } from 'drizzle-orm';
 import {
   bigint,
@@ -24,18 +24,11 @@ export const licenseTier = pgEnum('license_tier', [
   'C',
 ] as const satisfies readonly Exclude<LicenseTier, 'X'>[]);
 
-export const setType = pgEnum('set_type', [
-  'ui',
-  'color',
-  'developer',
-  'logos',
-  'emoji',
-  'flags',
-  'maps',
-  'themed',
-  'illustrations',
-  'archive',
-]);
+/**
+ * 'ui' is legacy: interface sets were split into finer kinds (migration 0005). No row uses it after
+ * a re-import; drop it in a later contract migration.
+ */
+export const setType = pgEnum('set_type', ['ui', ...SET_TYPES]);
 
 export const tagSource = pgEnum('tag_source', ['set', 'auto', 'cldr', 'manual']);
 

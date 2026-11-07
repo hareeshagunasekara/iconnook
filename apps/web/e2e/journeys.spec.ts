@@ -65,18 +65,18 @@ test('downloads SVG and PNG at the chosen size', async ({ page, request }) => {
 
 test('filters live in the URL and survive reload and Back', async ({ page }) => {
   await page.goto('/search?q=circle');
-  await page.getByLabel('Kind').selectOption('ui');
-  await expect(page).toHaveURL(/type=ui/);
+  await page.getByLabel('Kind').selectOption('solid');
+  await expect(page).toHaveURL(/type=solid/);
   await page.getByLabel('License').selectOption('A');
-  await expect(page).toHaveURL(/type=ui.*tier=A|tier=A.*type=ui/);
+  await expect(page).toHaveURL(/type=solid.*tier=A|tier=A.*type=solid/);
 
   await page.reload();
-  await expect(page.getByLabel('Kind')).toHaveValue('ui');
+  await expect(page.getByLabel('Kind')).toHaveValue('solid');
   await expect(page.getByLabel('License')).toHaveValue('A');
 
   await page.goBack();
   await expect(page).not.toHaveURL(/tier=A/);
-  await expect(page.getByLabel('Kind')).toHaveValue('ui');
+  await expect(page.getByLabel('Kind')).toHaveValue('solid');
 });
 
 test('keyboard only: "/" focuses search, arrows move through the grid, Enter opens', async ({

@@ -87,8 +87,8 @@ test.describe('without JavaScript', () => {
 
   test('filters work with the Apply button', async ({ page }) => {
     await page.goto('/search?q=circle');
-    await page.getByLabel('Kind').selectOption('ui');
+    await page.getByLabel('Kind').selectOption('solid');
     await page.getByRole('button', { name: 'Apply filters' }).click();
-    await expect(page).toHaveURL(/type=ui/);
+    await expect(page).toHaveURL(/type=solid/);
   });
 });

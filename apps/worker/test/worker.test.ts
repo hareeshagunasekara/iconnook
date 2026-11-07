@@ -52,7 +52,7 @@ beforeAll(async () => {
       name: 'Pack Test',
       licenseSpdx: 'MIT',
       licenseTier: 'A',
-      type: 'ui',
+      type: 'solid',
       authorName: 'IconNook',
     })
     .returning({ id: schema.iconSets.id });

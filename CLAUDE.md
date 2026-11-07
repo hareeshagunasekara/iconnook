@@ -49,6 +49,7 @@ Every icon must have a known license. Tiers (see `SOURCES.md`):
 Never import from Flaticon, Icons8, Freepik, Noun Project or unDraw (proprietary / license forbids competing libraries), and never scrape any icon site.
 Logos & brand icons: the license covers the drawing, not the trademark — show a trademark notice.
 Adding a new source: verify the license at its official source, assign a tier, add it to `SOURCES.md`, then to the importer.
+Set kinds (`/sets?type=…`) come from `packages/importer/src/set-kinds.ts`: Iconify's category, then curated lists (Material, pixel, design systems, frameworks), size, and line vs solid. After an `@iconify/json` upgrade, check new interface sets' samples and add a line/solid override where the "Uses Stroke" tag is wrong.
 
 ## Standards — read before working
 

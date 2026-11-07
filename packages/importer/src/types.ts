@@ -1,7 +1,6 @@
-import type { LicenseTier } from '@iconnook/core';
-import type { schema } from '@iconnook/db';
+import type { LicenseTier, SetType } from '@iconnook/core';
 
-export type SetType = (typeof schema.setType.enumValues)[number];
+export type { SetType };
 
 /** Set-level metadata, independent of where it came from. */
 export interface SourceSet {
