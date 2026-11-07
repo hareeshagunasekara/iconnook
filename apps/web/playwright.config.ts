@@ -15,6 +15,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4321',
     trace: 'retain-on-failure',
+    // Smooth scrolling (on unless reduced motion) keeps elements moving, which makes clicks flaky.
+    reducedMotion: 'reduce',
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

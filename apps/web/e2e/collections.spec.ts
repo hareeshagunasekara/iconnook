@@ -155,11 +155,13 @@ test('clearing the collection asks in a themed dialog, not a browser box', async
   await expect(list.getByRole('listitem')).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Clear collection' }).click();
+  await expect(dialog).toBeVisible(); // it opens on the next render
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
   await expect(list.getByRole('listitem')).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Clear collection' }).click();
+  await expect(dialog).toBeVisible();
   await dialog.getByRole('button', { name: 'Remove all icons' }).click();
   await expect(page.getByRole('heading', { name: 'Your collection is empty' })).toBeVisible();
 });
