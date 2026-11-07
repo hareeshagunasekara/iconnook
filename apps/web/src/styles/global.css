@@ -94,6 +94,12 @@
     scroll-padding-top: 5rem;
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   /* No page scrolling behind an open dialog. */
   html:has(dialog[open]) {
     overflow: hidden;
@@ -243,6 +249,18 @@
     color: var(--color-text);
     box-shadow: 8px 8px 0 var(--color-purple);
   }
+  /* Themed confirmations (instead of the browser's confirm box). */
+  .confirm-dialog {
+    width: min(28rem, calc(100vw - 1.5rem));
+    margin: auto;
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-card);
+    background: var(--color-bg);
+    padding: 0;
+    color: var(--color-text);
+    box-shadow: 6px 6px 0 var(--color-coral);
+  }
+  .confirm-dialog::backdrop,
   .icon-modal::backdrop {
     background: rgb(17 17 17 / 0.55);
   }

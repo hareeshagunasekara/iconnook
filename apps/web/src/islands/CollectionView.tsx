@@ -7,6 +7,7 @@ import {
   onCollectionChange,
   removeFromCollection,
 } from '../lib/collection';
+import { ConfirmDialog } from './ConfirmDialog';
 import { PackDownloader } from './PackDownloader';
 
 /** The visitor's own collection (browser storage): browse, remove, download, share. */
@@ -23,6 +24,7 @@ export function CollectionView({ apiUrl }: { apiUrl: string }) {
   const [items, setItems] = useState<Item[]>([]);
   const [share, setShare] = useState<{ url: string } | { error: string } | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   useEffect(() => {
     const load = () => {
@@ -166,14 +168,27 @@ export function CollectionView({ apiUrl }: { apiUrl: string }) {
             type="button"
             class="min-h-11 text-sm underline"
             onClick={() => {
-              if (window.confirm('Remove all icons from your collection?')) {
-                clearCollection();
-                announce('Collection cleared');
-              }
+              setConfirmClear(true);
             }}
           >
             Clear collection
           </button>
+          <ConfirmDialog
+            open={confirmClear}
+            title="Clear your collection?"
+            confirmLabel="Remove all icons"
+            onCancel={() => {
+              setConfirmClear(false);
+            }}
+            onConfirm={() => {
+              setConfirmClear(false);
+              clearCollection();
+              announce('Collection cleared');
+            }}
+          >
+            This removes all {items.length} {items.length === 1 ? 'icon' : 'icons'} from your
+            collection in this browser. Shared links keep working.
+          </ConfirmDialog>
         </div>
         <ul
           class="mt-3 grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2"

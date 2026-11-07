@@ -136,3 +136,30 @@ test('unknown or malformed share links are a 404', async ({ page }) => {
   expect((await page.goto('/c/doesnotexist12'))?.status()).toBe(404);
   expect((await page.goto('/c/bad!id'))?.status()).toBe(404);
 });
+
+test('clearing the collection asks in a themed dialog, not a browser box', async ({ page }) => {
+  page.on('dialog', () => {
+    throw new Error('A native browser dialog was shown');
+  });
+  await add(page, 'circle');
+  await page.goto('/collection');
+  const list = page.getByRole('list', { name: 'Icons in your collection' });
+  await expect(list.getByRole('listitem')).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Clear collection' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Clear your collection?' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Cancel' })).toBeFocused(); // safe choice first
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(list.getByRole('listitem')).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Clear collection' }).click();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(list.getByRole('listitem')).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Clear collection' }).click();
+  await dialog.getByRole('button', { name: 'Remove all icons' }).click();
+  await expect(page.getByRole('heading', { name: 'Your collection is empty' })).toBeVisible();
+});
