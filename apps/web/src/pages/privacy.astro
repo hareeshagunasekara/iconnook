@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const REPO = 'https://github.com/hareeshagunasekara/iconnook';
+---
+
+<Layout
+  title="Privacy Policy"
+  description="What IconNook collects (almost nothing), what stays in your browser, and how to reach us."
+>
+  <article class="max-w-3xl">
+    <h1 class="section-title">Privacy Policy</h1>
+    <p class="mt-2 text-sm text-text-muted">Last updated: 8 November 2026</p>
+    <p class="mt-6 text-lg">
+      IconNook is built to work without knowing who you are. There are no accounts, no sign-up, no
+      ads and no tracking cookies.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-bold">What stays in your browser</h2>
+    <ul class="mt-3 list-disc space-y-2 pl-6">
+      <li>
+        <strong>Your collection</strong> of saved icons is stored in your browser (local storage).
+        It never leaves your device unless you choose to share it.
+      </li>
+      <li>
+        <strong>Recent searches</strong> shown in the search suggestions are stored the same way.
+        Clearing your browser's site data removes both.
+      </li>
+    </ul>
+
+    <h2 class="mt-10 text-2xl font-bold">What our servers keep</h2>
+    <ul class="mt-3 list-disc space-y-2 pl-6">
+      <li>
+        <strong>Download counts:</strong> we count downloads only as totals per icon. Nothing about
+        who downloaded is kept.
+      </li>
+      <li>
+        <strong>Shared collections:</strong> when you create a share link, we store the list of
+        icons and the optional name you give it, so the link keeps working. Anyone with the link can
+        see it. There is nothing personal in it.
+      </li>
+      <li>
+        <strong>Logs:</strong> each request is logged with its method, path, status and timing,
+        without IP addresses, user agents or query strings.
+      </li>
+      <li>
+        <strong>Abuse protection:</strong> to stop overload, we count requests per visitor using a
+        one-way hash of the IP address. These counters expire within a minute.
+      </li>
+    </ul>
+
+    <h2 class="mt-10 text-2xl font-bold">Hosting</h2>
+    <p class="mt-3">
+      Like most websites, IconNook is delivered through a content delivery network, which processes
+      requests (including IP addresses) to serve and protect the site. We don't sell or share data
+      with anyone else, and we don't use third-party analytics or ads.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-bold">Questions</h2>
+    <p class="mt-3">
+      IconNook is open source, so you can read exactly what it does in the{' '}
+      <a class="link" href={REPO}>
+        source code
+      </a>
+      . For questions,{' '}
+      <a class="link" href={`${REPO}/issues`}>
+        open an issue
+      </a>{' '}
+      on GitHub.
+    </p>
+  </article>
+</Layout>

@@ -21,6 +21,8 @@ export const GET: APIRoute = async ({ params, site }) => {
         url('/categories'),
         url('/licenses'),
         url('/about'),
+        url('/privacy'),
+        url('/terms'),
         ...(sets ?? []).map((s) => url(`/sets/${s.prefix}`)),
         ...(categories ?? []).map((c) => url(`/categories/${c.slug}`)),
       ]),

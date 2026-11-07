@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const REPO = 'https://github.com/hareeshagunasekara/iconnook';
+---
+
+<Layout
+  title="Terms of Use"
+  description="The simple rules for using IconNook: free to use, icons keep their own licenses, provided as is."
+>
+  <article class="max-w-3xl">
+    <h1 class="section-title">Terms of Use</h1>
+    <p class="mt-2 text-sm text-text-muted">Last updated: 8 November 2026</p>
+    <p class="mt-6 text-lg">
+      IconNook is free for everyone. By using the site you agree to these short terms.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-bold">The icons</h2>
+    <p class="mt-3">
+      Every icon belongs to its authors and keeps the license of its icon set, which is shown on
+      every icon page. Your use of an icon is governed by that license, including giving credit when
+      it asks for it. See{' '}
+      <a class="link" href="/licenses">
+        Licenses &amp; attribution
+      </a>{' '}
+      for what each license means.
+    </p>
+    <p class="mt-3">
+      Logos and brand icons: the license covers the drawing, not the brand. Logos and brand names
+      belong to their owners; follow their brand guidelines.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-bold">The website and code</h2>
+    <p class="mt-3">
+      IconNook's own code is open source under the Apache License 2.0. Please use the site and its
+      API fairly: automated bulk downloading that overloads the service isn't allowed, and requests
+      may be rate limited.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-bold">No warranty</h2>
+    <p class="mt-3">
+      IconNook and the icons are provided "as is", without warranties of any kind. We work hard to
+      label every license correctly, but please check an icon's license before relying on it, and
+      tell us if something is wrong.
+    </p>
+
+    <h2 class="mt-10 text-2xl font-bold">Problems and takedowns</h2>
+    <p class="mt-3">
+      If you believe an icon is mislabeled or shouldn't be here,{' '}
+      <a class="link" href={`${REPO}/issues`}>
+        report it on GitHub
+      </a>{' '}
+      and we'll look into it promptly. Security issues go to{' '}
+      <a class="link" href={`${REPO}/security/advisories/new`}>
+        a private security report
+      </a>
+      .
+    </p>
+  </article>
+</Layout>
