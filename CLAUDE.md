@@ -7,6 +7,7 @@ Goals, in priority order: **legally clean icons**, **fast**, **accessible to eve
 > **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
 > **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
+> **Writing rules:** never use the em dash (U+2014) in commit messages, PR titles and descriptions, documentation or user-facing text; use a period, comma, colon or parentheses. Never mention phases or steps (e.g. "Phase 6", "step 2") in commit messages or PR titles; describe the change itself.
 
 ## Stack (decided — don't re-propose alternatives)
 
