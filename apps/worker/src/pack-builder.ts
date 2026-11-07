@@ -50,7 +50,7 @@ export function licensesMarkdown(icons: readonly PackIcon[], missing: readonly s
     a.icon.setName.localeCompare(b.icon.setName),
   )) {
     lines.push(`## ${icon.setName} (${icon.set})`, '');
-    lines.push(`- License: ${icon.licenseSpdx}${icon.licenseUrl ? ` — ${icon.licenseUrl}` : ''}`);
+    lines.push(`- License: ${icon.licenseSpdx}${icon.licenseUrl ? ` (${icon.licenseUrl})` : ''}`);
     if (icon.author) lines.push(`- Author: ${icon.author}`);
     lines.push(`- Icons in this pack: ${String(names.length)}`);
     if (requiresAttribution(icon.tier)) {

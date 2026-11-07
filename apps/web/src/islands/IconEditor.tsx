@@ -147,7 +147,7 @@ export function IconEditor({
         setCopied(false);
       }, 2_000);
     } catch {
-      announce('Copy failed — select the code and copy it manually');
+      announce('Copy failed. Select the code and copy it manually.');
     }
   };
 

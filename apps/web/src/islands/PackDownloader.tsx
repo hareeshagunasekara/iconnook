@@ -46,8 +46,8 @@ export function PackDownloader({ apiUrl, refs }: Props) {
         body: JSON.stringify(body),
       });
       if (res.status === 503)
-        throw new Error('Downloads are busy right now — please try again in a minute.');
-      if (res.status === 429) throw new Error('Too many downloads at once — please wait a minute.');
+        throw new Error('Downloads are busy right now. Please try again in a minute.');
+      if (res.status === 429) throw new Error('Too many downloads at once. Please wait a minute.');
       if (!res.ok) throw new Error('This download could not be prepared.');
       let status = (await res.json()) as PackStatus;
       while (status.state !== 'completed' && !isCancelled()) {

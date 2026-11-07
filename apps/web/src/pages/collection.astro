@@ -14,7 +14,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=86400
 >
   <h1 class="text-3xl font-bold">My collection</h1>
   <p class="mt-2 text-[var(--color-text-muted)]">
-    Saved in this browser only — no account, nothing sent until you share.
+    Saved in this browser only. No account, and nothing is sent until you share.
   </p>
   <div class="mt-6">
     <CollectionView client:load apiUrl={PUBLIC_API_URL} />

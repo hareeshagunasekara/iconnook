@@ -83,7 +83,7 @@ export function CollectionView({ apiUrl }: { apiUrl: string }) {
         <h2 class="text-xl font-semibold">Your collection is empty</h2>
         <p class="mt-2 text-[var(--color-text-muted)]">
           Open any icon and choose <strong>Add to collection</strong>. Collections are saved in this
-          browser — no account needed.
+          browser, no account needed.
         </p>
         <p class="mt-4">
           <a class="link" href="/sets">

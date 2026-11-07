@@ -22,7 +22,7 @@ interface Props {
 const { title, description, image = '/og.png', index = true, query = '' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const fullTitle =
-  title === 'IconNook' ? 'IconNook — free, open-source SVG icons' : `${title} · IconNook`;
+  title === 'IconNook' ? 'IconNook: free, open-source SVG icons' : `${title} · IconNook`;
 const ogImage = new URL(image, Astro.site);
 ---
 
