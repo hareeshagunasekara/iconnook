@@ -49,6 +49,9 @@ describe('migrations', () => {
 
     expect(rows.map((r) => r.table_name)).toEqual([
       'categories',
+      'collection_icons',
+      'collections',
+      'download_flushes',
       'downloads',
       'icon_categories',
       'icon_sets',
