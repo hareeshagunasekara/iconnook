@@ -1,0 +1,51 @@
+---
+/**
+ * A responsive illustration from src/assets/illustrations. The AVIF/WebP variants are generated
+ * once by `pnpm --filter @iconnook/web illustrations` and bundled as hashed, immutable files.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Name = 'hero-team' | 'reader';
+
+interface Props extends Omit<HTMLAttributes<'img'>, 'src' | 'srcset' | 'width' | 'height'> {
+  name: Name;
+  /** Rendered width hints for the browser, as in the `sizes` attribute. */
+  sizes: string;
+}
+
+/** Intrinsic size of each source PNG (keeps the aspect ratio stable before load: no CLS). */
+const SIZE: Record<Name, { width: number; height: number }> = {
+  'hero-team': { width: 1374, height: 1145 },
+  reader: { width: 1422, height: 1106 },
+};
+const WIDTHS = [480, 800, 1280];
+
+const files = import.meta.glob<string>('../assets/illustrations/*.{avif,webp}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const { name, sizes, alt = '', ...attrs } = Astro.props;
+
+function url(width: number, format: 'avif' | 'webp'): string {
+  const file = files[`../assets/illustrations/${name}-${String(width)}.${format}`];
+  if (!file)
+    throw new Error(`Missing ${name}-${String(width)}.${format}: run the illustrations script`);
+  return file;
+}
+const srcset = (format: 'avif' | 'webp') =>
+  WIDTHS.map((w) => `${url(w, format)} ${String(w)}w`).join(', ');
+---
+
+<picture>
+  <source type="image/avif" srcset={srcset('avif')} sizes={sizes} />
+  <source type="image/webp" srcset={srcset('webp')} sizes={sizes} />
+  <img
+    src={url(1280, 'webp')}
+    alt={alt}
+    width={SIZE[name].width}
+    height={SIZE[name].height}
+    decoding="async"
+    {...attrs}
+  />
+</picture>

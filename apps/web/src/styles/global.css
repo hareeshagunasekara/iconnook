@@ -3,24 +3,56 @@
 /* Design tokens (docs/standards/ui-ux.md). Components use tokens, never raw values.
    Contrast (WCAG 2.2 AA): text ≥ 4.5:1, UI borders/focus ≥ 3:1 against --color-bg.
    Light theme only — IconNook has no dark mode (ADR 0004). */
-@theme {
-  --color-bg: #ffffff;
-  --color-surface: #f4f5f7;
-  --color-surface-2: #e9ebef;
-  --color-border: #8a919c;
-  --color-text: #14161a;
-  --color-text-muted: #4d5560;
-  --color-accent: #3443c4;
+/* static: inline styles reference tokens with var(), so emit them even if no utility uses them. */
+@theme static {
+  /* Brand palette. Ink text passes AA on every brand color except purple (use white there). */
+  --color-cream: #fff9f0;
+  --color-ink: #111111;
+  --color-mustard: #ffc567;
+  --color-pink: #fb7da8;
+  --color-coral: #fd5a46;
+  --color-purple: #552cb7;
+  --color-green: #00995e;
+  --color-blue: #058cd7;
+  /* Softer fills for pills and icon tiles (ink text ≥ 9:1 on all of them). */
+  --color-mustard-soft: #ffd894;
+  --color-pink-soft: #fdb3cc;
+  --color-coral-soft: #fea79c;
+  --color-purple-soft: #cbbcf2;
+  --color-green-soft: #9ddcc0;
+  --color-blue-soft: #9dd3f2;
+
+  /* Semantic roles */
+  --color-bg: var(--color-cream);
+  --color-surface: #ffffff;
+  --color-surface-2: #f3eadb;
+  --color-border: #8c8279;
+  --color-text: var(--color-ink);
+  --color-text-muted: #4a4540;
+  --color-accent: var(--color-purple);
+  --color-accent-hover: #4421a0;
   --color-accent-contrast: #ffffff;
-  --color-focus: #3443c4;
+  --color-focus: var(--color-purple);
   --color-tier-a: #1d6b3a;
   --color-tier-b: #8a4b00;
   --color-tier-c: #8a1c4a;
 
+  --font-display:
+    'Bricolage Grotesque Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-sans:
-    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji';
+    'DM Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --radius-card: 1rem;
+  --radius-control: 0.875rem;
+  --radius-button: 0.75rem;
+  --radius-tile: 0.75rem;
+
+  /* Offset "printed paper" shadow; .pop-card takes the color from --pop on the element. */
+  --pop-offset: 5px;
+  --pop-offset-lifted: 7px;
+  --ease-snappy: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* Base styles live in @layer base: unlayered CSS would override every Tailwind utility. */
@@ -31,12 +63,21 @@
     font-family: var(--font-sans);
     line-height: 1.5;
     color-scheme: light;
+    -webkit-font-smoothing: antialiased;
   }
 
   body {
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    line-height: 1.15;
   }
 
   :focus-visible {
@@ -55,22 +96,94 @@
 }
 
 @layer components {
-  .set-card {
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-    gap: 0.5rem;
-    border-radius: 0.75rem;
-    background: var(--color-surface);
-    padding: 1rem;
+  /* Page width shared by header, main and footer. */
+  .wrap {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+    @media (width >= 40rem) {
+      padding-inline: 1.5rem;
+    }
+    @media (width >= 64rem) {
+      padding-inline: 2.5rem;
+    }
   }
-  .set-card:hover {
-    outline: 1px solid var(--color-border);
+
+  /* Poster-like section headings on the home and About pages. */
+  .section-title {
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
   }
+
   .link {
     color: var(--color-accent);
+    font-weight: 500;
     text-decoration: underline;
+    text-decoration-thickness: 1.5px;
     text-underline-offset: 3px;
+  }
+  .link:hover {
+    text-decoration-thickness: 2.5px;
+  }
+
+  /* White card, ink outline, colored offset shadow that lifts on hover. Set --pop for the color. */
+  .pop-card {
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--pop-offset) var(--pop-offset) 0 var(--pop, var(--color-mustard));
+    transition:
+      transform 150ms var(--ease-snappy),
+      box-shadow 150ms var(--ease-snappy);
+  }
+  a.pop-card:hover,
+  a.pop-card:focus-visible {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--pop-offset-lifted) var(--pop-offset-lifted) 0 var(--pop, var(--color-mustard));
+  }
+
+  /* Rounded chip with an ink outline. Set --pill for the fill. */
+  .pill {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid var(--color-ink);
+    border-radius: 999px;
+    background: var(--pill, var(--color-surface));
+    padding-inline: 1rem;
+    font-weight: 600;
+    transition: transform 150ms var(--ease-snappy);
+  }
+  a.pill:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-button);
+    background: var(--color-accent);
+    padding-inline: 1.25rem;
+    font-weight: 600;
+    color: var(--color-accent-contrast);
+    transition: background-color 150ms;
+  }
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .input {
+    min-height: 2.75rem;
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
   }
 }
 
