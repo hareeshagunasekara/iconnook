@@ -3,33 +3,10 @@ import type { IconifyInfo, IconifyJSON } from '@iconify/types';
 import { getIconData, iconToSVG } from '@iconify/utils';
 import { licenseTier } from '@iconnook/core';
 
-import type { IconSource, LoadedSet, SetType, SourceIcon, SourceSet } from '../types.js';
-
-/** Iconify's set categories → IconNook set types (see SOURCES.md). */
-const TYPE_BY_CATEGORY: Readonly<Record<string, SetType>> = {
-  Material: 'ui',
-  'UI 24px': 'ui',
-  'UI 16px / 32px': 'ui',
-  'UI Other / Mixed Grid': 'ui',
-  'UI Multicolor': 'color',
-  'High Detail Multicolor': 'color',
-  'Holiday / Seasonal': 'color',
-  Apps: 'color',
-  Programming: 'developer',
-  Logos: 'logos',
-  Emoji: 'emoji',
-  Location: 'maps',
-  Flags: 'flags',
-  Thematic: 'themed',
-  'High Detail': 'themed',
-  'Archive / Unmaintained': 'archive',
-};
+import { setKindFor } from '../set-kinds.js';
+import type { IconSource, LoadedSet, SourceIcon, SourceSet } from '../types.js';
 
 const TRANSFORM_KEYS = ['rotate', 'hFlip', 'vFlip', 'left', 'top', 'width', 'height'] as const;
-
-export function setTypeFor(category: string | undefined): SetType {
-  return (category ? TYPE_BY_CATEGORY[category] : undefined) ?? 'themed';
-}
 
 export function toSourceSet(prefix: string, info: IconifyInfo): SourceSet {
   return {
@@ -42,7 +19,12 @@ export function toSourceSet(prefix: string, info: IconifyInfo): SourceSet {
     licenseTitle: info.license.title,
     licenseUrl: info.license.url ?? null,
     licenseTier: licenseTier(info.license.spdx ?? ''),
-    type: setTypeFor(info.category),
+    type: setKindFor({
+      prefix,
+      category: info.category,
+      tags: info.tags ?? [],
+      total: info.total ?? 0,
+    }),
     sourceCategory: info.category ?? 'Uncategorized',
     isColor: info.palette ?? false,
     gridSize: typeof info.height === 'number' ? info.height : null,

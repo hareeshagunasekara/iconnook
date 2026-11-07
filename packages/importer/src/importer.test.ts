@@ -4,7 +4,7 @@ import { renderCatalog } from './catalog.js';
 import { fixtureIconifySet } from './fixtures.js';
 import { prepareIcons } from './prepare.js';
 import { selectSets } from './run.js';
-import { setTypeFor, splitIconifySet, toSourceSet } from './sources/iconify.js';
+import { splitIconifySet, toSourceSet } from './sources/iconify.js';
 import { slugify } from './sync.js';
 import type { SourceSet } from './types.js';
 
@@ -15,14 +15,6 @@ const loaded = splitIconifySet(fixture, toSourceSet(fixture.prefix, info));
 const byName = new Map(loaded.icons.map((i) => [i.name, i]));
 
 describe('Iconify adapter', () => {
-  it('maps Iconify categories to set types, unknown → themed', () => {
-    expect(setTypeFor('UI 24px')).toBe('ui');
-    expect(setTypeFor('Logos')).toBe('logos');
-    expect(setTypeFor('Archive / Unmaintained')).toBe('archive');
-    expect(setTypeFor('Something New')).toBe('themed');
-    expect(setTypeFor(undefined)).toBe('themed');
-  });
-
   it('assigns license tiers from the SPDX id', () => {
     expect(toSourceSet('x', info).licenseTier).toBe('A');
     const gpl = { ...info, license: { title: 'GPL', spdx: 'GPL-3.0-only' } };
@@ -120,7 +112,7 @@ describe('renderCatalog', () => {
     expect(md).toContain('| **A** | MIT, Apache-2.0');
     expect(md).toMatch(/\| \*\*A\*\* .*\| 15 \|/);
     expect(md).toMatch(/\| \*\*X\*\* .*\| 2 \|/);
-    expect(md).toContain('## Logos & Brands — 1 sets, 5 icons');
+    expect(md).toContain('## Logos & brands — 1 sets, 5 icons');
     expect(md).toContain('Pipe \\| Set');
     expect(md).toContain('## Sources outside Iconify');
   });
