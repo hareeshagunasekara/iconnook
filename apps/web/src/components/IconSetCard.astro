@@ -1,0 +1,62 @@
+---
+import { PUBLIC_API_URL } from 'astro:env/client';
+
+import type { IconSet } from '../lib/api';
+import { assetUrl, inlineSvg } from '../lib/icons';
+import LicenseBadge from './LicenseBadge.astro';
+
+interface Props {
+  set: IconSet;
+  /** Position in the grid; picks the tile and shadow colors so neighbours differ. */
+  index: number;
+  /**
+   * Load the preview as a lazy, CDN-cached image instead of inlining it: for long lists, where
+   * inlining every preview would bloat the page.
+   */
+  lazy?: boolean;
+}
+const { set, index, lazy = false } = Astro.props;
+
+// Tile and shadow walk the same palette two steps apart: a card's tile never matches its own
+// shadow, and neighbours differ across rows of 2 or 3.
+const PALETTE = ['purple', 'blue', 'mustard', 'coral', 'green', 'pink'];
+const tile = PALETTE[index % PALETTE.length] ?? 'purple';
+const shadow = PALETTE[(index + 2) % PALETTE.length] ?? 'mustard';
+const fmt = new Intl.NumberFormat('en');
+---
+
+<a
+  href={`/sets/${set.prefix}`}
+  class="pop-card flex h-full items-center gap-4 p-4"
+  style={`--pop: var(--color-${shadow})`}
+>
+  <span
+    class="grid size-16 shrink-0 place-items-center rounded-[var(--radius-tile)] text-ink"
+    style={`background: var(--color-${tile}-soft)`}
+  >
+    {set.preview && lazy ? (
+      <img
+        src={assetUrl(PUBLIC_API_URL, set.prefix, set.preview.name, 'svg')}
+        alt=""
+        width="36"
+        height="36"
+        loading="lazy"
+        decoding="async"
+        class="size-9 object-contain"
+      />
+    ) : set.preview ? (
+      <Fragment set:html={inlineSvg(set.preview, 'size-9')} />
+    ) : (
+      <span class="font-display text-2xl font-extrabold" aria-hidden="true">
+        {set.name.slice(0, 1)}
+      </span>
+    )}
+  </span>
+  <span class="flex min-w-0 flex-col gap-1">
+    <span class="font-display text-lg leading-tight font-bold">{set.name}</span>
+    <span class="text-sm text-text-muted">
+      {fmt.format(set.total)} icons{set.author ? ` · by ${set.author.name}` : ''}
+    </span>
+    <LicenseBadge license={set.license} />
+  </span>
+</a>

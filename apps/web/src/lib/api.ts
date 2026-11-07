@@ -1,5 +1,7 @@
 import { API_INTERNAL_URL } from 'astro:env/server';
 
+import type { UiIconName } from './ui-icons';
+
 /** Response shapes of the IconNook API (see /v1/openapi.json; contract-tested in apps/api). */
 
 export type Tier = 'A' | 'B' | 'C';
@@ -21,6 +23,8 @@ export interface IconSet {
   version: string | null;
   author: { name: string; url: string | null } | null;
   license: License;
+  /** A representative icon chosen by the set's authors (sanitized SVG body). */
+  preview: { name: string; body: string; width: number; height: number } | null;
 }
 
 export interface IconSummary {
@@ -97,16 +101,16 @@ export async function api<T>(
   return (await res.json()) as T;
 }
 
-export const SET_TYPES: readonly { value: string; label: string }[] = [
-  { value: 'ui', label: 'UI icons' },
-  { value: 'color', label: 'Color icons' },
-  { value: 'developer', label: 'Developer & tech' },
-  { value: 'logos', label: 'Logos & brands' },
-  { value: 'emoji', label: 'Emoji' },
-  { value: 'flags', label: 'Flags' },
-  { value: 'maps', label: 'Maps & location' },
-  { value: 'themed', label: 'Themed' },
-  { value: 'archive', label: 'Archive' },
-];
+export const SET_TYPES = [
+  { value: 'ui', label: 'UI icons', icon: 'monitor', color: 'mustard' },
+  { value: 'color', label: 'Color icons', icon: 'palette', color: 'pink' },
+  { value: 'developer', label: 'Developer & tech', icon: 'code-xml', color: 'green' },
+  { value: 'logos', label: 'Logos & brands', icon: 'tag', color: 'blue' },
+  { value: 'emoji', label: 'Emoji', icon: 'smile', color: 'purple' },
+  { value: 'flags', label: 'Flags', icon: 'flag', color: 'coral' },
+  { value: 'maps', label: 'Maps & location', icon: 'map-pin', color: 'mustard' },
+  { value: 'themed', label: 'Themed', icon: 'layers', color: 'pink' },
+  { value: 'archive', label: 'Archive', icon: 'archive', color: 'blue' },
+] as const satisfies readonly { value: string; label: string; icon: UiIconName; color: string }[];
 
 export const typeLabel = (type: string) => SET_TYPES.find((t) => t.value === type)?.label ?? type;

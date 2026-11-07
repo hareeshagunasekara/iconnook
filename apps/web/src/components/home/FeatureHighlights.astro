@@ -1,0 +1,37 @@
+---
+import type { UiIconName } from '../../lib/ui-icons';
+import UiIcon from '../UiIcon.astro';
+
+const FEATURES: { icon: UiIconName; color: string; label: [string, string] }[] = [
+  { icon: 'badge-check', color: 'mustard', label: ['Clearly', 'licensed'] },
+  { icon: 'accessibility', color: 'green-soft', label: ['Accessible', '& inclusive'] },
+  { icon: 'zap', color: 'coral-soft', label: ['Fast', '& simple'] },
+  { icon: 'lock', color: 'blue-soft', label: ['No sign-up', 'required'] },
+];
+---
+
+<ul class="grid grid-cols-2 gap-4 sm:max-w-md xl:flex xl:max-w-none">
+  {FEATURES.map((f) => (
+    <li class="feature flex items-center gap-2 xl:px-3 xl:first:pl-0">
+      <span
+        class="grid size-9 shrink-0 place-items-center rounded-full border-2 border-ink text-ink"
+        style={`background: var(--color-${f.color})`}
+      >
+        <UiIcon name={f.icon} class="size-5" />
+      </span>
+      <span class="text-sm leading-tight font-medium whitespace-nowrap">
+        {f.label[0]}
+        <br />
+        {f.label[1]}
+      </span>
+    </li>
+  ))}
+</ul>
+
+<style>
+  @media (width >= 80rem) {
+    .feature + .feature {
+      border-left: 2px solid var(--color-ink);
+    }
+  }
+</style>

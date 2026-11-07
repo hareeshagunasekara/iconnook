@@ -1,9 +1,10 @@
 ---
 import ErrorState from '../components/ErrorState.astro';
-import LicenseBadge from '../components/LicenseBadge.astro';
-import SearchForm from '../components/SearchForm.astro';
+import Hero from '../components/home/Hero.astro';
+import KindBrowser from '../components/home/KindBrowser.astro';
+import PopularSets from '../components/home/PopularSets.astro';
 import Layout from '../layouts/Layout.astro';
-import { api, SET_TYPES, type IconSet } from '../lib/api';
+import { api, type IconSet } from '../lib/api';
 
 let sets: IconSet[] | null = null;
 try {
@@ -17,92 +18,27 @@ const popular = [...all]
   .filter((s) => s.type === 'ui' || s.type === 'color')
   .sort((a, b) => b.total - a.total)
   .slice(0, 12);
-const POPULAR_SEARCHES = [
-  'home',
-  'arrow',
-  'user',
-  'settings',
-  'heart',
-  'search',
-  'mail',
-  'calendar',
-  'trash',
-  'star',
-];
-const fmt = new Intl.NumberFormat('en');
 ---
 
 <Layout
   title="IconNook"
   description="Hundreds of thousands of free, open-source SVG icons from 190+ sets. Every icon clearly licensed — copy as SVG, JSX, Vue or CSS, or download SVG and PNG."
 >
-  <section class="mx-auto max-w-3xl py-10 text-center sm:py-16">
-    <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Free, open-source SVG icons</h1>
-    <p class="mt-4 text-lg text-[var(--color-text-muted)]">
-      {totalIcons > 0
-        ? `${fmt.format(totalIcons)} icons from ${String(all.length)} sets`
-        : 'Hundreds of thousands of icons'}{' '}
-      — every one clearly licensed. No sign-up, no payments.
-    </p>
-    <div class="mt-8 text-left">
-      <SearchForm id="home-search" />
+  <Hero totalIcons={totalIcons} setCount={all.length} />
+
+  {!sets && (
+    <div class="mt-16">
+      <ErrorState title="Icon sets are temporarily unavailable" />
     </div>
-    <p class="mt-4 text-sm">
-      <span class="text-[var(--color-text-muted)]">Popular:</span>{' '}
-      {POPULAR_SEARCHES.map((q, i) => (
-        <>
-          {i > 0 && ' · '}
-          <a class="link" href={`/search?q=${encodeURIComponent(q)}`}>
-            {q}
-          </a>
-        </>
-      ))}
-    </p>
-  </section>
-
-  {!sets && <ErrorState title="Icon sets are temporarily unavailable" />}
-
-  {popular.length > 0 && (
-    <section aria-labelledby="popular-sets" class="mt-8">
-      <div class="flex items-baseline justify-between gap-4">
-        <h2 id="popular-sets" class="text-2xl font-semibold">
-          Popular icon sets
-        </h2>
-        <a class="link text-sm" href="/sets">
-          All {all.length} sets
-        </a>
-      </div>
-      <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {popular.map((set) => (
-          <li>
-            <a href={`/sets/${set.prefix}`} class="set-card">
-              <span class="font-semibold">{set.name}</span>
-              <span class="text-sm text-[var(--color-text-muted)]">
-                {fmt.format(set.total)} icons{set.author ? ` · by ${set.author.name}` : ''}
-              </span>
-              <LicenseBadge license={set.license} />
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
   )}
 
-  <section aria-labelledby="browse" class="mt-12">
-    <h2 id="browse" class="text-2xl font-semibold">
-      Browse by kind
-    </h2>
-    <ul class="mt-4 flex flex-wrap gap-2">
-      {SET_TYPES.filter((t) => t.value !== 'archive').map((t) => (
-        <li>
-          <a
-            href={`/sets?type=${t.value}`}
-            class="inline-flex min-h-11 items-center rounded-full border border-[var(--color-border)] px-4"
-          >
-            {t.label}
-          </a>
-        </li>
-      ))}
-    </ul>
-  </section>
+  {popular.length > 0 && (
+    <div class="mt-20 lg:mt-28">
+      <PopularSets sets={popular} total={all.length} />
+    </div>
+  )}
+
+  <div class="mt-20 lg:mt-28">
+    <KindBrowser />
+  </div>
 </Layout>

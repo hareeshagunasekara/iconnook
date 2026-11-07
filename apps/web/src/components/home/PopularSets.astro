@@ -1,0 +1,41 @@
+---
+import type { IconSet } from '../../lib/api';
+import Doodle from '../Doodle.astro';
+import IconSetCard from '../IconSetCard.astro';
+import UiIcon from '../UiIcon.astro';
+
+interface Props {
+  sets: IconSet[];
+  /** Number of sets in the whole catalog, for the "All N sets" link. */
+  total: number;
+}
+const { sets, total } = Astro.props;
+---
+
+<section aria-labelledby="popular-sets" class="relative">
+  <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+    <h2 id="popular-sets" class="section-title">
+      <span class="relative inline-block">
+        Popular
+        <Doodle
+          kind="squiggle"
+          color="coral"
+          class="absolute -bottom-[0.32em] left-[0.05em] h-[0.2em] w-[105%]"
+        />
+      </span>{' '}
+      icon sets
+    </h2>
+    <a class="link inline-flex min-h-11 items-center gap-1.5" href="/sets">
+      All {total} sets
+      <UiIcon name="arrow-right" class="size-4" />
+    </a>
+  </div>
+  <Doodle kind="burst" class="absolute top-[4.25rem] -left-7 hidden size-8 -rotate-45 xl:block" />
+  <ul class="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3 lg:gap-6">
+    {sets.map((set, i) => (
+      <li>
+        <IconSetCard set={set} index={i} />
+      </li>
+    ))}
+  </ul>
+</section>
