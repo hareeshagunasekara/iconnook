@@ -20,6 +20,8 @@ export interface SourceSet {
   isColor: boolean;
   gridSize: number | null;
   version: string | null;
+  /** Representative icon names chosen by the set's authors (only ones we actually import). */
+  samples: string[];
 }
 
 /** A raw icon from a source, before sanitization. */

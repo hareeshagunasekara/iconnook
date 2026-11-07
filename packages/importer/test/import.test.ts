@@ -52,8 +52,16 @@ describe('importSets', () => {
     expect((await t.db.select({ n: count() }).from(iconCategories))[0]?.n).toBe(3);
   });
 
+  it("stores the set's sample icons in order", async () => {
+    const [set] = await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'fixture-ui'));
+    expect(set?.sampleIcons).toEqual(['home', 'arrow-up']);
+  });
+
   it('changes nothing when run again', async () => {
+    const [before] = await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'fixture-ui'));
     const [report] = await importSets(t.db, source, { tiers: ['A'] });
+    const [after] = await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'fixture-ui'));
+    expect(after?.updatedAt).toEqual(before?.updatedAt); // set row untouched, arrays included
 
     expect(report).toMatchObject({ inserted: 0, updated: 0, deleted: 0, unchanged: 5 });
     expect(report?.links).toEqual({ added: 0, removed: 0 });
