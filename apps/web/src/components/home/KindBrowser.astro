@@ -4,8 +4,9 @@ import Doodle from '../Doodle.astro';
 import Illustration from '../Illustration.astro';
 import UiIcon from '../UiIcon.astro';
 
-// The archive (retired sets) is reachable from the sets page, not promoted here.
-const KINDS = SET_TYPES.filter((t) => t.value !== 'archive');
+// The most-wanted kinds; the rest (and the archive) are one click away on the sets page.
+const FEATURED = ['line', 'solid', 'libraries', 'color', 'logos', 'emoji', 'flags', 'animated'];
+const KINDS = FEATURED.flatMap((value) => SET_TYPES.filter((t) => t.value === value));
 ---
 
 <section
@@ -33,6 +34,12 @@ const KINDS = SET_TYPES.filter((t) => t.value !== 'archive');
         </li>
       ))}
     </ul>
+    <p class="mt-5">
+      <a class="link inline-flex min-h-11 items-center gap-1.5" href="/sets">
+        All kinds
+        <UiIcon name="arrow-right" class="size-4" />
+      </a>
+    </p>
   </div>
   <div class="mx-auto w-full max-w-[26rem] lg:max-w-[30rem]">
     <Illustration

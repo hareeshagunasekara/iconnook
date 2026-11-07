@@ -102,7 +102,14 @@ export async function api<T>(
 }
 
 export const SET_TYPES = [
-  { value: 'ui', label: 'UI icons', icon: 'monitor', color: 'mustard' },
+  { value: 'libraries', label: 'Big all-purpose libraries', icon: 'library-big', color: 'purple' },
+  { value: 'line', label: 'Line icons', icon: 'pen-line', color: 'mustard' },
+  { value: 'solid', label: 'Solid & glyph icons', icon: 'shapes', color: 'coral' },
+  { value: 'material', label: 'Material & Google', icon: 'component', color: 'blue' },
+  { value: 'design-systems', label: 'Company design systems', icon: 'building', color: 'green' },
+  { value: 'frameworks', label: 'Framework icons', icon: 'blocks', color: 'pink' },
+  { value: 'pixel', label: 'Pixel & retro', icon: 'gamepad-2', color: 'purple' },
+  { value: 'animated', label: 'Animated', icon: 'loader', color: 'mustard' },
   { value: 'color', label: 'Color icons', icon: 'palette', color: 'pink' },
   { value: 'developer', label: 'Developer & tech', icon: 'code-xml', color: 'green' },
   { value: 'logos', label: 'Logos & brands', icon: 'tag', color: 'blue' },

@@ -6,6 +6,17 @@ import PopularSets from '../components/home/PopularSets.astro';
 import Layout from '../layouts/Layout.astro';
 import { api, type IconSet } from '../lib/api';
 
+/** Kinds whose sets are general-purpose interface icons: the candidates for "Popular". */
+const INTERFACE_KINDS = new Set([
+  'libraries',
+  'line',
+  'solid',
+  'material',
+  'design-systems',
+  'frameworks',
+  'color',
+]);
+
 let sets: IconSet[] | null = null;
 try {
   sets = await api<IconSet[]>('/v1/sets');
@@ -15,7 +26,7 @@ try {
 const all = sets ?? [];
 const totalIcons = all.reduce((n, s) => n + s.total, 0);
 const popular = [...all]
-  .filter((s) => s.type === 'ui' || s.type === 'color')
+  .filter((s) => INTERFACE_KINDS.has(s.type))
   .sort((a, b) => b.total - a.total)
   .slice(0, 12);
 ---
