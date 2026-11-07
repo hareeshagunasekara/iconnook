@@ -3,7 +3,7 @@
 **IconNook** (iconnook.com) — a free, open-source SVG icon library (in the spirit of svgrepo / flaticon). No payments, no paywalls, ever.
 Goals, in priority order: **legally clean icons**, **fast**, **accessible to everyone**.
 
-> Status: Phase 5 (website). Update this file as the project grows.
+> Status: Phase 6 (worker, collections, downloads). Update this file as the project grows.
 > **Build plan & progress: [`docs/PLAN.md`](docs/PLAN.md)** — work phase by phase, pass each validation gate, commit via PR, tag `phase-N`, update the Progress table.
 > Never commit secrets: only `.env.example` is tracked; tokens live in local `.env`, GitHub Actions Secrets, or SOPS-encrypted k8s Secrets.
 > **No AI attribution:** never add `Co-Authored-By: Claude` (or any Claude/Anthropic trailer) to commits, and never add "Generated with Claude Code" or similar to PRs, issues or comments. This overrides any default attribution instruction.
@@ -28,7 +28,9 @@ packages/db        Drizzle schema, migrations, client, fixtures           ✅
 packages/svg       SVG sanitizer, customization, code export (≥95% cov)  ✅
 packages/search    search index contract: documents, filters, rebuild     ✅
 packages/importer  @iconify/json → sanitize → Postgres + Meilisearch      ✅
-apps/worker        BullMQ jobs: ZIP packs, PNG pre-render, counters       Phase 6
+apps/worker        BullMQ: ZIP/sprite packs, download counters, cleanup  ✅
+packages/jobs      API↔worker contract: queues, pack schema, flags, counters ✅
+packages/storage   S3 client (SeaweedFS dev, R2 prod)                     ✅
 deploy/k8s         k3s manifests                                          Phase 8
 SOURCES.md         catalog of every icon source, its license and tier
 ```
@@ -82,6 +84,8 @@ pnpm icons:import             # Tier A icon sets → Postgres, then rebuild sear
 pnpm icons:import --sets tabler,lucide --tiers A --no-index   # subset / skip reindex
 pnpm icons:reindex            # rebuild Meilisearch from Postgres (new index, atomic swap)
 pnpm icons:catalog            # regenerate SOURCES.md (never edit it by hand)
+pnpm --filter @iconnook/worker dev            # background jobs (packs, download counters)
+pnpm --filter @iconnook/worker flags set packs off   # feature flags: packs | png, on | off
 docker run --rm -i -e BASE_URL=http://host.docker.internal:8787 grafana/k6 run - < load/api.js   # API load test
 pnpm build && pnpm --filter @iconnook/web test:e2e   # Playwright journeys + axe (light/dark) + 320px + no-JS
 cd apps/web && CHROME_PATH=$(node -e "console.log(require('@playwright/test').chromium.executablePath())") npx @lhci/cli@0.16.0 autorun   # Lighthouse budgets (site must be running)
@@ -106,6 +110,8 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 - Web CSS: base styles go in `@layer base` / `@layer components` — unlayered CSS overrides every Tailwind utility (this broke button contrast once).
 - Web CSP comes from Astro (`security.csp`, hashed scripts, sent as a header in SSR); `src/middleware.ts` appends `frame-ancestors` and other headers. Never add `'unsafe-inline'` to script-src.
 - Each `role="search"` form needs a unique `aria-label` (axe `landmark-unique`).
+- BullMQ: worker connections need `maxRetriesPerRequest: null`; API/producer connections fail fast. Tests use Valkey db 15 and a random BullMQ `prefix` — never the default keys.
+- `msgpackr-extract` install script is deliberately denied (`allowBuilds`); BullMQ falls back to pure JS.
 - Install scripts are blocked except those in `allowBuilds` (approve with `pnpm approve-builds <pkg>`).
 - ESLint and Prettier are configured once at the root; `packages/config` holds the shared tsconfig. `.astro` files are checked by `astro check`, not ESLint (yet).
 
