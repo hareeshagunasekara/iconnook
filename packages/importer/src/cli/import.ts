@@ -6,7 +6,7 @@ import { createDb } from '@iconnook/db';
 import { Meilisearch } from 'meilisearch';
 
 import { loadImporterConfig } from '../config.js';
-import { importSets, type SetReport } from '../run.js';
+import { importSets, removeBlockedSets, type SetReport } from '../run.js';
 import { rebuildSearchIndex } from '@iconnook/search';
 import { APPROVED_SETS } from '../approved.js';
 import { externalSource } from '../sources/external.js';
@@ -40,6 +40,8 @@ try {
       console.log(line);
     },
   };
+  const blocked = await removeBlockedSets(handle.db);
+  if (blocked.length > 0) console.log(`Removed blocked sets: ${blocked.join(', ')}`);
   const reports: SetReport[] = [];
   for (const source of [iconifySource, externalSource])
     reports.push(...(await importSets(handle.db, source, options)));
