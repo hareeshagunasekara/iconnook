@@ -57,6 +57,8 @@ export interface Category {
   slug: string;
   label: string;
   total: number;
+  /** A few icons that show what the category is about. */
+  preview: { set: string; name: string }[];
 }
 
 export interface Attribution {

@@ -3,23 +3,44 @@ import ErrorState from '../../components/ErrorState.astro';
 import IconSetCard from '../../components/IconSetCard.astro';
 import UiIcon from '../../components/UiIcon.astro';
 import Layout from '../../layouts/Layout.astro';
+import Pagination from '../../components/Pagination.astro';
 import { api, SET_TYPES, typeLabel, type IconSet } from '../../lib/api';
+import { pageNumber, paginate } from '../../lib/paging';
 
+/** 6 rows of the 3-column card grid. */
+const PER_PAGE = 18;
 const type = SET_TYPES.find((t) => t.value === Astro.url.searchParams.get('type'))?.value;
+const page = pageNumber(Astro.url.searchParams.get('page'));
+if (page === 0) return Astro.rewrite('/404');
+
 let sets: IconSet[] | null = null;
 try {
   sets = await api<IconSet[]>('/v1/sets', { type });
 } catch {
   Astro.response.status = 503;
 }
+// Kinds in their usual order, biggest sets first; a page may start or end mid-kind.
+const ordered = SET_TYPES.flatMap((t) =>
+  (sets ?? []).filter((s) => s.type === t.value).sort((a, b) => b.total - a.total),
+);
+const { items, pages } = paginate(ordered, page, PER_PAGE);
+if (sets && page > pages) return Astro.rewrite('/404');
 const groups = SET_TYPES.map((t) => ({
   ...t,
-  sets: (sets ?? []).filter((s) => s.type === t.value).sort((a, b) => b.total - a.total),
+  total: ordered.filter((s) => s.type === t.value).length,
+  sets: items.filter((s) => s.type === t.value),
 })).filter((g) => g.sets.length > 0);
+const pageHref = (p: number) => {
+  const query = new URLSearchParams();
+  if (type) query.set('type', type);
+  if (p > 1) query.set('page', String(p));
+  const qs = query.toString();
+  return qs ? `/sets?${qs}` : '/sets';
+};
 ---
 
 <Layout
-  title={type ? `${typeLabel(type)}: icon sets` : 'Icon sets'}
+  title={`${type ? `${typeLabel(type)}: icon sets` : 'Icon sets'}${page > 1 ? ` (page ${String(page)})` : ''}`}
   description="Every open-source icon set on IconNook, with its license and number of icons."
 >
   <h1 class="section-title">{type ? typeLabel(type) : 'All icon sets'}</h1>
@@ -56,9 +77,7 @@ const groups = SET_TYPES.map((t) => ({
     <section aria-labelledby={`g-${group.value}`} class="mt-10">
       <h2 id={`g-${group.value}`} class="text-2xl font-bold">
         {group.label}{' '}
-        <span class="text-base font-normal text-[var(--color-text-muted)]">
-          ({group.sets.length})
-        </span>
+        <span class="text-base font-normal text-[var(--color-text-muted)]">({group.total})</span>
       </h2>
       <ul class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {group.sets.map((set, i) => (
@@ -69,6 +88,8 @@ const groups = SET_TYPES.map((t) => ({
       </ul>
     </section>
   ))}
+
+  <Pagination page={page} pages={pages} href={pageHref} />
 </Layout>
 
 <style>
