@@ -190,7 +190,12 @@ export const SetIconsPage = z
   .openapi('SetIconsPage');
 
 export const Category = z
-  .object({ slug: z.string(), label: z.string(), total: z.number().int() })
+  .object({
+    slug: z.string(),
+    label: z.string(),
+    total: z.number().int(),
+    preview: z.array(z.object({ set: z.string(), name: z.string() })),
+  })
   .openapi('Category');
 
 export const CodeResult = z

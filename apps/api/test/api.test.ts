@@ -152,7 +152,14 @@ describe('against real Postgres, Meilisearch and Valkey', () => {
                 WHERE c.slug = 'shapes' AND i.name IN ('circle', 'ghost')`;
 
     const categories = await contract('/v1/categories', Category.array());
-    expect(categories).toEqual([{ slug: 'shapes', label: 'Shapes', total: 1 }]);
+    expect(categories).toEqual([
+      {
+        slug: 'shapes',
+        label: 'Shapes',
+        total: 1,
+        preview: [{ set: 'iconnook-fixtures', name: 'circle' }], // the hidden icon isn't shown
+      },
+    ]);
     expect((await app.request('/v1/icons/iconnook-fixtures/ghost')).status).toBe(404);
   });
 

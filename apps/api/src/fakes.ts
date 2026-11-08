@@ -100,7 +100,15 @@ export function fakeDeps(
         nextCursor: all.length > page.limit ? (items.at(-1)?.name ?? null) : null,
       });
     },
-    listCategories: () => Promise.resolve([{ slug: 'arrows', label: 'Arrows', total: 1 }]),
+    listCategories: () =>
+      Promise.resolve([
+        {
+          slug: 'arrows',
+          label: 'Arrows',
+          total: 1,
+          preview: [{ set: 'tabler', name: 'arrow-left' }],
+        },
+      ]),
     collections: new Map(),
     getIconsByRefs: (refs) =>
       Promise.resolve(
