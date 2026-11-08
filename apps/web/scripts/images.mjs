@@ -33,7 +33,7 @@ async function variants(source, outBase, widths) {
 const illustrations = join(ASSETS, 'illustrations');
 for (const file of (await readdir(illustrations)).filter((f) => f.endsWith('.png'))) {
   const name = file.slice(0, -'.png'.length);
-  await variants(join(illustrations, file), join(illustrations, name), [480, 800, 1280]);
+  await variants(join(illustrations, file), join(illustrations, name), [480, 720, 960, 1280]);
   console.log(`illustration ${name}`);
 }
 
