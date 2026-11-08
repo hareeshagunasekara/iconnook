@@ -1,7 +1,18 @@
 ---
+import { PUBLIC_API_URL } from 'astro:env/client';
+
 import ErrorState from '../../components/ErrorState.astro';
+import Pagination from '../../components/Pagination.astro';
 import Layout from '../../layouts/Layout.astro';
 import { api, type Category } from '../../lib/api';
+import { orderCategories } from '../../lib/categories';
+import { assetUrl, label } from '../../lib/icons';
+import { pageNumber, paginate } from '../../lib/paging';
+
+/** 10 rows of the 3-column card grid. */
+const PER_PAGE = 30;
+const page = pageNumber(Astro.url.searchParams.get('page'));
+if (page === 0) return Astro.rewrite('/404');
 
 let categories: Category[] | null = null;
 try {
@@ -9,32 +20,60 @@ try {
 } catch {
   Astro.response.status = 503;
 }
+const { items, pages } = paginate(orderCategories(categories ?? []), page, PER_PAGE);
+if (categories && page > pages) return Astro.rewrite('/404');
 const fmt = new Intl.NumberFormat('en');
-const sorted = [...(categories ?? [])].sort((a, b) => a.label.localeCompare(b.label));
+const SHADOWS = ['mustard', 'pink', 'blue', 'green', 'coral', 'purple'];
 ---
 
 <Layout
-  title="Categories"
-  description="Browse free icons by topic: arrows, buildings, business, communication and more."
+  title={`Categories${page > 1 ? ` (page ${String(page)})` : ''}`}
+  description="Browse free icons by topic: animals, food, weather, travel, business and more."
 >
-  <h1 class="text-3xl font-bold">Categories</h1>
-  <p class="mt-2 text-[var(--color-text-muted)]">Topics come from the icon sets themselves.</p>
+  <h1 class="section-title">Categories</h1>
+  <p class="mt-2 text-text-muted">
+    {categories ? `${fmt.format(categories.length)} topics, ` : ''}from the icon sets themselves.
+  </p>
   {!categories && (
     <div class="mt-8">
       <ErrorState title="Categories are temporarily unavailable" />
     </div>
   )}
-  <ul class="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-    {sorted.map((c) => (
+  <ul class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Categories">
+    {items.map((c, i) => (
       <li>
         <a
           href={`/categories/${c.slug}`}
-          class="flex min-h-11 items-center justify-between gap-2 rounded-lg bg-[var(--color-surface)] px-3 py-2 hover:outline hover:outline-1 hover:outline-[var(--color-border)]"
+          class="pop-card flex min-h-14 items-center gap-3 px-4 py-3"
+          style={`--pop: var(--color-${SHADOWS[i % SHADOWS.length] ?? 'mustard'})`}
         >
-          <span>{c.label}</span>
-          <span class="text-sm text-[var(--color-text-muted)]">{fmt.format(c.total)}</span>
+          <span class="min-w-0 flex-1 truncate font-display font-bold">{c.label}</span>
+          <span class="flex shrink-0 items-center gap-1.5" aria-hidden="true">
+            {c.preview.map((p) => (
+              <img
+                src={assetUrl(PUBLIC_API_URL, p.set, p.name, 'svg')}
+                alt=""
+                title={label(p.name)}
+                width="20"
+                height="20"
+                loading="lazy"
+                decoding="async"
+                class="size-5 object-contain"
+              />
+            ))}
+          </span>
+          <span class="shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold tabular-nums">
+            {fmt.format(c.total)}
+            <span class="sr-only"> icons</span>
+          </span>
         </a>
       </li>
     ))}
   </ul>
+
+  <Pagination
+    page={page}
+    pages={pages}
+    href={(p) => (p > 1 ? `/categories?page=${String(p)}` : '/categories')}
+  />
 </Layout>

@@ -5,13 +5,13 @@ import LicenseBadge from '../../components/LicenseBadge.astro';
 import Pagination from '../../components/Pagination.astro';
 import Layout from '../../layouts/Layout.astro';
 import { api, typeLabel, type IconSet, type IconSummary } from '../../lib/api';
+import { pageNumber as parsePage } from '../../lib/paging';
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 /** 5 rows of the 9-column grid. */
 const PER_PAGE = 45;
 const prefix = Astro.params.set ?? '';
-const pageParam = Astro.url.searchParams.get('page') ?? '1';
-const pageNumber = /^[1-9][0-9]{0,3}$/.test(pageParam) ? Number(pageParam) : 0;
+const pageNumber = parsePage(Astro.url.searchParams.get('page'));
 if (!SLUG.test(prefix) || pageNumber === 0) return Astro.rewrite('/404');
 
 let set: IconSet | null = null;
