@@ -7,15 +7,15 @@ import LicenseBadge from './LicenseBadge.astro';
 
 interface Props {
   set: IconSet;
-  /** Position in the grid; picks the tile and shadow colors so neighbours differ. */
+  /** Position in the grid; picks the tile (and shadow) colors so neighbours differ. */
   index: number;
   /**
-   * Load the preview as a lazy, CDN-cached image instead of inlining it: for long lists, where
-   * inlining every preview would bloat the page.
+   * For long lists (all icon sets): a plain card without the colored shadow, four of the set's
+   * sample icons as small lazy, CDN-cached images, and a quieter license line.
    */
-  lazy?: boolean;
+  compact?: boolean;
 }
-const { set, index, lazy = false } = Astro.props;
+const { set, index, compact = false } = Astro.props;
 
 // Tile and shadow walk the same palette two steps apart: a card's tile never matches its own
 // shadow, and neighbours differ across rows of 2 or 3.
@@ -23,18 +23,33 @@ const PALETTE = ['purple', 'blue', 'mustard', 'coral', 'green', 'pink'];
 const tile = PALETTE[index % PALETTE.length] ?? 'purple';
 const shadow = PALETTE[(index + 2) % PALETTE.length] ?? 'mustard';
 const fmt = new Intl.NumberFormat('en');
+const samples = compact && set.samples.length >= 4 ? set.samples.slice(0, 4) : [];
 ---
 
 <a
   href={`/sets/${set.prefix}`}
-  class="pop-card flex h-full items-center gap-4 p-4"
-  style={`--pop: var(--color-${shadow})`}
+  class:list={[compact ? 'plain-card' : 'pop-card', 'flex h-full items-center gap-4 p-4']}
+  style={compact ? undefined : `--pop: var(--color-${shadow})`}
 >
   <span
     class="grid size-16 shrink-0 place-items-center rounded-[var(--radius-tile)] text-ink"
     style={`background: var(--color-${tile}-soft)`}
   >
-    {set.preview && lazy ? (
+    {samples.length > 0 ? (
+      <span class="grid grid-cols-2 gap-1.5">
+        {samples.map((name) => (
+          <img
+            src={assetUrl(PUBLIC_API_URL, set.prefix, name, 'svg')}
+            alt=""
+            width="20"
+            height="20"
+            loading="lazy"
+            decoding="async"
+            class="size-5 object-contain"
+          />
+        ))}
+      </span>
+    ) : set.preview && compact ? (
       <img
         src={assetUrl(PUBLIC_API_URL, set.prefix, set.preview.name, 'svg')}
         alt=""
@@ -57,6 +72,6 @@ const fmt = new Intl.NumberFormat('en');
     <span class="text-sm text-text-muted">
       {fmt.format(set.total)} icons{set.author ? ` · by ${set.author.name}` : ''}
     </span>
-    <LicenseBadge license={set.license} />
+    <LicenseBadge license={set.license} subtle={compact} />
   </span>
 </a>

@@ -9,8 +9,8 @@ import { orderCategories } from '../../lib/categories';
 import { assetUrl, label } from '../../lib/icons';
 import { pageNumber, paginate } from '../../lib/paging';
 
-/** 10 rows of the 3-column card grid. */
-const PER_PAGE = 30;
+/** 8 rows of the 3-column card grid. */
+const PER_PAGE = 24;
 const page = pageNumber(Astro.url.searchParams.get('page'));
 if (page === 0) return Astro.rewrite('/404');
 
@@ -23,7 +23,6 @@ try {
 const { items, pages } = paginate(orderCategories(categories ?? []), page, PER_PAGE);
 if (categories && page > pages) return Astro.rewrite('/404');
 const fmt = new Intl.NumberFormat('en');
-const SHADOWS = ['mustard', 'pink', 'blue', 'green', 'coral', 'purple'];
 ---
 
 <Layout
@@ -40,12 +39,11 @@ const SHADOWS = ['mustard', 'pink', 'blue', 'green', 'coral', 'purple'];
     </div>
   )}
   <ul class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Categories">
-    {items.map((c, i) => (
+    {items.map((c) => (
       <li>
         <a
           href={`/categories/${c.slug}`}
-          class="pop-card flex min-h-14 items-center gap-3 px-4 py-3"
-          style={`--pop: var(--color-${SHADOWS[i % SHADOWS.length] ?? 'mustard'})`}
+          class="plain-card flex min-h-14 items-center gap-3 px-4 py-3"
         >
           <span class="min-w-0 flex-1 truncate font-display font-bold">{c.label}</span>
           <span class="flex shrink-0 items-center gap-1.5" aria-hidden="true">
