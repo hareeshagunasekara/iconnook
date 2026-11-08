@@ -5,11 +5,14 @@ import Pagination from '../../components/Pagination.astro';
 import Layout from '../../layouts/Layout.astro';
 import { api, type Category, type SearchResult } from '../../lib/api';
 
-const PER_PAGE = 96;
+/** 5 rows of the 9-column grid. */
+const PER_PAGE = 45;
+/** The API serves at most 100 pages of results. */
+const MAX_PAGES = 100;
 const slug = Astro.params.slug ?? '';
 if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) return Astro.rewrite('/404');
 const page = Math.min(
-  50,
+  MAX_PAGES,
   Math.max(1, Number.parseInt(Astro.url.searchParams.get('page') ?? '1', 10) || 1),
 );
 
@@ -28,7 +31,7 @@ try {
   Astro.response.status = 503;
 }
 if (!failed && !category) return Astro.rewrite('/404');
-const pages = result ? Math.ceil(Math.min(result.total, 5_000) / PER_PAGE) : 0;
+const pages = result ? Math.min(MAX_PAGES, Math.ceil(Math.min(result.total, 5_000) / PER_PAGE)) : 0;
 const fmt = new Intl.NumberFormat('en');
 ---
 
@@ -54,9 +57,9 @@ const fmt = new Intl.NumberFormat('en');
       <div class="mt-6">
         <IconGrid icons={result.items} name={`${category.label} icons`} showSet />
         <Pagination
-          prev={page > 1 ? `/categories/${slug}?page=${String(page - 1)}` : undefined}
-          next={page < pages ? `/categories/${slug}?page=${String(page + 1)}` : undefined}
-          status={`Page ${String(page)} of ${String(Math.max(pages, 1))}`}
+          page={page}
+          pages={pages}
+          href={(p) => `/categories/${slug}?page=${String(p)}`}
         />
       </div>
     </>

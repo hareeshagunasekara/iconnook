@@ -5,14 +5,9 @@ import ErrorState from '../../../components/ErrorState.astro';
 import IconGrid from '../../../components/IconGrid.astro';
 import LicenseBadge from '../../../components/LicenseBadge.astro';
 import { IconEditor } from '../../../islands/IconEditor.tsx';
+import { IconInfo } from '../../../islands/IconInfo.tsx';
 import Layout from '../../../layouts/Layout.astro';
-import {
-  api,
-  typeLabel,
-  type Attribution,
-  type IconDetail,
-  type SearchResult,
-} from '../../../lib/api';
+import { api, type Attribution, type IconDetail, type SearchResult } from '../../../lib/api';
 import { assetUrl, inlineSvg, label } from '../../../lib/icons';
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -83,120 +78,23 @@ const title = icon ? `${label(icon.name)} icon from ${icon.setInfo.name}` : 'Ico
         name={icon.name}
         isColor={icon.setInfo.isColor}
         hasStroke={hasStroke}
-        initialCode={code}
         initialSvg={inlineSvg(icon)}
         iconId={icon.id}
       />
+      <noscript>
+        <details class="mt-4">
+          <summary class="cursor-pointer font-semibold">SVG code</summary>
+          <pre class="mt-2 max-h-80 overflow-auto rounded-lg bg-surface-2 p-3 text-xs whitespace-pre-wrap break-all"><code>{code}</code></pre>
+        </details>
+      </noscript>
 
-      <div class="mt-10 grid gap-6 lg:grid-cols-2">
-        <section
-          aria-labelledby="license"
-          class="min-w-0 rounded-xl border border-[var(--color-surface-2)] p-5"
-        >
-          <h2 id="license" class="text-lg font-semibold">
-            License
-          </h2>
-          <p class="mt-2">
-            <strong>{icon.setInfo.license.spdx}</strong>, from{' '}
-            <a class="link" href={`/sets/${icon.set}`}>
-              {icon.setInfo.name}
-            </a>
-            {icon.setInfo.author && <> by {icon.setInfo.author.name}</>}.{' '}
-            {icon.setInfo.license.url && (
-              <a class="link" href={icon.setInfo.license.url} rel="noopener">
-                Read the license
-              </a>
-            )}
-          </p>
-          {attribution && (
-            <div class="mt-3">
-              {attribution.required ? (
-                <p>
-                  <strong>Credit required.</strong> Copy this line into your project or site:
-                </p>
-              ) : (
-                <p class="text-[var(--color-text-muted)]">
-                  Free for personal and commercial use. No attribution needed, but a credit is
-                  always appreciated:
-                </p>
-              )}
-              <p class="mt-2 rounded-lg bg-[var(--color-surface)] p-3 font-mono text-xs [overflow-wrap:anywhere]">
-                {attribution.plain}
-              </p>
-              {attribution.shareAlike && (
-                <p class="mt-2 text-sm">
-                  If you modify this icon, share your version under the same license.
-                </p>
-              )}
-            </div>
-          )}
-          {icon.setInfo.type === 'logos' && (
-            <p class="mt-3 text-sm text-[var(--color-text-muted)]">
-              <strong>Trademark notice:</strong> the license covers this drawing, not the brand.
-              Logos and brand names belong to their owners; follow their brand guidelines.
-            </p>
-          )}
-          <p class="mt-3 text-sm">
-            <a class="link" href="/licenses">
-              How licenses work on IconNook
-            </a>
-          </p>
-        </section>
-
-        <section
-          aria-labelledby="details"
-          class="min-w-0 rounded-xl border border-[var(--color-surface-2)] p-5"
-        >
-          <h2 id="details" class="text-lg font-semibold">
-            Details
-          </h2>
-          <dl class="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-            <dt class="text-[var(--color-text-muted)]">Set</dt>
-            <dd>
-              <a class="link" href={`/sets/${icon.set}`}>
-                {icon.setInfo.name}
-              </a>{' '}
-              ({typeLabel(icon.setInfo.type)})
-            </dd>
-            <dt class="text-[var(--color-text-muted)]">Name</dt>
-            <dd class="font-mono">
-              {icon.set}:{icon.name}
-            </dd>
-            <dt class="text-[var(--color-text-muted)]">Grid</dt>
-            <dd>
-              {icon.width} × {icon.height}
-            </dd>
-          </dl>
-          {(icon.synonyms.length > 0 || icon.categories.length > 0) && (
-            <ul class="mt-4 flex flex-wrap gap-2" aria-label="Tags">
-              {icon.categories.map((c) => (
-                <li>
-                  <a
-                    href={`/categories/${c.slug}`}
-                    class="inline-flex min-h-8 items-center rounded-full border border-[var(--color-border)] px-3 text-sm"
-                  >
-                    {c.label}
-                  </a>
-                </li>
-              ))}
-              {icon.synonyms.map((s) => (
-                <li>
-                  <a
-                    href={`/search?q=${encodeURIComponent(s)}`}
-                    class="inline-flex min-h-8 items-center rounded-full bg-[var(--color-surface)] px-3 text-sm"
-                  >
-                    {s}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+      <div class="mt-8">
+        <IconInfo icon={icon} attribution={attribution} />
       </div>
 
       {similarIcons.length > 0 && (
-        <section aria-labelledby="similar" class="mt-10">
-          <h2 id="similar" class="text-xl font-semibold">
+        <section aria-labelledby="similar" class="mt-8">
+          <h2 id="similar" class="font-display text-xl font-bold">
             Similar icons
           </h2>
           <div class="mt-4">

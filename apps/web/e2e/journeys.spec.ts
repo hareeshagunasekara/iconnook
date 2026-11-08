@@ -1,10 +1,18 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /** Critical user journeys (docs/standards/testing.md). Data: the CC0 fixture set "iconnook-fixtures". */
 
 const SET = 'iconnook-fixtures';
 
-test('search → open icon → customize → copy SVG', async ({ page, context }) => {
+/** The icon page's editor works once its island has hydrated (Astro then drops the ssr flag). */
+const editorReady = (page: Page) =>
+  page.locator('astro-island[component-url*="IconEditor"]:not([ssr])').waitFor();
+
+/** Icon tiles open in a dialog once the modal island is ready (before that they're plain links). */
+const modalReady = (page: Page) =>
+  page.waitForFunction(() => document.documentElement.dataset.iconModalReady === 'true');
+
+test('search → open icon in the dialog → customize → copy SVG', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto(`/sets/${SET}`);
   const setSearch = page.getByRole('searchbox', { name: 'Search in IconNook Fixtures' });
@@ -12,39 +20,84 @@ test('search → open icon → customize → copy SVG', async ({ page, context }
   await setSearch.press('Enter');
   await expect(page).toHaveURL(/\/search\?set=iconnook-fixtures&q=circle/);
 
+  await modalReady(page);
   await page.locator(`a[href="/icons/${SET}/circle"]`).first().click();
-  await expect(page.getByRole('heading', { level: 1, name: 'circle' })).toBeVisible();
+  const dialog = page.getByRole('dialog', { name: 'circle' });
+  await expect(dialog).toBeVisible();
+  await expect(page).toHaveURL(new RegExp(`/icons/${SET}/circle$`)); // shareable
 
-  // Island hydrates when visible; then customize.
-  await page.getByLabel('Color as hex code').fill('#ff0000');
-  await page.getByLabel('Size').selectOption('64');
-  await expect(page.getByRole('tabpanel')).toContainText('color="#ff0000"');
-  await expect(page.getByRole('tabpanel')).toContainText('width="64"');
-  await page.getByRole('button', { name: 'Copy SVG' }).click();
-  await expect(page.getByRole('button', { name: 'Copied ✓' })).toBeVisible();
+  await dialog.getByLabel('Color as hex code').fill('#ff0000');
+  await dialog.getByLabel('Size').selectOption('64');
+  await dialog.getByRole('button', { name: 'Copy as SVG' }).click();
+  await expect(dialog.getByRole('button', { name: 'Copied SVG' })).toBeVisible();
 
   const clipboard = await page.evaluate(() => navigator.clipboard.readText());
   expect(clipboard).toMatch(/^<svg /);
   expect(clipboard).toContain('color="#ff0000"');
+  expect(clipboard).toContain('width="64"');
   await expect(page.locator('#announcer')).toHaveText(/Copied SVG code/);
+
+  // License, details and similar icons sit below the editor.
+  await expect(dialog.getByText('CC0-1.0', { exact: true })).toBeVisible();
+
+  // Escape closes the dialog and restores the page's URL.
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(page).toHaveURL(/\/search\?set=iconnook-fixtures&q=circle/);
 });
 
-test('copy as JSX, Vue and the other formats via keyboard-operable tabs', async ({ page }) => {
+test('Back closes the icon dialog', async ({ page }) => {
+  await page.goto(`/sets/${SET}`);
+  await modalReady(page);
+  await page.locator(`a[href="/icons/${SET}/plus"]`).click();
+  await expect(page.getByRole('dialog', { name: 'plus' })).toBeVisible();
+  await page.goBack();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page).toHaveURL(new RegExp(`/sets/${SET}$`));
+});
+
+test('copies every code format with one click, without showing the code', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto(`/icons/${SET}/plus`);
-  const svgTab = page.getByRole('tab', { name: 'SVG' });
-  await svgTab.focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(page.getByRole('tab', { name: 'JSX' })).toBeFocused();
-  await expect(page.getByRole('tab', { name: 'JSX' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByRole('tabpanel')).toContainText(
-    'export function IconnookFixturesPlus(props)',
-  );
-  await page.keyboard.press('ArrowRight');
-  await expect(page.getByRole('tabpanel')).toContainText('<template>');
+  await editorReady(page);
+  const copied = () => page.evaluate(() => navigator.clipboard.readText());
+  await page.getByRole('button', { name: 'Copy as JSX' }).click();
+  await expect(page.getByRole('button', { name: 'Copied JSX' })).toBeVisible();
+  expect(await copied()).toContain('export function IconnookFixturesPlus(props)');
+  await page.getByRole('button', { name: 'Copy as Vue' }).click();
+  await expect(page.getByRole('button', { name: 'Copied Vue' })).toBeVisible();
+  expect(await copied()).toContain('<template>');
+  await expect(page.locator('pre code')).toBeHidden(); // no code on screen with JavaScript
+});
+
+test('search box suggests searches, sets and icons', async ({ page }) => {
+  await page.goto('/');
+  const box = page.getByRole('combobox', { name: 'Search icons' }).first();
+  await box.click();
+  const list = page.getByRole('listbox', { name: 'Search suggestions' }).first();
+  await expect(list).toBeVisible();
+  await expect(list.getByRole('option', { name: 'home' })).toBeVisible(); // popular searches
+
+  await box.fill('circ');
+  await expect(list.getByRole('option', { name: 'Search for “circ”' })).toBeVisible();
+  await expect(list.getByRole('option', { name: /circle/ }).first()).toBeVisible();
+  await page.keyboard.press('ArrowDown');
+  await expect(box).toHaveAttribute('aria-activedescendant', /suggestions-0$/);
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/search\?q=circ$/);
+});
+
+test('set pages show numbered pages and 404 past the last one', async ({ page }) => {
+  expect((await page.goto(`/sets/${SET}?page=2`))?.status()).toBe(404);
+  expect((await page.goto(`/sets/${SET}?page=abc`))?.status()).toBe(404);
 });
 
 test('downloads SVG and PNG at the chosen size', async ({ page, request }) => {
   await page.goto(`/icons/${SET}/square`);
+  await editorReady(page);
   await page.getByLabel('Size').selectOption('128');
   const svgHref = await page.getByRole('link', { name: 'Download SVG' }).getAttribute('href');
   const pngHref = await page
@@ -150,7 +203,10 @@ test('pages load without CSP violations or console errors', async ({ page }) => 
   // The editor island hydrated (CSP allowed Astro's hashed scripts).
   await page.goto(`/icons/${SET}/circle`);
   await page.getByLabel('Color as hex code').fill('#00aa55');
-  await expect(page.getByRole('tabpanel')).toContainText('#00aa55');
+  await expect(page.getByRole('img', { name: /preview on light background/ })).toHaveAttribute(
+    'src',
+    /color=%2300aa55/,
+  );
   expect(problems).toEqual([]);
 });
 
@@ -165,4 +221,14 @@ test('sends security headers and a CSP', async ({ request, page }) => {
   expect(csp).not.toMatch(/script-src[^;]*'unsafe-inline'/);
   expect(res.headers()['cache-control']).toContain('s-maxage');
   await page.goto('/');
+});
+
+test('"Back to top" scrolls up to the hero', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+  await page.getByRole('link', { name: 'Back to top' }).click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
 });

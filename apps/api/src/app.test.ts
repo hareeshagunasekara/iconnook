@@ -242,6 +242,8 @@ describe('JSON endpoints', () => {
     '/v1/sets?tier=X',
     '/v1/sets/tabler/icons?limit=0',
     '/v1/sets/tabler/icons?cursor=Bad%20Cursor',
+    '/v1/sets/tabler/icons?page=0',
+    '/v1/sets/tabler/icons?page=2&cursor=home',
     '/v1/icons/tabler/arrow-left/code?format=php',
     '/v1/icons/Tabler/arrow-left',
   ])('rejects invalid input: %s', async (path) => {
@@ -276,6 +278,14 @@ describe('JSON endpoints', () => {
       nextCursor: string | null;
     };
     expect(second).toMatchObject({ items: [{ name: 'home' }], nextCursor: null });
+  });
+
+  it('paginates set icons by page number', async () => {
+    const { app } = setup();
+    const second = (await (await app.request('/v1/sets/tabler/icons?limit=1&page=2')).json()) as {
+      items: { name: string }[];
+    };
+    expect(second.items.map((i) => i.name)).toEqual(['home']);
   });
 
   it('returns icon details and code in every format', async () => {

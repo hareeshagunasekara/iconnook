@@ -165,7 +165,7 @@ export class DrizzleIconRepository implements IconRepository {
 
   async listSetIcons(
     prefix: string,
-    page: { cursor?: string; limit: number },
+    page: { cursor?: string; offset?: number; limit: number },
   ): Promise<Page<IconRecord>> {
     const conditions = [eq(iconSets.prefix, prefix), visible];
     if (page.cursor) conditions.push(gt(icons.name, page.cursor));
@@ -175,7 +175,8 @@ export class DrizzleIconRepository implements IconRepository {
       .innerJoin(iconSets, eq(iconSets.id, icons.setId))
       .where(and(...conditions))
       .orderBy(asc(icons.name))
-      .limit(page.limit + 1);
+      .limit(page.limit + 1)
+      .offset(page.offset ?? 0);
     const items = rows.slice(0, page.limit);
     return { items, nextCursor: rows.length > page.limit ? (items.at(-1)?.name ?? null) : null };
   }

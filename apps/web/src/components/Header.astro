@@ -11,10 +11,8 @@ const path = Astro.url.pathname;
 const nav = [
   { href: '/sets', label: 'Icon sets' },
   { href: '/categories', label: 'Categories' },
-  { href: '/licenses', label: 'Licenses' },
   { href: '/collection', label: 'Collection' },
   { href: '/about', label: 'About' },
-  { href: 'https://github.com/hareeshagunasekara/iconnook', label: 'Open source' },
 ];
 ---
 
@@ -28,7 +26,7 @@ const nav = [
     </div>
     <button
       type="button"
-      class="menu-button ml-auto inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-button)] border-2 border-ink bg-surface px-3 font-semibold xl:hidden"
+      class="menu-button ml-auto inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-button)] border-2 border-ink bg-surface px-3 font-semibold lg:hidden"
       aria-expanded="false"
       aria-controls="main-nav"
       data-menu-button
@@ -37,13 +35,13 @@ const nav = [
       <UiIcon name="x" class="icon-open size-5" />
       Menu
     </button>
-    <nav id="main-nav" aria-label="Main" class="w-full xl:ml-auto xl:w-auto" data-menu>
-      <ul class="flex flex-col xl:flex-row xl:items-center xl:gap-x-1">
+    <nav id="main-nav" aria-label="Main" class="w-full lg:ml-auto lg:w-auto" data-menu>
+      <ul class="flex flex-col lg:flex-row lg:items-center lg:gap-x-1">
         {nav.map((item) => (
-          <li class="max-xl:border-t max-xl:border-ink/10">
+          <li class="max-lg:border-t max-lg:border-ink/10">
             <a
               href={item.href}
-              class="nav-link inline-flex min-h-11 w-full items-center rounded-lg px-1 text-[0.9375rem] font-medium xl:w-auto xl:px-2.5"
+              class="nav-link inline-flex min-h-11 w-full items-center rounded-lg px-1 text-[0.9375rem] font-medium lg:w-auto lg:px-2.5"
               aria-current={path.startsWith(item.href) ? 'page' : undefined}
             >
               {item.label}
@@ -73,7 +71,7 @@ const nav = [
 </header>
 
 <style>
-  @media (width < 80rem) {
+  @media (width < 64rem) {
     [data-menu]:not([data-open]) {
       display: none;
     }

@@ -94,10 +94,17 @@ export const SetListQuery = z.object({
   tier: z.enum(['A', 'B', 'C']).optional(),
 });
 
-export const SetIconsQuery = z.object({
-  cursor: z.string().max(100).regex(SLUG).optional(),
-  limit: z.coerce.number().int().min(1).max(500).default(100),
-});
+export const SetIconsQuery = z
+  .object({
+    cursor: z.string().max(100).regex(SLUG).optional(),
+    /** Numbered pages (1-based), for page links; use either this or cursor. */
+    page: z.coerce.number().int().min(1).max(10_000).optional(),
+    limit: z.coerce.number().int().min(1).max(500).default(100),
+  })
+  .refine((q) => q.cursor === undefined || q.page === undefined, {
+    message: 'Use either cursor or page, not both',
+    path: ['page'],
+  });
 
 // ---- Response schemas ----
 

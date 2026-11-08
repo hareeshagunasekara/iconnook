@@ -5,7 +5,10 @@ import Pagination from '../components/Pagination.astro';
 import Layout from '../layouts/Layout.astro';
 import { api, ApiError, SET_TYPES, type SearchResult } from '../lib/api';
 
-const PER_PAGE = 96;
+/** 5 rows of the 9-column grid. */
+const PER_PAGE = 45;
+/** The API serves at most 100 pages of results. */
+const MAX_PAGES = 100;
 const params = Astro.url.searchParams;
 const q = (params.get('q') ?? '').trim().slice(0, 100);
 const type = SET_TYPES.some((t) => t.value === params.get('type'))
@@ -20,7 +23,7 @@ const color = ['true', 'false'].includes(params.get('color') ?? '')
 const set = /^[a-z0-9]+(-[a-z0-9]+)*$/.test(params.get('set') ?? '')
   ? (params.get('set') ?? undefined)
   : undefined;
-const page = Math.min(50, Math.max(1, Number.parseInt(params.get('page') ?? '1', 10) || 1));
+const page = Math.min(MAX_PAGES, Math.max(1, Number.parseInt(params.get('page') ?? '1', 10) || 1));
 
 let result: SearchResult | null = null;
 let failed = false;
@@ -50,7 +53,7 @@ const pageUrl = (p: number) => {
   next.set('page', String(p));
   return `/search?${next.toString()}`;
 };
-const pages = result ? Math.ceil(Math.min(result.total, 5_000) / PER_PAGE) : 0;
+const pages = result ? Math.min(MAX_PAGES, Math.ceil(Math.min(result.total, 5_000) / PER_PAGE)) : 0;
 const hasFilters = Boolean(type || tier || color || set);
 const fmt = new Intl.NumberFormat('en');
 const SUGGESTIONS = ['home', 'arrow', 'user', 'settings', 'heart', 'mail'];
@@ -150,11 +153,7 @@ const SUGGESTIONS = ['home', 'arrow', 'user', 'settings', 'heart', 'mail'];
       {result.total > 0 ? (
         <div class="mt-4">
           <IconGrid icons={result.items} name={`Search results for ${q}`} showSet />
-          <Pagination
-            prev={page > 1 ? pageUrl(page - 1) : undefined}
-            next={page < pages ? pageUrl(page + 1) : undefined}
-            status={`Page ${String(page)} of ${String(Math.max(pages, 1))}`}
-          />
+          <Pagination page={page} pages={pages} href={pageUrl} />
         </div>
       ) : (
         <section class="mt-6 rounded-xl bg-[var(--color-surface)] p-6">
