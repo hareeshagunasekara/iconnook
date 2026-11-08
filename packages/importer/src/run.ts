@@ -3,6 +3,7 @@ import { schema, type Database } from '@iconnook/db';
 import { inArray } from 'drizzle-orm';
 
 import { BLOCKED_SETS } from './approved.js';
+import { addCuratedCategories } from './curated.js';
 
 import { prepareIcons } from './prepare.js';
 import { syncSet, type SyncStats } from './sync.js';
@@ -73,7 +74,7 @@ export async function importSets(
   const reports: SetReport[] = [];
 
   for (const [i, meta] of selected.entries()) {
-    const loaded = await source.loadSet(meta.prefix);
+    const loaded = addCuratedCategories(await source.loadSet(meta.prefix));
     const prepared = prepareIcons(loaded.icons);
     let stats: SyncStats;
     try {
