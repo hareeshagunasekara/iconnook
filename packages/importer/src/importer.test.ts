@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { renderCatalog } from './catalog.js';
+import { addCuratedCategories } from './curated.js';
 import { fixtureIconifySet } from './fixtures.js';
 import { prepareIcons } from './prepare.js';
 import { selectSets } from './run.js';
@@ -53,6 +54,51 @@ describe('Iconify adapter', () => {
       Buildings: ['home'],
       Arrows: ['arrow-up', 'arrow-down'],
     });
+  });
+});
+
+describe('addCuratedCategories', () => {
+  const icon = (name: string) => ({ name, body: '<path d="M0 0h1"/>', width: 24, height: 24 });
+  const setOf = (prefix: string, names: string[], categories: Record<string, string[]> = {}) =>
+    addCuratedCategories({
+      set: toSourceSet(prefix, info),
+      icons: names.map(icon),
+      synonyms: new Map(),
+      categories: new Map(Object.entries(categories)),
+    }).categories;
+
+  it('files reviewed brand logos under "Brands", keeping their other categories', () => {
+    const categories = setOf(
+      'typcn',
+      ['social-github', 'social-at-circular', 'vendor-apple', 'home'],
+      { Social: ['social-github', 'social-at-circular'] },
+    );
+    expect(Object.fromEntries(categories)).toEqual({
+      Social: ['social-github', 'social-at-circular'],
+      Brands: ['social-github', 'vendor-apple'],
+    });
+  });
+
+  it('gathers loading indicators by name, and whole spinner sets', () => {
+    const names = [
+      'loader-2',
+      'bubble-loading',
+      'spinner-gap-bold',
+      'loaders',
+      'download',
+      'spinach',
+    ];
+    expect(setOf('any', names).get('Loading & spinners')).toEqual([
+      'loader-2',
+      'bubble-loading',
+      'spinner-gap-bold',
+      'loaders',
+    ]);
+    expect(setOf('svg-spinners', ['3-dots-bounce', 'pulse']).get('Loading & spinners')).toEqual([
+      '3-dots-bounce',
+      'pulse',
+    ]);
+    expect(setOf('any', ['home']).size).toBe(0);
   });
 });
 

@@ -50,7 +50,8 @@ Every icon must have a known license. Tiers (see `SOURCES.md`):
 Never import from Flaticon, Icons8, Freepik, Noun Project or unDraw (proprietary / license forbids competing libraries), and never scrape any icon site.
 Logos & brand icons: the license covers the drawing, not the trademark, so show a trademark notice.
 Adding a new source: verify the license at its official source, assign a tier, add it to `SOURCES.md`, then to the importer.
-Tier A imports by default; a Tier B/C set only after a one-by-one review in `packages/importer/src/approved.ts` (`APPROVED_SETS`, plus `CREDITS` when the licensor asks for specific wording). Sets outside Iconify live in `src/sources/external.ts`, pinned to a commit, SHA-256 or npm version, and every file is verified before use.
+Tier A imports by default; a Tier B/C set only after a one-by-one review in `packages/importer/src/approved.ts` (`APPROVED_SETS`, plus `CREDITS` when the licensor asks for specific wording). Brand logos inside non-logo sets (OpenMoji, Typicons) are listed in `BRAND_ICONS` and filed under "Brands", which shows the trademark notice. Our own cross-set categories ("Brands", "Loading & spinners") are added in `src/curated.ts`.
+Sets outside Iconify live in `src/sources/external.ts`, pinned to a commit, SHA-256 or npm version, and every file is verified before use.
 Set kinds (`/sets?type=…`) come from `packages/importer/src/set-kinds.ts`: Iconify's category, then curated lists (Material, pixel, design systems, frameworks), size, and line vs solid. After an `@iconify/json` upgrade, check new interface sets' samples and add a line/solid override where the "Uses Stroke" tag is wrong.
 
 ## Standards: read before working
@@ -109,7 +110,7 @@ Git hooks (lefthook): pre-commit runs gitleaks + Prettier + ESLint on staged fil
 - `pnpm-workspace.yaml` forces drizzle-kit's old `@esbuild-kit` loader onto esbuild 0.25 (GHSA-67mh-4wv8-2f99). Remove when drizzle-kit drops `@esbuild-kit`.
 - CI dependency review allows **GHSA-g3hv-75wg-m249** (minimatch 10.x, dev-only via ESLint; forcing minimatch 11 breaks `eslint-plugin-import-x` 4.17). Remove the exception once import-x ≥ 4.18 is installed.
 - `@iconify/json` is ~600 MB unpacked: fine for dev/CI, but keep it out of runtime images (Phase 7: run the importer as its own Job image).
-- The importer writes per-set rejections and sanitizer changes to `.data/import-report.json` (gitignored): review it after upgrading `@iconify/json`. Expected today: 13 rejected (2 over 512 KB, 1 with 0×0 size upstream, 10 Blobmoji skin-tone files with broken path data upstream), ~230 changed (amCharts and Blobmoji markup re-serialized, nothing removed that matters).
+- The importer writes per-set rejections and sanitizer changes to `.data/import-report.json` (gitignored): review it after upgrading `@iconify/json`. Expected today: 15 rejected (4 over 512 KB, 1 with 0×0 size upstream, 10 Blobmoji skin-tone files with broken path data upstream), ~230 changed (amCharts and Blobmoji markup re-serialized, nothing removed that matters).
 - **Light theme only: no dark mode** (ADR 0004, your decision): no `prefers-color-scheme` styles, no theme toggle, no dark-mode tests, and don't propose it. The dark _background_ in the icon-page preview is an icon preview, not a theme.
 - Web CSS: base styles go in `@layer base` / `@layer components`: unlayered CSS overrides every Tailwind utility (this broke button contrast once).
 - Web tokens use `@theme static`: components read them through `var()` in inline styles, and plain `@theme` drops variables no utility uses.
