@@ -59,6 +59,8 @@ export interface CategorySummary {
   slug: string;
   label: string;
   total: number;
+  /** A few icons that show what the category is about (colorful and varied when possible). */
+  preview: { set: string; name: string }[];
 }
 
 export interface Page<T> {

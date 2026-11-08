@@ -28,6 +28,16 @@ type SetRow = typeof iconSets.$inferSelect;
 
 const visible = eq(icons.hidden, false);
 
+/** Style words that only make variants of one icon ("cat-outline", "cat-24-filled"). */
+const STYLE_WORD =
+  /^(outline|outlined|filled|fill|solid|bold|thin|light|regular|duotone|duo|sharp|rounded|round|twotone|line|linear|broken|alt|\d+)$/;
+/** An icon name without its style words: "cat-outline" and "cat-24-filled" are both "cat". */
+const iconStem = (name: string) =>
+  name
+    .split('-')
+    .filter((part) => !STYLE_WORD.test(part))
+    .join('-');
+
 function toSetSummary(row: SetRow, preview: SetPreview | null): SetSummary {
   return {
     preview,
@@ -182,13 +192,45 @@ export class DrizzleIconRepository implements IconRepository {
   }
 
   async listCategories(): Promise<CategorySummary[]> {
-    return this.db
-      .select({ slug: categories.slug, label: categories.label, total: count(icons.id) })
-      .from(categories)
-      .innerJoin(iconCategories, eq(iconCategories.categoryId, categories.id))
-      .innerJoin(icons, and(eq(icons.id, iconCategories.iconId), visible))
-      .groupBy(categories.id)
-      .orderBy(asc(categories.label));
+    const [rows, candidates] = await Promise.all([
+      this.db
+        .select({ slug: categories.slug, label: categories.label, total: count(icons.id) })
+        .from(categories)
+        .innerJoin(iconCategories, eq(iconCategories.categoryId, categories.id))
+        .innerJoin(icons, and(eq(icons.id, iconCategories.iconId), visible))
+        .groupBy(categories.id)
+        .orderBy(asc(categories.label)),
+      // Up to 16 candidates per category: colorful sets first (they read best when tiny), taking
+      // one icon from each set in turn (a stable shuffle within each set) so no single set fills
+      // every card. Archived sets are left out.
+      this.db.execute<{ slug: string; prefix: string; name: string }>(sql`
+        SELECT c.slug, p.prefix, p.name
+        FROM categories c
+        CROSS JOIN LATERAL (
+          SELECT prefix, name
+          FROM (
+            SELECT s.prefix, i.name, s.is_color,
+              row_number() OVER (
+                PARTITION BY s.id ORDER BY md5(s.prefix || ':' || i.name)
+              ) AS turn
+            FROM icon_categories ic
+            JOIN icons i ON i.id = ic.icon_id AND NOT i.hidden
+            JOIN icon_sets s ON s.id = i.set_id AND s.type <> 'archive'
+            WHERE ic.category_id = c.id
+          ) ranked
+          ORDER BY is_color DESC, turn, md5(prefix)
+          LIMIT 16
+        ) p`),
+    ]);
+    const previews = new Map<string, { set: string; name: string }[]>();
+    for (const row of candidates) {
+      const picked = previews.get(row.slug) ?? [];
+      // Four different things, not four variants of one icon ("cat", "cat-outline", …).
+      if (picked.length < 4 && !picked.some((p) => iconStem(p.name) === iconStem(row.name)))
+        picked.push({ set: row.prefix, name: row.name });
+      previews.set(row.slug, picked);
+    }
+    return rows.map((row) => ({ ...row, preview: previews.get(row.slug) ?? [] }));
   }
 
   async getIconsByRefs(refs: readonly string[]): Promise<IconListItem[]> {
