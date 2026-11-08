@@ -160,6 +160,18 @@
     box-shadow: var(--pop-offset-lifted) var(--pop-offset-lifted) 0 var(--pop, var(--color-mustard));
   }
 
+  /* The same card without the colored shadow, for long lists. */
+  .plain-card {
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    transition: border-color 150ms;
+  }
+  a.plain-card:hover,
+  a.plain-card:focus-visible {
+    border-color: var(--color-purple);
+  }
+
   /* Rounded chip with an ink outline. Set --pill for the fill. */
   .pill {
     display: inline-flex;
