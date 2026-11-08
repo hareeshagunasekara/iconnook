@@ -152,7 +152,7 @@ const SUGGESTIONS = ['home', 'arrow', 'user', 'settings', 'heart', 'mail'];
       </p>
       {result.total > 0 ? (
         <div class="mt-4">
-          <IconGrid icons={result.items} name={`Search results for ${q}`} showSet />
+          <IconGrid icons={result.items} name={`Search results for ${q}`} />
           <Pagination page={page} pages={pages} href={pageUrl} />
         </div>
       ) : (

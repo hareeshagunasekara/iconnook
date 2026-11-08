@@ -245,9 +245,7 @@ export function IconModal({ apiUrl }: { apiUrl: string }) {
                         <span class="line-clamp-2 text-xs [overflow-wrap:anywhere]">
                           {label(i.name)}
                         </span>
-                        <span class="line-clamp-1 text-[0.7rem] text-text-muted">
-                          {i.setName ?? i.set}
-                        </span>
+                        <span class="sr-only">, {i.setName ?? i.set}</span>
                       </a>
                     </li>
                   ))}

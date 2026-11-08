@@ -6,10 +6,8 @@ interface Props {
   icons: IconSummary[];
   /** Accessible name of the grid, e.g. "Search results for home". */
   name: string;
-  /** Show the set name under each icon (search results mix sets). */
-  showSet?: boolean;
 }
-const { icons, name, showSet = false } = Astro.props;
+const { icons, name } = Astro.props;
 ---
 
 <!-- Fixed columns (3 / 5 / 9) so a page of 45 icons fills whole rows: 5 rows on desktop. -->
@@ -28,12 +26,8 @@ const { icons, name, showSet = false } = Astro.props;
           set:html={inlineSvg(icon, 'h-8 w-auto max-w-full')}
         />
         <span class="line-clamp-2 text-xs [overflow-wrap:anywhere]">{label(icon.name)}</span>
-        {showSet && icon.setName && (
-          <span class="line-clamp-1 text-[0.7rem] text-[var(--color-text-muted)]">
-            {icon.setName}
-          </span>
-        )}
-        {!showSet && icon.setName && <span class="sr-only">, {icon.setName}</span>}
+        {/* The set is named on the icon's page; screen readers still hear it here. */}
+        {icon.setName && <span class="sr-only">, {icon.setName}</span>}
       </a>
     </li>
   ))}

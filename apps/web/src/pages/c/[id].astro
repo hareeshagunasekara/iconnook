@@ -53,7 +53,7 @@ const title = collection?.name ? collection.name : 'Shared collection';
         <SaveCollection client:visible refs={refs} />
       </div>
       <div class="mt-8">
-        <IconGrid icons={collection.items} name={`${title} icons`} showSet />
+        <IconGrid icons={collection.items} name={`${title} icons`} />
       </div>
     </>
   )}
