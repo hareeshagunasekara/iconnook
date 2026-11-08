@@ -90,9 +90,16 @@ test('search box suggests searches, sets and icons', async ({ page }) => {
   await expect(page).toHaveURL(/\/search\?q=circ$/);
 });
 
-test('set pages show numbered pages and 404 past the last one', async ({ page }) => {
-  expect((await page.goto(`/sets/${SET}?page=2`))?.status()).toBe(404);
-  expect((await page.goto(`/sets/${SET}?page=abc`))?.status()).toBe(404);
+test('paged lists 404 past the last page or for a bad page number', async ({ page }) => {
+  for (const path of [
+    `/sets/${SET}?page=2`,
+    `/sets/${SET}?page=abc`,
+    '/sets?page=99',
+    '/categories?page=0',
+  ])
+    expect((await page.goto(path))?.status(), path).toBe(404);
+  expect((await page.goto('/sets?page=1'))?.status()).toBe(200);
+  expect((await page.goto('/categories'))?.status()).toBe(200);
 });
 
 test('downloads SVG and PNG at the chosen size', async ({ page, request }) => {
@@ -162,8 +169,10 @@ test('keyboard only: "/" focuses search, arrows move through the grid, Enter ope
 });
 
 test('set cards preview a real icon from each set and link to it', async ({ page }) => {
-  await page.goto('/sets');
+  await page.goto('/sets?type=solid');
   const card = page.locator(`a[href="/sets/${SET}"]`);
+  // The list is paged; with a full catalog the fixture set may be on a later page.
+  while ((await card.count()) === 0) await page.getByRole('link', { name: 'Next' }).click();
   await expect(card).toContainText('No attribution needed');
   // The set's sample icon, as a lazy image of its cacheable SVG URL.
   await expect(card.locator('img')).toHaveAttribute(
