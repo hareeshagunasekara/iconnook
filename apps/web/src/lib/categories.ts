@@ -7,9 +7,16 @@ import type { Category } from './api';
 const DISTINCTIVE =
   /emoji|smil|\bfaces?\b|emotion|animal|pet|nature|food|drink|beverage|fruit|weather|zodiac|constellation|astronom|science|sport|game|gaming|music|instrument|travel|place|holiday|halloween|winter|spring|autumn|flag|people|body|hand|cloth|medic|health|transport|vehicle|building|baby|agricultur|ecology|religion|makeup|photograph|romance|camping|chess|maritime|character|energy|money/i;
 
-/** Distinctive topics first, then categories whose preview fills the card, then the biggest. */
+/** Our own cross-set collections (built by the importer), shown before everything else. */
+const FEATURED = ['loading-and-spinners'];
+
+/**
+ * Featured collections first, then distinctive topics, then categories whose preview fills the
+ * card, then the biggest.
+ */
 export function orderCategories(categories: readonly Category[]): Category[] {
   const rank = (c: Category) => [
+    FEATURED.includes(c.slug) ? 0 : 1,
     DISTINCTIVE.test(c.label) ? 0 : 1,
     c.preview.length >= 4 ? 0 : 1,
     -c.total,

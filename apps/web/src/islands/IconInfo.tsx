@@ -1,6 +1,9 @@
 import type { Attribution, IconDetail } from '../lib/api';
 import { typeLabel } from '../lib/kinds';
 
+/** Category slugs used for brand logos (by upstream sets, and by our importer for "Brands"). */
+const BRAND_CATEGORIES = new Set(['brand', 'brands', 'logo', 'logos', 'brand-logo', 'brand-logos']);
+
 /**
  * License and details of an icon, kept small: who made it, the license and (when needed) the
  * credit line to copy, plus set, name, size and tags. Rendered on the server for the icon page
@@ -14,6 +17,8 @@ export function IconInfo({
   attribution: Attribution | null;
 }) {
   const { setInfo } = icon;
+  const isBrand =
+    setInfo.type === 'logos' || icon.categories.some((c) => BRAND_CATEGORIES.has(c.slug));
   const tags = [
     ...icon.categories.map((c) => ({ label: c.label, href: `/categories/${c.slug}` })),
     ...icon.synonyms.map((s) => ({ label: s, href: `/search?q=${encodeURIComponent(s)}` })),
@@ -49,7 +54,7 @@ export function IconInfo({
             </p>
           </>
         )}
-        {setInfo.type === 'logos' && (
+        {isBrand && (
           <p class="mt-2 text-text-muted">
             <strong>Trademark notice:</strong> the license covers this drawing, not the brand.
           </p>

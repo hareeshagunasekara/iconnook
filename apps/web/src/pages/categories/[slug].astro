@@ -7,10 +7,14 @@ import { api, type Category, type SearchResult } from '../../lib/api';
 
 /** 5 rows of the 9-column grid. */
 const PER_PAGE = 45;
+/** 3 rows of animated icons above the full list (e.g. the spinners in "Loading & spinners"). */
+const ANIMATED_PREVIEW = 27;
 /** The API serves at most 100 pages of results. */
 const MAX_PAGES = 100;
 const slug = Astro.params.slug ?? '';
 if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) return Astro.rewrite('/404');
+// ?type=animated lists only the animated icons; any other value is ignored.
+const animatedOnly = Astro.url.searchParams.get('type') === 'animated';
 const page = Math.min(
   MAX_PAGES,
   Math.max(1, Number.parseInt(Astro.url.searchParams.get('page') ?? '1', 10) || 1),
@@ -18,14 +22,29 @@ const page = Math.min(
 
 let category: Category | undefined;
 let result: SearchResult | null = null;
+let animated: SearchResult | null = null;
 let failed = false;
 try {
-  const [categories, found] = await Promise.all([
+  const [categories, found, moving] = await Promise.all([
     api<Category[]>('/v1/categories'),
-    api<SearchResult>('/v1/search', { category: slug, page, limit: PER_PAGE }),
+    api<SearchResult>('/v1/search', {
+      category: slug,
+      ...(animatedOnly && { type: 'animated' }),
+      page,
+      limit: PER_PAGE,
+    }),
+    !animatedOnly && page === 1
+      ? api<SearchResult>('/v1/search', {
+          category: slug,
+          type: 'animated',
+          limit: ANIMATED_PREVIEW,
+        })
+      : null,
   ]);
   category = categories?.find((c) => c.slug === slug);
   result = found;
+  // Only worth a section of its own when the category isn't all animated.
+  if (moving && result && moving.total > 0 && moving.total < result.total) animated = moving;
 } catch {
   failed = true;
   Astro.response.status = 503;
@@ -33,10 +52,12 @@ try {
 if (!failed && !category) return Astro.rewrite('/404');
 const pages = result ? Math.min(MAX_PAGES, Math.ceil(Math.min(result.total, 5_000) / PER_PAGE)) : 0;
 const fmt = new Intl.NumberFormat('en');
+const base = `/categories/${slug}`;
+const pageHref = (p: number) => `${base}?${animatedOnly ? 'type=animated&' : ''}page=${String(p)}`;
 ---
 
 <Layout
-  title={category ? `${category.label} icons` : 'Category'}
+  title={category ? `${animatedOnly ? 'Animated ' : ''}${category.label} icons` : 'Category'}
   description={
     category
       ? `${fmt.format(category.total)} free ${category.label} icons in SVG and PNG.`
@@ -50,17 +71,50 @@ const fmt = new Intl.NumberFormat('en');
         <a class="link" href="/categories">
           Categories
         </a>{' '}
-        › <span aria-current="page">{category.label}</span>
+        ›{' '}
+        {animatedOnly ? (
+          <>
+            <a class="link" href={base}>
+              {category.label}
+            </a>{' '}
+            › <span aria-current="page">Animated</span>
+          </>
+        ) : (
+          <span aria-current="page">{category.label}</span>
+        )}
       </nav>
-      <h1 class="mt-2 text-3xl font-bold">{category.label} icons</h1>
-      <p class="mt-1 text-[var(--color-text-muted)]">{fmt.format(category.total)} icons</p>
-      <div class="mt-6">
-        <IconGrid icons={result.items} name={`${category.label} icons`} />
-        <Pagination
-          page={page}
-          pages={pages}
-          href={(p) => `/categories/${slug}?page=${String(p)}`}
+      <h1 class="mt-2 text-3xl font-bold">
+        {animatedOnly
+          ? `Animated ${category.label.toLowerCase()} icons`
+          : `${category.label} icons`}
+      </h1>
+      <p class="mt-1 text-[var(--color-text-muted)]">
+        {fmt.format(animatedOnly ? result.total : category.total)} icons
+      </p>
+      {animated && (
+        <section aria-labelledby="animated-heading" class="mt-6">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h2 id="animated-heading" class="text-xl font-bold">
+              Animated
+            </h2>
+            {animated.total > animated.items.length && (
+              <a class="link text-sm" href={`${base}?type=animated`}>
+                See all {fmt.format(animated.total)} animated
+              </a>
+            )}
+          </div>
+          <div class="mt-3">
+            <IconGrid icons={animated.items} name={`Animated ${category.label} icons`} />
+          </div>
+        </section>
+      )}
+      {animated && <h2 class="mt-8 text-xl font-bold">All {category.label.toLowerCase()} icons</h2>}
+      <div class={animated ? 'mt-3' : 'mt-6'}>
+        <IconGrid
+          icons={result.items}
+          name={`${animatedOnly ? 'Animated ' : ''}${category.label} icons`}
         />
+        <Pagination page={page} pages={pages} href={pageHref} />
       </div>
     </>
   )}
