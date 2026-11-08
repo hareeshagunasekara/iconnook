@@ -26,6 +26,7 @@ export const fakeSet = (overrides: Partial<SetSummary> = {}): SetSummary => ({
   version: '1.0.0',
   author: { name: 'Paweł Kuna', url: 'https://github.com/tabler' },
   preview: { name: 'arrow-left', body: '<path d="M5 12h14"/>', width: 24, height: 24 },
+  samples: ['arrow-left'],
   license: {
     spdx: 'MIT',
     tier: 'A',

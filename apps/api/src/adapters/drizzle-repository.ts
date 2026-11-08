@@ -38,9 +38,15 @@ const iconStem = (name: string) =>
     .filter((part) => !STYLE_WORD.test(part))
     .join('-');
 
-function toSetSummary(row: SetRow, preview: SetPreview | null): SetSummary {
+interface SetSamples {
+  preview: SetPreview | null;
+  samples: string[];
+}
+
+function toSetSummary(row: SetRow, { preview, samples }: SetSamples): SetSummary {
   return {
     preview,
+    samples,
     prefix: row.prefix,
     name: row.name,
     type: row.type,
@@ -70,13 +76,16 @@ interface PreviewRow extends Record<string, unknown> {
  * Preview icon per set: the first of the set's sample icons that exists and is visible, in the
  * order the set's authors listed them. One query for any number of sets (uses the set_id+name index).
  */
+const NO_SAMPLES: SetSamples = { preview: null, samples: [] };
+
+/** The authors' sample icons that exist, in their order: the first as the preview, up to 4 names. */
 async function loadPreviews(
   db: Database,
   setIds: readonly number[],
-): Promise<Map<number, SetPreview>> {
+): Promise<Map<number, SetSamples>> {
   if (setIds.length === 0) return new Map();
   const rows = await db.execute<PreviewRow>(sql`
-    SELECT DISTINCT ON (s.id) s.id AS set_id, i.name, i.body, i.width, i.height
+    SELECT s.id AS set_id, i.name, i.body, i.width, i.height
     FROM icon_sets s
     JOIN icons i ON i.set_id = s.id AND i.name = ANY (s.sample_icons) AND NOT i.hidden
     WHERE s.id IN (${sql.join(
@@ -84,9 +93,16 @@ async function loadPreviews(
       sql`, `,
     )})
     ORDER BY s.id, array_position(s.sample_icons, i.name)`);
-  return new Map(
-    rows.map((r) => [r.set_id, { name: r.name, body: r.body, width: r.width, height: r.height }]),
-  );
+  const bySet = new Map<number, SetSamples>();
+  for (const r of rows) {
+    const entry = bySet.get(r.set_id) ?? {
+      preview: { name: r.name, body: r.body, width: r.width, height: r.height },
+      samples: [],
+    };
+    if (entry.samples.length < 4) entry.samples.push(r.name);
+    bySet.set(r.set_id, entry);
+  }
+  return bySet;
 }
 
 const iconColumns = {
@@ -128,7 +144,7 @@ export class DrizzleIconRepository implements IconRepository {
       ...row.icon,
       setInfo: toSetSummary(
         row.setRow,
-        (await loadPreviews(this.db, [row.setRow.id])).get(row.setRow.id) ?? null,
+        (await loadPreviews(this.db, [row.setRow.id])).get(row.setRow.id) ?? NO_SAMPLES,
       ),
       synonyms: synonyms.map((s) => s.label),
       categories: cats,
@@ -164,13 +180,13 @@ export class DrizzleIconRepository implements IconRepository {
       this.db,
       rows.map((r) => r.id),
     );
-    return rows.map((r) => toSetSummary(r, previews.get(r.id) ?? null));
+    return rows.map((r) => toSetSummary(r, previews.get(r.id) ?? NO_SAMPLES));
   }
 
   async getSet(prefix: string): Promise<SetSummary | null> {
     const [row] = await this.db.select().from(iconSets).where(eq(iconSets.prefix, prefix));
     if (!row) return null;
-    return toSetSummary(row, (await loadPreviews(this.db, [row.id])).get(row.id) ?? null);
+    return toSetSummary(row, (await loadPreviews(this.db, [row.id])).get(row.id) ?? NO_SAMPLES);
   }
 
   async listSetIcons(

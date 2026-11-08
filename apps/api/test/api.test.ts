@@ -133,12 +133,14 @@ describe('against real Postgres, Meilisearch and Valkey', () => {
     await t.raw`UPDATE icon_sets SET sample_icons = '{}' WHERE prefix = 'iconnook-fixtures'`;
     const before = await contract('/v1/sets/iconnook-fixtures', IconSet);
     expect(before.preview).toBeNull(); // no samples recorded
+    expect(before.samples).toEqual([]);
 
     await t.raw`UPDATE icon_sets SET sample_icons = ARRAY['not-in-set', 'plus', 'circle']
                 WHERE prefix = 'iconnook-fixtures'`;
     const sets = await contract('/v1/sets', IconSet.array());
     expect(sets[0]?.preview).toMatchObject({ name: 'plus', width: 24, height: 24 });
     expect(sets[0]?.preview?.body).toContain('<path');
+    expect(sets[0]?.samples).toEqual(['plus', 'circle']); // existing samples, in order
     const icon = await contract('/v1/icons/iconnook-fixtures/circle', IconDetail);
     expect(icon.setInfo.preview?.name).toBe('plus');
   });
