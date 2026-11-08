@@ -145,6 +145,9 @@ export const IconSet = z
       .openapi({
         description: "A real icon from the set (first of the authors' samples), sanitized SVG body",
       }),
+    samples: z
+      .array(z.string())
+      .openapi({ description: "Up to four of the authors' sample icon names" }),
   })
   .openapi('IconSet');
 

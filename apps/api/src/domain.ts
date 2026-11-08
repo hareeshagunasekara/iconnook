@@ -23,6 +23,8 @@ export interface SetSummary {
   license: LicenseInfo;
   /** A real icon from the set (the first of its authors' sample icons) for cards; null if none. */
   preview: SetPreview | null;
+  /** Up to four of the authors' sample icons (names), for cards that show a few at once. */
+  samples: string[];
 }
 
 export interface SetPreview {
