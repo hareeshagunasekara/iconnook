@@ -281,7 +281,7 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 | `emojione` | Emoji One (Colored) | 1,834 | CC-BY-4.0 | B | ● | [Ranks.com and the Emojitwo contributors](https://github.com/EmojiTwo/emojitwo) |
 | `emojione-monotone` | Emoji One (Monotone) | 1,403 | CC-BY-4.0 | B |  | [Ranks.com and the Emojitwo contributors](https://github.com/EmojiTwo/emojitwo) |
 | `streamline-emojis` | Streamline Emojis | 787 | CC-BY-4.0 | B | ● | [Streamline](https://www.streamlinehq.com) |
-| `openmoji` | OpenMoji | 4,545 | CC-BY-SA-4.0 | C | ● | [OpenMoji](https://github.com/hfg-gmuend/openmoji) |
+| `openmoji` | OpenMoji | 4,545 | CC-BY-SA-4.0 | C | ● | [OpenMoji](https://openmoji.org/) |
 | `emojione-v1` | Emoji One (v1) | 1,262 | CC-BY-SA-4.0 | C | ● | [Emoji One](https://github.com/joypixels/emojione-legacy) |
 
 ## Maps & location: 8 sets, 4,900 icons
@@ -356,9 +356,12 @@ Logos & Brands: the SVG license covers the drawing, not the trademark. Show a tr
 
 ## Reviewed and imported beyond Tier A
 
-Imported by default after a one-by-one review (license checked at the source on 2026-11-07, credit
-wording checked; see `packages/importer/src/approved.ts`). Every icon page shows a copy-ready credit,
-every downloaded SVG carries the credit in a comment, and ZIP packs include a LICENSES file.
+Imported by default after a one-by-one review (license checked at the source on 2026-11-07 for
+CC BY and 2026-11-08 for CC BY-SA, credit wording checked; see `packages/importer/src/approved.ts`).
+Every icon page shows a copy-ready credit, every downloaded SVG carries the credit in a comment, and
+ZIP packs include a LICENSES file. For CC BY-SA sets, each of these also says that modified versions
+must use the same license. Brand logos inside these sets are filed under "Brands" and carry a
+trademark notice.
 
 | Set | License | Credited as |
 |---|---|---|
@@ -367,6 +370,14 @@ every downloaded SVG carries the credit in a comment, and ZIP packs include a LI
 | `twemoji` Twemoji | CC BY 4.0 (graphics) | Twitter, Inc. and other contributors |
 | `emojione`, `emojione-monotone` Emoji One 2.x | CC BY 4.0 | Ranks.com and the Emojitwo contributors, in the set "Emoji One" (as Emojitwo asks) |
 | `amcharts-weather` amCharts Animated Weather | CC BY 4.0 | amCharts |
+| `openmoji` OpenMoji | CC BY-SA 4.0 | OpenMoji, linking openmoji.org (as their README asks) |
+| `emojione-v1` Emoji One 1.x | CC BY-SA 4.0 (artwork) | Emoji One |
+| `typcn` Typicons | CC BY-SA 4.0 (artwork; the font is OFL) | Stephen Hutchings |
+| `entypo`, `entypo-social` Entypo+ | CC BY-SA 4.0 | Daniel Bruce |
+| `brandico` Brandico | CC BY-SA 3.0 (the README says "CC BY" but links BY-SA; we follow BY-SA) | Fontello |
+
+Not imported: `arcticons` (CC BY-SA, but 15,000 drawings of other companies' app logos would bury
+ordinary results), and `fontelico` and `si-glyph` (hidden as deprecated in Iconify).
 
 
 ## Never imported on purpose
