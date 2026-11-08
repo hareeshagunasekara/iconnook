@@ -64,17 +64,6 @@ ${Object.entries(BLOCKED_SETS)
 
 `;
 
-const BLOCKED = `## Never imported on purpose
-
-These sets have permissive licenses but break our sources policy, so the importer skips them
-(\`BLOCKED_SETS\` in \`packages/importer/src/approved.ts\`):
-
-${Object.entries(BLOCKED_SETS)
-  .map(([prefix, why]) => `- \`${prefix}\`: ${why}`)
-  .join('\n')}
-
-`;
-
 const EXTRA_SOURCES = `## Sources outside Iconify
 
 | Source | Type | License | Status |

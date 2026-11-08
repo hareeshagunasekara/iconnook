@@ -391,17 +391,6 @@ These sets have permissive licenses but break our sources policy, so the importe
 - `wpf`: Icons8 Windows 8 Icons, by Icons8
 
 
-## Never imported on purpose
-
-These sets have permissive licenses but break our sources policy, so the importer skips them
-(`BLOCKED_SETS` in `packages/importer/src/approved.ts`):
-
-- `la`: Line Awesome, by Icons8
-- `flat-color-icons`: Flat Color Icons, by Icons8
-- `icons8`: Icons8 Windows 10 Icons, by Icons8
-- `wpf`: Icons8 Windows 8 Icons, by Icons8
-
-
 ## Sources outside Iconify
 
 | Source | Type | License | Status |
