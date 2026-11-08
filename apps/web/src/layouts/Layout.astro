@@ -1,7 +1,5 @@
 ---
-import '@fontsource-variable/bricolage-grotesque/wght.css';
-import '@fontsource-variable/dm-sans/wght.css';
-import headingFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
+import headingFont from '../assets/fonts/bricolage-core.woff2?url';
 import { PUBLIC_API_URL } from 'astro:env/client';
 
 import '../styles/global.css';
@@ -18,9 +16,18 @@ interface Props {
   index?: boolean;
   /** Prefill the header search box. */
   query?: string;
+  /** Load the icon dialog (pages with icon tiles). The home page skips it to load faster. */
+  iconModal?: boolean;
 }
 
-const { title, description, image = '/og.png', index = true, query = '' } = Astro.props;
+const {
+  title,
+  description,
+  image = '/og.png',
+  index = true,
+  query = '',
+  iconModal = true,
+} = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const fullTitle =
   title === 'IconNook' ? 'IconNook: free, open-source SVG icons' : `${title} · IconNook`;
@@ -64,7 +71,7 @@ const ogImage = new URL(image, Astro.site);
       <slot />
     </main>
     <Footer />
-    <IconModal client:idle apiUrl={PUBLIC_API_URL} />
+    {iconModal && <IconModal client:idle apiUrl={PUBLIC_API_URL} />}
     <!-- Screen-reader announcements ("Copied", result counts) -->
     <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <script>

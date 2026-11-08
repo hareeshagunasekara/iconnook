@@ -16,6 +16,9 @@ export default defineConfig({
   integrations: [preact()],
   vite: {
     plugins: [tailwindcss()],
+    // Never inline images or fonts as base64: small logo files repeated in every page's HTML cost
+    // more than a cached request.
+    build: { assetsInlineLimit: 0 },
     envDir: '../..',
   },
   env: {
