@@ -39,7 +39,8 @@ export function creditComment(icon: IconDetail): string {
   const url = setInfo.license.url ? ` (${setInfo.license.url})` : '';
   const text =
     `"${icon.name}" from ${setInfo.name}${by}. License: ${setInfo.license.spdx}${url}. ` +
-    'Optimized by IconNook (iconnook.com); modified from the original.';
+    'Optimized by IconNook (iconnook.com); modified from the original.' +
+    (setInfo.license.tier === 'C' ? ' Modified versions must use the same license.' : '');
   // "--" can't appear inside an XML comment.
   return `<!-- ${text.replace(/-{2,}/g, '-')} -->\n`;
 }

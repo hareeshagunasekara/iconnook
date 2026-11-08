@@ -347,6 +347,16 @@ describe('JSON endpoints', () => {
     expect(comment).toContain('License: CC-BY-4.0 (https://creativecommons.org/licenses/by/4.0/)');
     expect(comment).toContain('modified from the original');
     expect(comment).not.toContain('--'); // would end the XML comment early
+    expect(comment).not.toContain('same license');
+  });
+
+  it('adds the share-alike notice to SVG files from CC BY-SA sets', async () => {
+    const set = fakeSet({
+      license: { spdx: 'CC-BY-SA-4.0', tier: 'C', url: null, attributionRequired: true },
+    });
+    const { app } = setup({}, fakeDeps([fakeIcon({ setInfo: set })]));
+    const svg = await (await app.request('/v1/icons/tabler/arrow-left.svg')).text();
+    expect(svg).toMatch(/^<!-- .*Modified versions must use the same license\. -->\n<svg /);
   });
 
   it('keeps Markdown links intact for URLs containing parentheses', async () => {
