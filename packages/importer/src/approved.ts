@@ -36,3 +36,15 @@ export const CREDITS: Readonly<Record<string, { authorName: string; authorUrl: s
     authorUrl: 'https://github.com/EmojiTwo/emojitwo',
   },
 };
+
+/**
+ * Sets we never import even though their license allows it, with the reason. The importer skips
+ * them and deletes them from the database if an earlier import stored them.
+ */
+export const BLOCKED_SETS: Readonly<Record<string, string>> = {
+  // Our sources policy (CLAUDE.md): never import from Icons8, whatever the set's license says.
+  la: 'Line Awesome, by Icons8',
+  'flat-color-icons': 'Flat Color Icons, by Icons8',
+  icons8: 'Icons8 Windows 10 Icons, by Icons8',
+  wpf: 'Icons8 Windows 8 Icons, by Icons8',
+};

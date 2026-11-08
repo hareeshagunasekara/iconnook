@@ -145,6 +145,9 @@ export const IconSet = z
       .openapi({
         description: "A real icon from the set (first of the authors' samples), sanitized SVG body",
       }),
+    samples: z
+      .array(z.string())
+      .openapi({ description: "Up to four of the authors' sample icon names" }),
   })
   .openapi('IconSet');
 
@@ -190,7 +193,12 @@ export const SetIconsPage = z
   .openapi('SetIconsPage');
 
 export const Category = z
-  .object({ slug: z.string(), label: z.string(), total: z.number().int() })
+  .object({
+    slug: z.string(),
+    label: z.string(),
+    total: z.number().int(),
+    preview: z.array(z.object({ set: z.string(), name: z.string() })),
+  })
   .openapi('Category');
 
 export const CodeResult = z

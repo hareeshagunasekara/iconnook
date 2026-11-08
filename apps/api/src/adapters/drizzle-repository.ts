@@ -28,9 +28,25 @@ type SetRow = typeof iconSets.$inferSelect;
 
 const visible = eq(icons.hidden, false);
 
-function toSetSummary(row: SetRow, preview: SetPreview | null): SetSummary {
+/** Style words that only make variants of one icon ("cat-outline", "cat-24-filled"). */
+const STYLE_WORD =
+  /^(outline|outlined|filled|fill|solid|bold|thin|light|regular|duotone|duo|sharp|rounded|round|twotone|line|linear|broken|alt|\d+)$/;
+/** An icon name without its style words: "cat-outline" and "cat-24-filled" are both "cat". */
+const iconStem = (name: string) =>
+  name
+    .split('-')
+    .filter((part) => !STYLE_WORD.test(part))
+    .join('-');
+
+interface SetSamples {
+  preview: SetPreview | null;
+  samples: string[];
+}
+
+function toSetSummary(row: SetRow, { preview, samples }: SetSamples): SetSummary {
   return {
     preview,
+    samples,
     prefix: row.prefix,
     name: row.name,
     type: row.type,
@@ -60,13 +76,16 @@ interface PreviewRow extends Record<string, unknown> {
  * Preview icon per set: the first of the set's sample icons that exists and is visible, in the
  * order the set's authors listed them. One query for any number of sets (uses the set_id+name index).
  */
+const NO_SAMPLES: SetSamples = { preview: null, samples: [] };
+
+/** The authors' sample icons that exist, in their order: the first as the preview, up to 4 names. */
 async function loadPreviews(
   db: Database,
   setIds: readonly number[],
-): Promise<Map<number, SetPreview>> {
+): Promise<Map<number, SetSamples>> {
   if (setIds.length === 0) return new Map();
   const rows = await db.execute<PreviewRow>(sql`
-    SELECT DISTINCT ON (s.id) s.id AS set_id, i.name, i.body, i.width, i.height
+    SELECT s.id AS set_id, i.name, i.body, i.width, i.height
     FROM icon_sets s
     JOIN icons i ON i.set_id = s.id AND i.name = ANY (s.sample_icons) AND NOT i.hidden
     WHERE s.id IN (${sql.join(
@@ -74,9 +93,16 @@ async function loadPreviews(
       sql`, `,
     )})
     ORDER BY s.id, array_position(s.sample_icons, i.name)`);
-  return new Map(
-    rows.map((r) => [r.set_id, { name: r.name, body: r.body, width: r.width, height: r.height }]),
-  );
+  const bySet = new Map<number, SetSamples>();
+  for (const r of rows) {
+    const entry = bySet.get(r.set_id) ?? {
+      preview: { name: r.name, body: r.body, width: r.width, height: r.height },
+      samples: [],
+    };
+    if (entry.samples.length < 4) entry.samples.push(r.name);
+    bySet.set(r.set_id, entry);
+  }
+  return bySet;
 }
 
 const iconColumns = {
@@ -118,7 +144,7 @@ export class DrizzleIconRepository implements IconRepository {
       ...row.icon,
       setInfo: toSetSummary(
         row.setRow,
-        (await loadPreviews(this.db, [row.setRow.id])).get(row.setRow.id) ?? null,
+        (await loadPreviews(this.db, [row.setRow.id])).get(row.setRow.id) ?? NO_SAMPLES,
       ),
       synonyms: synonyms.map((s) => s.label),
       categories: cats,
@@ -154,13 +180,13 @@ export class DrizzleIconRepository implements IconRepository {
       this.db,
       rows.map((r) => r.id),
     );
-    return rows.map((r) => toSetSummary(r, previews.get(r.id) ?? null));
+    return rows.map((r) => toSetSummary(r, previews.get(r.id) ?? NO_SAMPLES));
   }
 
   async getSet(prefix: string): Promise<SetSummary | null> {
     const [row] = await this.db.select().from(iconSets).where(eq(iconSets.prefix, prefix));
     if (!row) return null;
-    return toSetSummary(row, (await loadPreviews(this.db, [row.id])).get(row.id) ?? null);
+    return toSetSummary(row, (await loadPreviews(this.db, [row.id])).get(row.id) ?? NO_SAMPLES);
   }
 
   async listSetIcons(
@@ -182,13 +208,45 @@ export class DrizzleIconRepository implements IconRepository {
   }
 
   async listCategories(): Promise<CategorySummary[]> {
-    return this.db
-      .select({ slug: categories.slug, label: categories.label, total: count(icons.id) })
-      .from(categories)
-      .innerJoin(iconCategories, eq(iconCategories.categoryId, categories.id))
-      .innerJoin(icons, and(eq(icons.id, iconCategories.iconId), visible))
-      .groupBy(categories.id)
-      .orderBy(asc(categories.label));
+    const [rows, candidates] = await Promise.all([
+      this.db
+        .select({ slug: categories.slug, label: categories.label, total: count(icons.id) })
+        .from(categories)
+        .innerJoin(iconCategories, eq(iconCategories.categoryId, categories.id))
+        .innerJoin(icons, and(eq(icons.id, iconCategories.iconId), visible))
+        .groupBy(categories.id)
+        .orderBy(asc(categories.label)),
+      // Up to 16 candidates per category: colorful sets first (they read best when tiny), taking
+      // one icon from each set in turn (a stable shuffle within each set) so no single set fills
+      // every card. Archived sets are left out.
+      this.db.execute<{ slug: string; prefix: string; name: string }>(sql`
+        SELECT c.slug, p.prefix, p.name
+        FROM categories c
+        CROSS JOIN LATERAL (
+          SELECT prefix, name
+          FROM (
+            SELECT s.prefix, i.name, s.is_color,
+              row_number() OVER (
+                PARTITION BY s.id ORDER BY md5(s.prefix || ':' || i.name)
+              ) AS turn
+            FROM icon_categories ic
+            JOIN icons i ON i.id = ic.icon_id AND NOT i.hidden
+            JOIN icon_sets s ON s.id = i.set_id AND s.type <> 'archive'
+            WHERE ic.category_id = c.id
+          ) ranked
+          ORDER BY is_color DESC, turn, md5(prefix)
+          LIMIT 16
+        ) p`),
+    ]);
+    const previews = new Map<string, { set: string; name: string }[]>();
+    for (const row of candidates) {
+      const picked = previews.get(row.slug) ?? [];
+      // Four different things, not four variants of one icon ("cat", "cat-outline", …).
+      if (picked.length < 4 && !picked.some((p) => iconStem(p.name) === iconStem(row.name)))
+        picked.push({ set: row.prefix, name: row.name });
+      previews.set(row.slug, picked);
+    }
+    return rows.map((row) => ({ ...row, preview: previews.get(row.slug) ?? [] }));
   }
 
   async getIconsByRefs(refs: readonly string[]): Promise<IconListItem[]> {

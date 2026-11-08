@@ -26,6 +26,7 @@ export const fakeSet = (overrides: Partial<SetSummary> = {}): SetSummary => ({
   version: '1.0.0',
   author: { name: 'Paweł Kuna', url: 'https://github.com/tabler' },
   preview: { name: 'arrow-left', body: '<path d="M5 12h14"/>', width: 24, height: 24 },
+  samples: ['arrow-left'],
   license: {
     spdx: 'MIT',
     tier: 'A',
@@ -100,7 +101,15 @@ export function fakeDeps(
         nextCursor: all.length > page.limit ? (items.at(-1)?.name ?? null) : null,
       });
     },
-    listCategories: () => Promise.resolve([{ slug: 'arrows', label: 'Arrows', total: 1 }]),
+    listCategories: () =>
+      Promise.resolve([
+        {
+          slug: 'arrows',
+          label: 'Arrows',
+          total: 1,
+          preview: [{ set: 'tabler', name: 'arrow-left' }],
+        },
+      ]),
     collections: new Map(),
     getIconsByRefs: (refs) =>
       Promise.resolve(

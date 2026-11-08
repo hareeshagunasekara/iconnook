@@ -23,6 +23,8 @@ export interface SetSummary {
   license: LicenseInfo;
   /** A real icon from the set (the first of its authors' sample icons) for cards; null if none. */
   preview: SetPreview | null;
+  /** Up to four of the authors' sample icons (names), for cards that show a few at once. */
+  samples: string[];
 }
 
 export interface SetPreview {
@@ -59,6 +61,8 @@ export interface CategorySummary {
   slug: string;
   label: string;
   total: number;
+  /** A few icons that show what the category is about (colorful and varied when possible). */
+  preview: { set: string; name: string }[];
 }
 
 export interface Page<T> {

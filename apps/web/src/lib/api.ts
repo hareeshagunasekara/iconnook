@@ -23,6 +23,8 @@ export interface IconSet {
   license: License;
   /** A representative icon chosen by the set's authors (sanitized SVG body). */
   preview: { name: string; body: string; width: number; height: number } | null;
+  /** Up to four of the authors' sample icon names. */
+  samples: string[];
 }
 
 export interface IconSummary {
@@ -57,6 +59,8 @@ export interface Category {
   slug: string;
   label: string;
   total: number;
+  /** A few icons that show what the category is about. */
+  preview: { set: string; name: string }[];
 }
 
 export interface Attribution {

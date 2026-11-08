@@ -1,5 +1,6 @@
 import type { LicenseTier } from '@iconnook/core';
 
+import { BLOCKED_SETS } from './approved.js';
 import type { SetType, SourceSet } from './types.js';
 
 const GROUPS: readonly [SetType, string][] = [
@@ -41,6 +42,17 @@ every downloaded SVG carries the credit in a comment, and ZIP packs include a LI
 
 `;
 
+const BLOCKED = `## Never imported on purpose
+
+These sets have permissive licenses but break our sources policy, so the importer skips them
+(\`BLOCKED_SETS\` in \`packages/importer/src/approved.ts\`):
+
+${Object.entries(BLOCKED_SETS)
+  .map(([prefix, why]) => `- \`${prefix}\`: ${why}`)
+  .join('\n')}
+
+`;
+
 const EXTRA_SOURCES = `## Sources outside Iconify
 
 | Source | Type | License | Status |
@@ -74,7 +86,7 @@ export function renderCatalog(
   meta: { iconifyVersion: string; date: string },
 ): string {
   const totals: Record<LicenseTier, number> = { A: 0, B: 0, C: 0, X: 0 };
-  for (const s of sets) totals[s.licenseTier] += s.total;
+  for (const s of sets) if (!(s.prefix in BLOCKED_SETS)) totals[s.licenseTier] += s.total;
 
   const out: string[] = [
     '# Icon Sources',
@@ -96,7 +108,7 @@ export function renderCatalog(
 
   for (const [type, title] of GROUPS) {
     const rows = sets
-      .filter((s) => s.type === type)
+      .filter((s) => s.type === type && !(s.prefix in BLOCKED_SETS))
       .sort((a, b) => TIER_ORDER[a.licenseTier] - TIER_ORDER[b.licenseTier] || b.total - a.total);
     if (rows.length === 0) continue;
     out.push(
@@ -120,6 +132,6 @@ export function renderCatalog(
     out.push('');
   }
 
-  out.push(REVIEWED, EXTRA_SOURCES);
+  out.push(REVIEWED, BLOCKED, EXTRA_SOURCES);
   return out.join('\n');
 }

@@ -1,5 +1,8 @@
 import { isImportable, type ImportableTier } from '@iconnook/core';
-import type { Database } from '@iconnook/db';
+import { schema, type Database } from '@iconnook/db';
+import { inArray } from 'drizzle-orm';
+
+import { BLOCKED_SETS } from './approved.js';
 
 import { prepareIcons } from './prepare.js';
 import { syncSet, type SyncStats } from './sync.js';
@@ -43,10 +46,20 @@ export function selectSets(sets: readonly SourceSet[], options: ImportOptions): 
   const prefixes = options.prefixes ? new Set(options.prefixes) : null;
   return sets.filter(
     (s) =>
+      !(s.prefix in BLOCKED_SETS) &&
       isImportable(s.licenseTier) &&
       (tiers.has(s.licenseTier) || approved.has(s.prefix)) &&
       (!prefixes || prefixes.has(s.prefix)),
   );
+}
+
+/** Deletes blocked sets an earlier import stored (their icons go with them). Returns their prefixes. */
+export async function removeBlockedSets(db: Database): Promise<string[]> {
+  const removed = await db
+    .delete(schema.iconSets)
+    .where(inArray(schema.iconSets.prefix, Object.keys(BLOCKED_SETS)))
+    .returning({ prefix: schema.iconSets.prefix });
+  return removed.map((r) => r.prefix);
 }
 
 /** Imports the selected sets one by one; each set is its own transaction. */

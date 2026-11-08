@@ -55,7 +55,7 @@ const fmt = new Intl.NumberFormat('en');
       <h1 class="mt-2 text-3xl font-bold">{category.label} icons</h1>
       <p class="mt-1 text-[var(--color-text-muted)]">{fmt.format(category.total)} icons</p>
       <div class="mt-6">
-        <IconGrid icons={result.items} name={`${category.label} icons`} showSet />
+        <IconGrid icons={result.items} name={`${category.label} icons`} />
         <Pagination
           page={page}
           pages={pages}

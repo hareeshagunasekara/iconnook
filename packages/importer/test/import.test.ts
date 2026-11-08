@@ -8,7 +8,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { loadImporterConfig } from '../src/config.js';
 import { fixtureIconifySet, memorySource } from '../src/fixtures.js';
-import { importSets } from '../src/run.js';
+import { importSets, removeBlockedSets } from '../src/run.js';
 import { rebuildSearchIndex, type SearchDocument } from '@iconnook/search';
 import { iconifySource } from '../src/sources/iconify.js';
 import { syncSet } from '../src/sync.js';
@@ -19,6 +19,7 @@ let t: TestDatabase;
 const gpl = fixtureIconifySet({ prefix: 'fixture-gpl' });
 if (gpl.info) gpl.info = { ...gpl.info, license: { title: 'GPL', spdx: 'GPL-3.0-only' } };
 const source = memorySource([fixtureIconifySet(), gpl]);
+const icons8 = fixtureIconifySet({ prefix: 'icons8' });
 
 beforeAll(async () => {
   t = await createTestDatabase();
@@ -82,6 +83,21 @@ describe('importSets', () => {
     expect(await iconCount()).toBe(4);
     const [stored] = await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'fixture-ui'));
     expect(stored?.iconCount).toBe(4);
+  });
+
+  it('deletes blocked sets an earlier import stored, with their icons', async () => {
+    const loaded = await memorySource([icons8]).loadSet('icons8');
+    await syncSet(t.db, loaded, loaded.icons);
+    const [stored] = await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'icons8'));
+    expect(stored).toBeDefined();
+
+    expect(await removeBlockedSets(t.db)).toEqual(['icons8']);
+    expect(await t.db.select().from(iconSets).where(eq(iconSets.prefix, 'icons8'))).toHaveLength(0);
+    const [left] = await t.db
+      .select({ n: count() })
+      .from(icons)
+      .where(eq(icons.setId, stored?.id ?? -1));
+    expect(left?.n).toBe(0);
   });
 
   it('refuses a tier X set even if called directly, and writes nothing', async () => {

@@ -85,6 +85,13 @@ describe('selectSets', () => {
     expect(selectSets(sets, { tiers: ['A', 'B', 'C'] }).map((s) => s.prefix)).toEqual(['a', 'b']);
   });
 
+  it('never selects a blocked set, even when asked for it by name', () => {
+    const blocked = [set('a', 'A'), set('icons8', 'A'), set('la', 'A')];
+    expect(
+      selectSets(blocked, { tiers: ['A'], prefixes: ['icons8', 'la', 'a'] }).map((s) => s.prefix),
+    ).toEqual(['a']);
+  });
+
   it('filters by prefix', () => {
     expect(selectSets(sets, { tiers: ['A', 'B'], prefixes: ['b'] }).map((s) => s.prefix)).toEqual([
       'b',
